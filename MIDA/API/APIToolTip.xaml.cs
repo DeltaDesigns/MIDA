@@ -26,8 +26,14 @@ public partial class APITooltip : UserControl
 
     public async void MakeTooltip(PlugItem item)
     {
-        if (ActiveItem is null)
+        if (ActiveItem == null && InfoBox.Visibility == Visibility.Visible) // idk whats happening here, sometimes loads visible when it shouldnt be
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ClearTooltip();
+            });
             return;
+        }
 
         item.Name = item.Name.ToUpper();
         var itemStrings = item.Item?.GetItemStrings();
@@ -320,7 +326,14 @@ public partial class APITooltip : UserControl
     private void OnRender(object sender, EventArgs e)
     {
         if (ActiveItem == null || InfoBox.Visibility != Visibility.Visible)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ClearTooltip();
+            });
             return;
+        }
+
 
         Point position = Mouse.GetPosition(this);
 

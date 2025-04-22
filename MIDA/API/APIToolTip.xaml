@@ -531,7 +531,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="95*" />
         </Grid.ColumnDefinitions>
 
@@ -564,16 +564,16 @@
             Grid.RowSpan="5"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            d:Background="#F1020202"
-            Background="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}"
-            Visibility="Visible" />
+            Background="#00f586" />
+        <!--  Background="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}"  -->
 
         <!--  Main header  -->
         <Grid
             Grid.Row="1"
             Grid.Column="1"
-            d:Background="#F1020202">
-            <Grid.Style>
+            d:Background="Transparent"
+            Background="Transparent">
+            <!-- <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="Background" Value="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}" />
                     <Style.Triggers>
@@ -582,7 +582,7 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </Grid.Style>
+            </Grid.Style>-->
 
             <!--  Image is outside the canvas without margin for some reason?  -->
             <Canvas
@@ -608,17 +608,17 @@
                     </Style>
                 </StackPanel.Style>
                 <TextBlock
-                    Margin="0,0,15,0"
+                    Margin="0,5,15,5"
                     VerticalAlignment="Center"
                     d:FontFamily="Marathon Shapiro 65"
                     d:Text="ADVANCED OS REBOOT"
-                    FontFamily="{DynamicResource Marathon Shapiro Wide 65}"
-                    FontSize="28"
+                    FontFamily="{DynamicResource KH Teka Bold}"
+                    FontSize="30"
                     Text="{Binding Name}"
                     TextWrapping="WrapWithOverflow">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="{StaticResource ForegroundColour100}" />
+                            <Setter Property="Foreground" Value="{StaticResource BackgroundColour7}" />
                             <Style.Triggers>
 
                                 <MultiDataTrigger>
@@ -732,7 +732,8 @@
         <Grid Grid.Row="3" Grid.Column="1">
             <Grid.Style>
                 <Style TargetType="Grid">
-                    <Setter Property="Background" Value="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.09}" />
+                    <!--<Setter Property="Background" Value="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.09}" /> -->
+                    <Setter Property="Background" Value="#222428" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding PlugStyle}" Value="Reusable">
                             <Setter Property="Background" Value="#D6202020" />

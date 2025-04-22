@@ -136,7 +136,8 @@
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
-                            Tag="NAMED BAGS:View and export entities contained in developer named 'bags', like a collection of prefabs.">
+                            Tag="NAMED BAGS:View and export entities contained in developer named 'bags', like a collection of prefabs."
+                            Visibility="Collapsed">
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"

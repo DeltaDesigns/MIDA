@@ -94,6 +94,7 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
         return Fonts.Count > 0;
     }
 
+    // TODO figure out why Marathon Shapiro flat out refuses to work as a resource
     private void RegisterFonts()
     {
         foreach (var (key, value) in Fonts)
@@ -101,6 +102,8 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
             if (!Application.Current.Resources.Contains($"{key.Family} {key.Subfamily}"))
             {
                 Application.Current.Resources.Add($"{key.Family} {key.Subfamily}", value);
+
+                //Console.WriteLine($"{string.Join(", ", value.FamilyMaps)} | {string.Join(", ", value.FamilyNames)} | ");
             }
         }
 
@@ -110,6 +113,7 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
         //{
         //    Console.WriteLine($"Family: {s.Key.Family} | SubFamilty: {s.Key.Subfamily}");
         //}
+
         /*
         Family: Destiny Keys SubFamilty: Regular
         Family: KH Interference Light SubFamilty: Keys
