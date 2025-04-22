@@ -38,12 +38,9 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
 
     private static void SaveAllFonts()
     {
-        return; // TODO
+        var vals = PackageResourcer.Get().GetAllHashes<S808050B7>();
+        Tag<S808050B7> fontsContainer = FileResourcer.Get().GetSchemaTag<S808050B7>(vals.First());
 
-        //0x80a00000 represents 0100 package
-        //var vals = PackageHandler.GetAllEntriesOfReference(0x100, 0x80803c0f);
-        var vals = PackageResourcer.Get().GetAllHashes<S0F3C8080>();
-        Tag<S0F3C8080> fontsContainer = FileResourcer.Get().GetSchemaTag<S0F3C8080>(vals.First());
         // Check if the font exists in the Fonts/ folder, if not extract it
         if (!Directory.Exists("fonts/"))
         {
@@ -77,11 +74,18 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
             Fonts.TryAdd(fontInfo, font);
 
             // Adds the Destiny Keys fonts as the fallback font for Haas Grot
-            if (fontInfo.Family.Contains("Haas Grot Text"))
+            if (fontInfo.Family.Contains("KH Interference"))
             {
                 FontFamily fontKeys = new FontFamily(otfPath + $"#{fontInfo.Family}, " +
-                    $"{Environment.CurrentDirectory + $"/fonts/destiny_symbols_common.otf#Destiny Keys"}, " +
-                    $"{Environment.CurrentDirectory + $"/fonts/destiny_symbols_pc.otf#Destiny Keys"}");
+                    $"{Environment.CurrentDirectory + $"/fonts/goliath_symbols_pc.otf#Destiny Keys"}");
+
+                Fonts.TryAdd(new FontInfo { Family = $"{fontInfo.Family} {fontInfo.Subfamily}", Subfamily = "Keys" }, fontKeys);
+            }
+
+            if (fontInfo.Family.Contains("PP Fraktion Mono"))
+            {
+                FontFamily fontKeys = new FontFamily(otfPath + $"#{fontInfo.Family}, " +
+                    $"{Environment.CurrentDirectory + $"/fonts/goliath_symbols_pc.otf#Destiny Keys"}");
 
                 Fonts.TryAdd(new FontInfo { Family = $"{fontInfo.Family} {fontInfo.Subfamily}", Subfamily = "Keys" }, fontKeys);
             }
@@ -99,39 +103,40 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
         }
 
         // Debug font list
-        //List<string> fontList = fonts.Select(pair => (pair.Key.Family + " " + pair.Key.Subfamily).Trim()).ToList();
-        //foreach (var s in fontList)
-        //{
-        //    Console.WriteLine(s);
-        //}
+        // List<string> fontList = Fonts.Select(pair => (pair.Key.Family + " " + pair.Key.Subfamily).Trim()).ToList();
+        foreach (var s in Fonts)
+        {
+            Console.WriteLine($"Family: {s.Key.Family} | SubFamilty: {s.Key.Subfamily}");
+        }
         /*
-        Haas Grot Disp 75 Bold
-        Noto Serif KR Medium
-        Destiny Keys Regular
-        Pragmatica Bold
-        Pragmatica Book
-        Pragmatica Medium Oblique
-        Pragmatica Medium
-        Pragmatica Book Oblique
-        Noto Sans TC
-        Noto Sans TC Medium
-        Noto Serif TC Medium
-        Aldine 401 BT
-        Noto Serif JP Medium
-        Noto Sans JP
-        Noto Sans JP Medium
-        Noto Serif SC Medium
-        Noto Sans KR
-        Noto Sans KR Medium
-        Cromwell NF
-        Destiny Symbols
-        Cromwell HPLHS
-        Haas Grot Text 55 Roman
-        Haas Grot Text 56 Italic
-        Haas Grot Text 65 Medium
-        Haas Grot Text 66 Medium Italic
-        Noto Sans SC
-        Noto Sans SC Medium
+        Family: Destiny Keys SubFamilty: Regular
+        Family: KH Interference Light SubFamilty: Keys
+        Family: IvyPresto Headline SubFamilty: Regular
+        Family: KH Teka SubFamilty: Regular
+        Family: KH Teka SubFamilty: Medium
+        Family: KH Teka SubFamilty: Light
+        Family: KH Teka SubFamilty: Bold
+        Family: Pragmatica SubFamilty: Bold
+        Family: Noto Sans SC SubFamilty: Medium
+        Family: Noto Sans SC SubFamilty:
+        Family: Noto Sans JP SubFamilty: Medium
+        Family: Noto Sans JP SubFamilty:
+        Family: Synchro Std SubFamilty:
+        Family: KH Interference SubFamilty: Regular
+        Family: KH Interference SubFamilty: Light
+        Family: Marathon Shapiro SubFamilty: Wide 65
+        Family: Destiny Symbols SubFamilty:
+        Family: Shapiro SubFamilty: 65 Light Heavy Wide
+        Family: PP Fraktion Mono SubFamilty: Semibold
+        Family: PP Fraktion Mono SubFamilty: Medium
+        Family: PP Fraktion Mono SubFamilty: Light
+        Family: PP Fraktion Mono SubFamilty:
+        Family: PP Fraktion Mono SubFamilty: Thin
+        Family: KH Interference Regular SubFamilty: Keys
+        Family: Noto Sans KR SubFamilty: Medium
+        Family: Noto Sans KR SubFamilty:
+        Family: Noto Sans TC SubFamilty: Medium
+        Family: Noto Sans TC SubFamilty:
         */
     }
 

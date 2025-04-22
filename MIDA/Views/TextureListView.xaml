@@ -27,7 +27,7 @@
                         Margin="15,10,15,10"
                         HorizontalAlignment="Left"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="18"
                         Foreground="{StaticResource ForegroundColour100}"
                         Text="{Binding Name}">
@@ -51,7 +51,7 @@
                         Margin="15,5,15,10"
                         HorizontalAlignment="Left"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="16"
                         Foreground="{StaticResource ForegroundColour70}">
                         <Run Text="Textures: " />

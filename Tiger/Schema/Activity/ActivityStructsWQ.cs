@@ -19,7 +19,7 @@ public struct SActivity
 
     [SchemaField(0x40, TigerStrategy.MARATHON_ALPHA)]
     public DynamicArray<S26898080> Unk40;
-    public DynamicArray<S24898080> Unk50;
+    public DynamicArray<S3EAB8080> Unk50;
 
     [SchemaField(0x60, TigerStrategy.MARATHON_ALPHA)]
     public TigerHash Unk60;
@@ -233,8 +233,8 @@ public struct S478F8080
 /// <summary>
 /// Stores static map data for activities
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "3EAB8080", 0x48)]
-public struct S24898080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "3EAB8080", 0x38)]
+public struct S3EAB8080
 {
     public TigerHash LocationName;
     public TigerHash ActivityName;
@@ -243,13 +243,11 @@ public struct S24898080
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA)]
     public ResourcePointer Unk10;  // 0F978080, 53418080
     public DynamicArray<S48898080> Unk18;
-
-    [SchemaField(TigerStrategy.MARATHON_ALPHA)]
-    public DynamicArray<S1D898080> MapReferences;
+    public DynamicArray<S26AB8080> MapReferences;
 }
 
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "26AB8080", 0x10)]
-public struct S1D898080
+public struct S26AB8080
 {
     [SchemaField(Tag64 = true)]
     public Tag<SBubbleParent> MapReference;

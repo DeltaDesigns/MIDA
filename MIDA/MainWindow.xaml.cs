@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -10,21 +9,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using SharpDX;
-using SharpDX.Direct3D;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using Tiger;
 using Tiger.Schema;
 using VersionChecker;
-using Buffer = SharpDX.Direct3D11.Buffer;
-using Color = SharpDX.Color;
-using Device = SharpDX.Direct3D11.Device;
-using ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode;
-using Vector4 = SharpDX.Vector4;
 
 namespace MIDA;
 /// <summary>
@@ -62,8 +51,6 @@ public partial class MainWindow
         else
             SpinnerContainer.Visibility = Visibility.Hidden;
 
-
-        //RenderSpinner();
     }
 
     public MainWindow()
@@ -143,7 +130,7 @@ public partial class MainWindow
         PopupBanner warn = new()
         {
             DarkenBackground = true,
-            Icon = "⚠️",
+            Icon = $"{Char.ConvertFromUtf32(0xEE21)[0]}",
             Title = "ATTENTION",
             Subtitle = "MIDA is NOT a datamining tool!",
             Description = $"MIDA's main purpose is focused towards 3D artists, content preservation and learning how the game works!" +
@@ -566,125 +553,4 @@ public partial class MainWindow
                  new Int32Rect(0, 0, icon.Width, icon.Height),
                  BitmapSizeOptions.FromEmptyOptions());
     }
-
-    [STAThread]
-    private void RenderSpinner()
-    {
-        //var form = new RenderForm("SharpDX - MiniTri Direct3D 11 Sample");
-        var window = Window.GetWindow(this);
-        var form = new System.Windows.Interop.WindowInteropHelper(window);
-
-        // Setup handler on resize form
-        bool userResized = true;
-        this.SizeChanged += (object sender, SizeChangedEventArgs e) => userResized = true;
-
-        // SwapChain description
-        var desc = new SwapChainDescription()
-        {
-            BufferCount = 1,
-            ModeDescription = new ModeDescription((int)Width, (int)Height,
-                                                   new Rational(60, 1), Format.R8G8B8A8_UNorm),
-            IsWindowed = true,
-            OutputHandle = form.Handle,
-            SampleDescription = new SampleDescription(1, 0),
-            SwapEffect = SwapEffect.Discard,
-            Usage = Usage.RenderTargetOutput
-        };
-
-        // Create Device and SwapChain
-        Device device;
-        SwapChain swapChain;
-        Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, desc, out device, out swapChain);
-        var context = device.ImmediateContext;
-
-        // Ignore all windows events
-        var factory = swapChain.GetParent<Factory>();
-        factory.MakeWindowAssociation(form.Handle, WindowAssociationFlags.IgnoreAll);
-
-        // New RenderTargetView from the backbuffer
-        var backBuffer = Texture2D.FromSwapChain<Texture2D>(swapChain, 0);
-        var renderView = new RenderTargetView(device, backBuffer);
-
-        // Compile Vertex and Pixel shaders
-        MemoryStream stream = new MemoryStream(File.ReadAllBytes("shaders/procedural_spinner.vs.cso"));
-        var vertexShaderByteCode = ShaderBytecode.Load(stream);
-        var vertexShader = new VertexShader(device, vertexShaderByteCode);
-        stream.Dispose();
-
-        stream = new MemoryStream(File.ReadAllBytes("shaders/procedural_spinner.ps.cso"));
-        var pixelShaderByteCode = ShaderBytecode.Load(stream);
-        var pixelShader = new PixelShader(device, pixelShaderByteCode);
-        stream.Dispose();
-
-        // Prepare All the stages
-        context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-        context.VertexShader.Set(vertexShader);
-        context.Rasterizer.SetViewport(new Viewport(0, 0, (int)Width, (int)Height, 0.0f, 1.0f));
-        context.PixelShader.Set(pixelShader);
-        context.OutputMerger.SetTargets(renderView);
-
-
-        // Create Constant Buffer
-        var contantBuffer = new Buffer(device, Utilities.SizeOf<Vector4>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-        context.VertexShader.SetConstantBuffer(0, contantBuffer);
-
-        var clock = new Stopwatch();
-        clock.Start();
-
-        // Main loop
-        CompositionTarget.Rendering += ((object sender, EventArgs e) =>
-        {
-            if (swapChain.IsDisposed)
-                return; // Skip frame or delay resize
-
-            Debug.Assert(swapChain != null, "SwapChain is null");
-            Debug.Assert(!swapChain.IsDisposed, "SwapChain is disposed");
-
-            // If Form resized
-            if (userResized)
-            {
-                // Dispose all previous allocated resources
-                Utilities.Dispose(ref backBuffer);
-                Utilities.Dispose(ref renderView);
-
-                // Resize the backbuffer
-                swapChain.ResizeBuffers(desc.BufferCount, (int)ActualWidth, (int)ActualHeight, Format.Unknown, SwapChainFlags.None);
-
-                backBuffer = Texture2D.FromSwapChain<Texture2D>(swapChain, 0);
-                renderView = new RenderTargetView(device, backBuffer);
-
-                // Setup targets and viewport for rendering
-                context.Rasterizer.SetViewport(new Viewport(0, 0, (int)ActualWidth, (int)ActualHeight, 0.0f, 1.0f));
-                context.OutputMerger.SetTargets(renderView);
-
-                userResized = false;
-            }
-
-            context.ClearRenderTargetView(renderView, Color.Black);
-
-            Vector4 invTime = new Vector4(1f / swapChain.Description.ModeDescription.Width, 1f / swapChain.Description.ModeDescription.Height, clock.ElapsedMilliseconds / 1000f, 0);
-
-            context.UpdateSubresource(ref invTime, contantBuffer);
-
-            context.Draw(6, 0);
-            swapChain.Present(0, PresentFlags.None);
-        });
-
-        this.Unloaded += (s, e) =>
-        {
-            vertexShaderByteCode?.Dispose();
-            vertexShader?.Dispose();
-            pixelShaderByteCode?.Dispose();
-            pixelShader?.Dispose();
-            renderView?.Dispose();
-            backBuffer?.Dispose();
-            context?.ClearState();
-            context?.Flush();
-            device?.Dispose();
-            context?.Dispose();
-            swapChain?.Dispose();
-            factory?.Dispose();
-        };
-    }
-
 }

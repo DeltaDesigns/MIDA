@@ -26,7 +26,7 @@
             <TextBlock
                 Margin="0,3,0,3"
                 VerticalAlignment="Center"
-                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                 FontSize="{Binding FontSize}"
                 Text="{Binding Text}"
                 TextWrapping="Wrap" />
@@ -34,7 +34,7 @@
                 Margin="0,0,0,3"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                 FontSize="{Binding LabelFontSize}"
                 Foreground="{StaticResource ForegroundColour50}"
                 Text="{Binding Label}"

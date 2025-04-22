@@ -42,7 +42,7 @@
         <Style.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource ForegroundColour80}" />
-                <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=Haas Grot Text 55 Roman}" />
+                <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=PP Fraktion Mono Medium}" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Margin" Value="15" />
@@ -290,7 +290,7 @@
         <Style.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource ForegroundColour80}" />
-                <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=Haas Grot Text 55 Roman}" />
+                <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=PP Fraktion Mono Medium}" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Margin" Value="10" />
@@ -472,7 +472,7 @@
         <Style.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource ForegroundColour80}" />
-                <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=Haas Grot Text 55 Roman}" />
+                <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=PP Fraktion Mono Medium}" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Margin" Value="10" />
@@ -1116,7 +1116,7 @@
         <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
         <Setter Property="MinWidth" Value="120" />
         <Setter Property="MinHeight" Value="20" />
-        <Setter Property="FontFamily" Value="{DynamicResource Haas Grot Text 55 Roman}" />
+        <Setter Property="FontFamily" Value="{DynamicResource PP Fraktion Mono Medium}" />
         <Setter Property="Foreground" Value="{StaticResource ForegroundColour80}" />
         <Setter Property="Template">
             <Setter.Value>

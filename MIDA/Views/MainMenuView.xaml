@@ -92,7 +92,7 @@
                     <Border Background="#BB181818">
                         <TextBlock
                             d:FontFamily="Haas Grot Text 55 Roman"
-                            FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                            FontFamily="{DynamicResource KH Interference Light}"
                             Text="MAPS AND ACTIVITIES"
                             TextWrapping="WrapWithOverflow" />
                     </Border>
@@ -107,7 +107,7 @@
                             <Grid Style="{StaticResource ColumnHeader}">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="MODELS" />
                             </Grid>
                         </Border>
@@ -124,7 +124,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="API" />
                             </Border>
                         </Button>
@@ -140,7 +140,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="NAMED BAGS" />
                             </Border>
                         </Button>
@@ -155,7 +155,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="DYNAMICS" />
                             </Border>
                         </Button>
@@ -171,7 +171,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="STATICS" />
                             </Border>
                         </Button>
@@ -187,7 +187,7 @@
                             <Grid Style="{StaticResource ColumnHeader}">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="AUDIO" />
                             </Grid>
                         </Border>
@@ -202,7 +202,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="ALL SOUNDS" />
                             </Border>
                         </Button>
@@ -218,7 +218,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="WEAPON AUDIO" />
                             </Border>
                         </Button>
@@ -234,7 +234,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="SOUND BANKS" />
                             </Border>
                         </Button>
@@ -250,7 +250,7 @@
                             <Grid Style="{StaticResource ColumnHeader}">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="OTHER" />
                             </Grid>
                         </Border>
@@ -265,7 +265,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="STRINGS" />
                             </Border>
                         </Button>
@@ -280,7 +280,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="TEXTURES" />
                             </Border>
                         </Button>
@@ -295,7 +295,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="MATERIALS" />
                             </Border>
                         </Button>
@@ -312,7 +312,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource KH Interference Light}"
                                     Text="COLLECTIONS" />
                             </Border>
                         </Button>
@@ -370,7 +370,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 d:FontFamily="Haas Grot Text 55 Roman"
-                FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                FontFamily="{DynamicResource KH Interference Light}"
                 FontSize="16"
                 Foreground="{StaticResource ForegroundColour80}"
                 Text="Game Version: " />
@@ -390,7 +390,7 @@
                     <TextBlock
                         Margin="5"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource KH Interference Light}"
                         FontSize="16"
                         Foreground="{StaticResource ForegroundColour80}"
                         Text="GITHUB" />
@@ -406,7 +406,7 @@
                     <TextBlock
                         Margin="5"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource KH Interference Light}"
                         FontSize="16"
                         Foreground="{StaticResource ForegroundColour80}"
                         Text="ABOUT" />

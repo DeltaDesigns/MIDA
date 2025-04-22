@@ -23,7 +23,7 @@
                     <TextBlock
                         Margin="75,25,75,25"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                         FontSize="32"
                         Text="{Binding Text}" />
                 </Border>

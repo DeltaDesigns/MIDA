@@ -108,7 +108,7 @@ public class DynamicArray<T> : List<T>, ITigerDeserialize
         }
         catch (EndOfStreamException ex)
         {
-            throw new EndOfStreamException($"[{reader.Hash:X2}] Failed to read at position {reader.BaseStream.Position:X}. Stream length: {reader.BaseStream.Length}", ex);
+            throw new EndOfStreamException($"[{reader.Hash:X2}] Failed to read at position {reader.BaseStream.Position:X2}. Stream length: {reader.BaseStream.Length:X2}", ex);
         }
 
     }
@@ -153,7 +153,7 @@ public class DynamicArrayUnloaded<T> : DynamicArray<T>
         }
         catch (EndOfStreamException ex)
         {
-            throw new EndOfStreamException($"[{reader.Hash:X2}] Failed to read at position {reader.BaseStream.Position:X}. Stream length: {reader.BaseStream.Length}", ex);
+            throw new EndOfStreamException($"[{reader.Hash:X2}] Failed to read at position {reader.BaseStream.Position:X2}. Stream length: {reader.BaseStream.Length:X2}", ex);
         }
     }
 

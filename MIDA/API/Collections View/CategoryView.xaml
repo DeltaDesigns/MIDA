@@ -57,7 +57,7 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="1"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                                 FontSize="20"
                                 Foreground="{StaticResource ForegroundColour90}"
                                 IsHitTestVisible="False"
@@ -129,7 +129,7 @@
                     Margin="15"
                     HorizontalAlignment="Left"
                     d:FontFamily="Haas Grot Text 55 Roman"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="20"
                     Foreground="{StaticResource ForegroundColour100}"
                     Text="{Binding ItemCategoryName}">
@@ -343,7 +343,7 @@
                                 Panel.ZIndex="1"
                                 d:FontFamily="Haas Grot Text 55 Roman"
                                 d:Text="PRIMARY"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                 FontSize="32"
                                 Foreground="{StaticResource ForegroundColour50}" />
                         </StackPanel>
@@ -640,7 +640,7 @@
                     VerticalAlignment="Center"
                     Panel.ZIndex="1"
                     d:FontFamily="Haas Grot Text 55 Roman, Destiny Keys"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="20"
                     Foreground="{StaticResource ForegroundColour80}"
                     Text=" Dismiss"

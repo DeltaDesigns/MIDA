@@ -108,8 +108,6 @@ public struct SStaticMeshInstanceMap
 public struct SBubbleParent
 {
     public long FileSize;
-
-    [SchemaField(TigerStrategy.MARATHON_ALPHA)]
     public Tag<SBubbleDefinition> ChildMapReference;
 
     [SchemaField(0x18, TigerStrategy.MARATHON_ALPHA)]
@@ -117,7 +115,7 @@ public struct SBubbleParent
     public int Unk1C;
 
     [SchemaField(0x40, TigerStrategy.MARATHON_ALPHA)]
-    public DynamicArray<SC9968080> Unk40;
+    public DynamicArray<SB2B08080> Unk40;
 
     [SchemaField(TigerStrategy.MARATHON_ALPHA, Tag64 = true)]
     public Tag Unk50;  // some kind of parent thing, very strange weird idk
@@ -128,7 +126,7 @@ public struct SBubbleParent
 /// Basically same table as in the child tag, but in a weird format. Never understood what its for.
 /// </summary>
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B2B08080", 0x10)]
-public struct SC9968080
+public struct SB2B08080
 {
     [SchemaField(Tag64 = true)]
     public Tag Unk00;

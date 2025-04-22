@@ -1,21 +1,20 @@
 ﻿namespace Tiger.Schema.Other;
 
-// C7478080 shadowkeep
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "0F3C8080", 0x18)]
-public struct S0F3C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "808050B7", 0x18)]
+public struct S808050B7
 {
     public long FileSize;
-    public DynamicArray<S113C8080> FontParents;
+    public DynamicArray<SB9508080> FontParents;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "113C8080", 0x04)]
-public struct S113C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B9508080", 0x04)]
+public struct SB9508080
 {
-    public Tag<S123C8080> FontParent;
+    public Tag<S808050BA> FontParent;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "123C8080", 0x20)]
-public struct S123C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "808050BA", 0x20)]
+public struct S808050BA
 {
     public long FileSize;
     public TigerFile FontFile;

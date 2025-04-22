@@ -295,7 +295,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Panel.ZIndex="1"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="19"
                         Foreground="{StaticResource ForegroundColour95}"
                         Style="{StaticResource DropShadowLight}"
@@ -373,7 +373,7 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="1"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                 FontSize="20"
                                 Foreground="{StaticResource ForegroundColour100}"
                                 Text="ENERGY" />
@@ -383,7 +383,7 @@
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="1"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                 FontSize="20"
                                 Foreground="{StaticResource ForegroundColour100}"
                                 Text="Charged" />
@@ -449,7 +449,7 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Panel.ZIndex" Value="1" />
             <Setter Property="FontWeight" Value="Light" />
-            <Setter Property="FontFamily" Value="{DynamicResource Haas Grot Text 55 Roman Keys}" />
+            <Setter Property="FontFamily" Value="{DynamicResource PP Fraktion Mono Medium Keys}" />
             <Setter Property="FontSize" Value="22" />
             <Setter Property="Foreground" Value="{StaticResource ForegroundColour70}" />
             <Setter Property="TextAlignment" Value="Left" />
@@ -623,7 +623,7 @@
                         Panel.ZIndex="1"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         d:Text="ITEM TYPE"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="32"
                         Foreground="{StaticResource ForegroundColour80}"
                         Text="{Binding ItemType}"
@@ -785,7 +785,7 @@
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     Panel.ZIndex="1"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                     FontSize="20"
                                     Foreground="{StaticResource ForegroundColour95}"
                                     Style="{StaticResource DropShadowLight}"
@@ -887,7 +887,7 @@
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     Panel.ZIndex="1"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                     FontSize="20"
                                     Foreground="{StaticResource ForegroundColour95}"
                                     Style="{StaticResource DropShadowLight}"
@@ -1104,7 +1104,7 @@
                     <TextBlock
                         Margin="70,0,35,0"
                         d:Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                         FontSize="22"
                         LineHeight="30px"
                         Text="{Binding ItemLore}"
@@ -1151,7 +1151,7 @@
                     VerticalAlignment="Center"
                     Panel.ZIndex="1"
                     d:FontFamily="Haas Grot Text 55 Roman, Destiny Keys"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="20"
                     Foreground="{StaticResource ForegroundColour80}"
                     Text=" Dismiss"
@@ -1163,7 +1163,7 @@
                     VerticalAlignment="Center"
                     Panel.ZIndex="1"
                     d:FontFamily="Haas Grot Text 55 Roman, Destiny Keys"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="20"
                     Foreground="{StaticResource ForegroundColour80}"
                     Text=" Hide Menu"
@@ -1175,7 +1175,7 @@
                     VerticalAlignment="Center"
                     Panel.ZIndex="1"
                     d:FontFamily="Haas Grot Text 55 Roman, Destiny Keys"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="20"
                     Foreground="{StaticResource ForegroundColour80}"
                     Text=" Show Lore"

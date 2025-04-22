@@ -26,7 +26,7 @@
             <TextBlock
                 Margin="0,3,0,3"
                 VerticalAlignment="Center"
-                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                 FontSize="24"
                 Text="{Binding SettingName}"
                 TextWrapping="Wrap" />
@@ -34,7 +34,7 @@
                 Margin="0,0,0,3"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                 FontSize="18"
                 Foreground="{StaticResource ForegroundColour50}"
                 Text="{Binding SettingLabel}"
@@ -73,7 +73,7 @@
             Style="{DynamicResource D2StyleButton}">
             <TextBlock
                 d:FontFamily="Haas Grot Text 55 Roman"
-                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                 FontSize="24"
                 Text="Change" />
         </Button>

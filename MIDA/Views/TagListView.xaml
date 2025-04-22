@@ -116,6 +116,7 @@
                                 Grid.Row="0"
                                 Grid.Column="0"
                                 HorizontalAlignment="Left"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                 FontSize="{Binding FontSize}"
                                 Foreground="{StaticResource ForegroundColour70}"
                                 Text="{Binding HashString}" />
@@ -124,7 +125,7 @@
                                 Grid.RowSpan="3"
                                 Grid.Column="1"
                                 Grid.ColumnSpan="2"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                 FontSize="{Binding FontSize}"
                                 Text="{Binding Name}"
                                 TextWrapping="WrapWithOverflow" />
@@ -133,7 +134,7 @@
                                 Grid.Column="0"
                                 Grid.ColumnSpan="2"
                                 VerticalAlignment="Bottom"
-                                FontFamily="{DynamicResource Haas Grot Text 56 Italic}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Light}"
                                 FontSize="14"
                                 Foreground="{StaticResource ForegroundColour75}"
                                 Text="{Binding Subname}" />
@@ -142,7 +143,7 @@
                                 Grid.Column="2"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                                 FontSize="14"
                                 Foreground="{StaticResource ForegroundColour75}"
                                 Opacity=".75"

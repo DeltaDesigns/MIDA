@@ -25,7 +25,7 @@
                 Margin="15,10,15,10"
                 d:FontFamily="Haas Grot Text 55 Roman"
                 d:Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                 FontSize="18"
                 Foreground="{StaticResource ForegroundColour80}"
                 Text="{Binding Description}"
@@ -40,7 +40,7 @@
                     Opacity="0.5" />
                 <TextBlock
                     Margin="15,10,15,10"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="18"
                     Foreground="{StaticResource ForegroundColour80}"
                     Text="{Binding Description}"
@@ -118,7 +118,7 @@
                     Margin="10,0,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="18"
                     Foreground="{StaticResource ForegroundColour90}"
                     Text="{Binding Description}"
@@ -164,7 +164,7 @@
                     VerticalAlignment="Top"
                     d:FontFamily="Haas Grot Text 55 Roman"
                     d:Text="✦"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="36"
                     Foreground="{StaticResource ForegroundColour100}"
                     Text="{Binding Name}"
@@ -189,7 +189,7 @@
                     VerticalAlignment="Center"
                     d:FontFamily="Haas Grot Text 55 Roman"
                     d:Text="Causing a lightning strike with this weapon partially reloads the magazine from reserves."
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="18"
                     Foreground="{StaticResource ForegroundColour70}"
                     Text="{Binding Description}"
@@ -239,7 +239,7 @@
                         VerticalAlignment="Top"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         d:Text="✦"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         Foreground="{StaticResource ForegroundColour100}"
                         TextAlignment="Center"
                         TextWrapping="WrapWithOverflow">
@@ -265,7 +265,7 @@
                         Margin="0,0,10,0"
                         VerticalAlignment="Top"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="16"
                         Foreground="{StaticResource ForegroundColour100}"
                         Text="✦"
@@ -290,7 +290,7 @@
                         VerticalAlignment="Center"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         d:Text="Causing a lightning strike with this weapon partially reloads the magazine from reserves."
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="18"
                         Text="{Binding Description}"
                         TextWrapping="WrapWithOverflow">
@@ -317,7 +317,7 @@
             <Grid Background="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}">
                 <TextBlock
                     Margin="15,5,15,5"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="17"
                     Foreground="{StaticResource ForegroundColour90}"
                     Text="{Binding Description}"
@@ -356,7 +356,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="17"
                         Foreground="{StaticResource ForegroundColour90}"
                         Text="{Binding Description}"
@@ -366,7 +366,7 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="17"
                         Foreground="{StaticResource ForegroundColour90}"
                         Text="{Binding Type}"
@@ -409,7 +409,7 @@
                     Margin="0,0,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="17"
                     Foreground="{StaticResource ForegroundColour90}"
                     Text="{Binding Description}"
@@ -419,7 +419,7 @@
                     Margin="0,0,0,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
-                    FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                     FontSize="17"
                     Foreground="{StaticResource ForegroundColour90}"
                     Text="{Binding Type}"
@@ -460,14 +460,14 @@
                     <Grid Margin="0,5,5,5" Background="Transparent">
                         <TextBlock
                             VerticalAlignment="Center"
-                            FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                            FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                             FontSize="18"
                             Foreground="{StaticResource ForegroundColour80}"
                             Text="{Binding Name}"
                             TextWrapping="WrapWithOverflow" />
                         <TextBlock
                             VerticalAlignment="Center"
-                            FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                            FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                             FontSize="18"
                             Foreground="#3396DA"
                             Text="{Binding Type}"
@@ -477,7 +477,7 @@
                     <TextBlock
                         Margin="0,0,0,0"
                         VerticalAlignment="Center"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman Keys}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="18"
                         Foreground="{StaticResource ForegroundColour80}"
                         Text="{Binding Description}"
@@ -591,9 +591,9 @@
                 <TextBlock
                     Margin="0,0,15,0"
                     VerticalAlignment="Center"
-                    d:FontFamily="Haas Grot Text 65 Medium"
+                    d:FontFamily="KH Interference Regular"
                     d:Text="ITEM NAME "
-                    FontFamily="{DynamicResource Haas Grot Text 65 Medium}"
+                    FontFamily="{DynamicResource KH Interference Regular Keys}"
                     FontSize="28"
                     Text="{Binding Name}"
                     TextWrapping="WrapWithOverflow">
@@ -630,9 +630,9 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock
                             VerticalAlignment="Center"
-                            d:FontFamily="Haas Grot Text 55 Roman"
+                            d:FontFamily="KH Interference Light"
                             d:Text="Item Type"
-                            FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                            FontFamily="{DynamicResource KH Interference Light Keys}"
                             FontSize="18"
                             Opacity="0.8"
                             Text="{Binding Type}">
@@ -673,9 +673,9 @@
                     <TextBlock
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
-                        d:FontFamily="Haas Grot Text 55 Roman"
+                        d:FontFamily="KH Interference Light Keys"
                         d:Text="Item Rarity"
-                        FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                         FontSize="18"
                         Foreground="{StaticResource ForegroundColour100}"
                         Opacity="0.5"

@@ -52,7 +52,7 @@
                             <TextBlock
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                                 FontSize="20"
                                 IsHitTestVisible="False"
                                 Text="{Binding Hash}"
@@ -60,7 +60,7 @@
                             <TextBlock
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                                 FontSize="20"
                                 IsHitTestVisible="False"
                                 Text="{Binding Dimensions}"
@@ -68,7 +68,7 @@
                             <TextBlock
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                                 FontSize="20"
                                 IsHitTestVisible="False"
                                 Text="{Binding Format}"
@@ -87,7 +87,7 @@
                                     Margin="5"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                                     FontSize="20"
                                     IsHitTestVisible="False"
                                     Text="3D Texture Slice"
@@ -114,7 +114,7 @@
                                         Margin="10,0,10,0"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
-                                        FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                                         FontSize="20"
                                         IsHitTestVisible="False"
                                         TextAlignment="Center">
@@ -146,7 +146,7 @@
                                 Visibility="Visible">
                                 <TextBlock
                                     VerticalAlignment="Center"
-                                    FontFamily="{DynamicResource Haas Grot Text 55 Roman}"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                                     FontSize="18"
                                     IsHitTestVisible="False"
                                     Text="Export All Slices"
