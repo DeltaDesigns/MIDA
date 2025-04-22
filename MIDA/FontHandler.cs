@@ -99,15 +99,17 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
         foreach (var (key, value) in Fonts)
         {
             if (!Application.Current.Resources.Contains($"{key.Family} {key.Subfamily}"))
+            {
                 Application.Current.Resources.Add($"{key.Family} {key.Subfamily}", value);
+            }
         }
 
         // Debug font list
         // List<string> fontList = Fonts.Select(pair => (pair.Key.Family + " " + pair.Key.Subfamily).Trim()).ToList();
-        foreach (var s in Fonts)
-        {
-            Console.WriteLine($"Family: {s.Key.Family} | SubFamilty: {s.Key.Subfamily}");
-        }
+        //foreach (var s in Fonts)
+        //{
+        //    Console.WriteLine($"Family: {s.Key.Family} | SubFamilty: {s.Key.Subfamily}");
+        //}
         /*
         Family: Destiny Keys SubFamilty: Regular
         Family: KH Interference Light SubFamilty: Keys

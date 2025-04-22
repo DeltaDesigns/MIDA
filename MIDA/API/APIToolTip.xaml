@@ -514,7 +514,7 @@
     <!--  InfoBox  -->
     <Grid
         x:Name="InfoBox"
-        Width="430"
+        Width="450"
         HorizontalAlignment="Left"
         VerticalAlignment="Bottom"
         Panel.ZIndex="50"
@@ -529,6 +529,12 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="95*" />
+        </Grid.ColumnDefinitions>
+
         <Grid.RenderTransform>
             <TranslateTransform X="0" Y="0" />
         </Grid.RenderTransform>
@@ -536,6 +542,7 @@
         <!--  Thin top bar  -->
         <Rectangle
             Grid.Row="0"
+            Grid.Column="1"
             Height="5"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Top"
@@ -552,8 +559,20 @@
             </Rectangle.Style>
         </Rectangle>
 
+        <Grid
+            Grid.Row="0"
+            Grid.RowSpan="5"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            d:Background="#F1020202"
+            Background="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}"
+            Visibility="Visible" />
+
         <!--  Main header  -->
-        <Grid Grid.Row="1" d:Background="#F1020202">
+        <Grid
+            Grid.Row="1"
+            Grid.Column="1"
+            d:Background="#F1020202">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="Background" Value="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}" />
@@ -580,7 +599,7 @@
             <StackPanel Background="Transparent" Orientation="Vertical">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
-                        <Setter Property="Margin" Value="15,10,15,10" />
+                        <Setter Property="Margin" Value="0,10,15,10" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding PlugStyle}" Value="Reusable">
                                 <Setter Property="Margin" Value="15,10,15,10" />
@@ -591,9 +610,9 @@
                 <TextBlock
                     Margin="0,0,15,0"
                     VerticalAlignment="Center"
-                    d:FontFamily="KH Interference Regular"
-                    d:Text="ITEM NAME "
-                    FontFamily="{DynamicResource KH Interference Regular Keys}"
+                    d:FontFamily="Marathon Shapiro 65"
+                    d:Text="ADVANCED OS REBOOT"
+                    FontFamily="{DynamicResource Marathon Shapiro Wide 65}"
                     FontSize="28"
                     Text="{Binding Name}"
                     TextWrapping="WrapWithOverflow">
@@ -702,12 +721,15 @@
         </Grid>
 
         <!--  Warning box  -->
-        <Grid Grid.Row="2" Background="Transparent">
+        <Grid
+            Grid.Row="2"
+            Grid.Column="1"
+            Background="Transparent">
             <StackPanel x:Name="WarningBoxStackPanel" Orientation="Vertical" />
         </Grid>
 
         <!--  Subheader/Info  -->
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="3" Grid.Column="1">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="Background" Value="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.09}" />

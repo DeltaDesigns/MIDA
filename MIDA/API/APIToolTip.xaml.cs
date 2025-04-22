@@ -389,11 +389,11 @@ public class InfoBoxColorConverter : IValueConverter
         {
             // hacky 'fix'
             if (brightnessFactor == 0.5f)
-                return new SolidColorBrush(Color.FromArgb(235, color.R, color.G, color.B));
+                return new SolidColorBrush(Color.FromArgb(255, color.R, color.G, color.B));
 
             System.Drawing.Color col = System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
             System.Drawing.Color newColor = ColorUtility.GenerateShades(col, 1, brightnessFactor).First();
-            return new SolidColorBrush(Color.FromArgb(235, newColor.R, newColor.G, newColor.B));
+            return new SolidColorBrush(Color.FromArgb(255, newColor.R, newColor.G, newColor.B));
         }
 
         return value;

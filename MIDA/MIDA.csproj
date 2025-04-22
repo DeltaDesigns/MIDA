@@ -12,7 +12,7 @@
 		<IsPackable>false</IsPackable>
 		<Authors />
 		<LangVersion>11</LangVersion>
-		<ApplicationIcon>charm.ico</ApplicationIcon>
+		<ApplicationIcon>MIDA.ico</ApplicationIcon>
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
@@ -127,6 +127,7 @@
         <Link>Shaders\TFXFunctions.hlsl</Link>
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Include="MIDA.ico" />
       <Content Include="Shaders\procedural_spinner.ps.cso">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
