@@ -246,14 +246,11 @@ public struct SB3938080
 }
 
 // /// <summary>
-// /// Boss entity data resource?
+// /// entity data resource?
 // /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "19808080", 0x50)]
-public struct S19808080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "839D8080", 0x50)]
+public struct S839D8080
 {
-    // todo rest of this
-    // [DestinyField(FieldType.ResourcePointer)]
-    // public dynamic? Unk00;
     [SchemaField(0x24)]
     public StringHash EntityName;
 }

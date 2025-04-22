@@ -25,14 +25,14 @@ public class GlobalStrings : Strategy.StrategistSingleton<GlobalStrings>
     {
         AddFromWordlist();
 
-
-        var vals = PackageResourcer.Get().GetAllHashes<S02218080>(); //TODO: Beyond Light
+        var vals = PackageResourcer.Get().GetAllHashes<S808050A1>();
         Parallel.ForEach(vals, val =>
         {
-            var tag = FileResourcer.Get().GetSchemaTag<S02218080>(val);
+            var tag = FileResourcer.Get().GetSchemaTag<S808050A1>(val);
             foreach (var entry in tag.TagData.Unk28)
             {
-                AddStrings(FileResourcer.Get().GetFile<LocalizedStrings>(entry.Unk10.Hash));
+                if (entry.Unk10 is not null && entry.Unk10.Hash.GetReferenceHash() == 0x8080B9B8)
+                    AddStrings(FileResourcer.Get().GetFile<LocalizedStrings>(entry.Unk10.Hash));
             }
         });
     }

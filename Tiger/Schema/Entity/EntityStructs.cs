@@ -928,24 +928,24 @@ public struct S4D7E8080
     public StringHash EntityName;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "0E478080", 0x110)]
-public struct S0E478080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "E05B8080", 0x120)]
+public struct SE05B8080
 {
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B5468080", 0x150)]
-public struct SB5468080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "835B8080", 0x1B0)]
+public struct S835B8080
 {
     [SchemaField(0x80)]
-    public DynamicArray<S96468080> Unk80;
+    public DynamicArray<S625B8080> Unk80;
 
-    [SchemaField(0xC0)]
+    [SchemaField(0xF0)]
     public Vector4 Rotation;
     public Vector4 Translation;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "96468080", 0x80)]
-public struct S96468080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "625B8080", 0x80)]
+public struct S625B8080
 {
     [SchemaField(0x28, Tag64 = true)]
     public Tag<SMapDataTable> DataTable;

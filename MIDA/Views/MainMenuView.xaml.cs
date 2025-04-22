@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -208,7 +209,7 @@ public partial class MainMenuView : UserControl
         PopupBanner about = new()
         {
             DarkenBackground = true,
-            Icon = "",
+            Icon = $"{Char.ConvertFromUtf32(0xEE3F)[0]}",
             //about.IconImage = MainWindow.GetBitmapSource(System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location));
             Title = $"MIDA {App.CurrentVersion.Id}",
             Subtitle = "MIDA is a fork of Charm designed soley for Marathon",

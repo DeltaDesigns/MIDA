@@ -1009,13 +1009,13 @@ public partial class TagListView : UserControl
             var vals = await PackageResourcer.Get().GetAllHashesAsync<SMapDataTable>();
             Parallel.ForEach(vals, val =>
             {
-                if (!val.ContainsHash(0x80808019))
+                if (!val.ContainsHash(0x80809D83))
                     return;
 
                 var entry = FileResourcer.Get().GetSchemaTag<SMapDataTable>(val);
                 foreach (var dataEntry in entry.TagData.DataEntries)
                 {
-                    if (dataEntry.DataResource.GetValue(entry.GetReader()) is S19808080 name)
+                    if (dataEntry.DataResource.GetValue(entry.GetReader()) is S839D8080 name)
                     {
                         if (name.EntityName.IsValid())
                         {
@@ -1034,26 +1034,17 @@ public partial class TagListView : UserControl
             Parallel.ForEach(resources, val =>
             {
                 // don't want to load the resource but need to check it first
-                //var data = PackageResourcer.Get().GetFileData(val);
-
-                //using TigerReader reader = new(data);
-                //reader.Seek(0x10, SeekOrigin.Begin);
-                //var offset = reader.ReadInt32() - 0x8;
-
-                //reader.Seek(offset, SeekOrigin.Current);
-                //var reference = reader.ReadUInt32();
-
-                if (val.ContainsHash(0x8080470E))//if (reference == 0x8080470E)
+                if (val.ContainsHash(0x80805BE0))
                 {
                     var resource = FileResourcer.Get().GetFile<EntityResource>(val);
-                    foreach (var entry in ((SB5468080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk80)
+                    foreach (var entry in ((S835B8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk80)
                     {
                         if (entry.DataTable is null)
                             continue;
 
                         foreach (var dataEntry in entry.DataTable.TagData.DataEntries)
                         {
-                            if (dataEntry.DataResource.GetValue(entry.DataTable.GetReader()) is S19808080 name)
+                            if (dataEntry.DataResource.GetValue(entry.DataTable.GetReader()) is S839D8080 name)
                             {
                                 if (entry.Name.IsValid())
                                 {

@@ -1,15 +1,13 @@
 ﻿
 namespace Tiger.Schema.Strings;
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "EF998080", 0x50)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080B9B8", 0x50)]
 public struct SLocalizedStrings
 {
     public ulong ThisSize;
     public SortedDynamicArray<SStringHash> StringHashes;
-    // [DestinyField(FieldType.FileHash), MarshalAs(UnmanagedType.ByValArray, SizeConst = 13)]
-    // public StringData[] StringData;
-    // [SchemaField(FieldType.FileHash)]  // only working with english rn for speed
-    public LocalizedStringsData EnglishStringsData;    // actually StringData class
+    // only working with english rn for speed
+    public LocalizedStringsData EnglishStringsData;
 }
 
 [SchemaStruct("70008080", 0x4)]
@@ -49,15 +47,15 @@ public struct SStringPartDefinition
     public long PartCount;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "02218080", 0x68)]
-public struct S02218080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "808050A1", 0x68)]
+public struct S808050A1
 {
     [SchemaField(0x28, TigerStrategy.MARATHON_ALPHA)]
-    public DynamicArray<S0E3C8080> Unk28;
+    public DynamicArray<SB6508080> Unk28;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "0E3C8080", 0x28)]
-public struct S0E3C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B6508080", 0x28)]
+public struct SB6508080
 {
     //[SchemaField(Tag64 = true)]
     //public Tag Unk00; // Always FFFFFFFF?
