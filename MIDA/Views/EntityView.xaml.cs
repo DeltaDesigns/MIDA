@@ -157,52 +157,34 @@ public partial class EntityView : UserControl
         Directory.CreateDirectory($"{savePath}/Textures");
         var scene = Tiger.Exporters.Exporter.Get().CreateScene(name, ExportType.API);
 
+        Log.Info($"Exporting entity model name: {name}");
+
         ExportGearShader(item, name, savePath);
 
         // Export the model
         // todo bad, should be replaced
         EntitySkeleton overrideSkeleton = null;
 
-        string skeleHash = item.ItemType == "Ghost Shell" ? "0000603046D31C68" : "0000670F342E9595";
+        string skeleHash = "00008E9C51120FCF";
         Entity skele = FileResourcer.Get().GetFile<Entity>(new FileHash(Hash64Map.Get().GetHash32Checked(skeleHash))); // 64 bit more permanent
         overrideSkeleton = new EntitySkeleton(skele.Skeleton.Hash);
 
         var val = Investment.Get().GetPatternEntityFromHash(item.Parent != null ? item.Parent.TagData.InventoryItemHash : item.Item.TagData.InventoryItemHash);
-        if (val != null && val.Skeleton != null)
-        {
-            overrideSkeleton = val.Skeleton;
-        }
 
         var entities = Investment.Get().GetEntitiesFromHash(item.Item.TagData.InventoryItemHash);
 
-        Log.Info($"Exporting entity model name: {name}");
+        if (val.Skeleton == null && overrideSkeleton != null)
+            val.Skeleton = overrideSkeleton;
 
-        foreach (var entity in entities)
-        {
-            if (entity.Skeleton == null && overrideSkeleton != null)
-                entity.Skeleton = overrideSkeleton;
+        List<BoneNode> boneNodes = overrideSkeleton != null ? overrideSkeleton.GetBoneNodes() : new List<BoneNode>();
+        if (val.Skeleton != null && overrideSkeleton == null)
+            boneNodes = val.Skeleton.GetBoneNodes();
 
-            var dynamicParts = entity.Load(ExportDetailLevel.MostDetailed);
-            List<BoneNode> boneNodes = overrideSkeleton != null ? overrideSkeleton.GetBoneNodes() : new List<BoneNode>();
-            if (entity.Skeleton != null && overrideSkeleton == null)
-            {
-                boneNodes = entity.Skeleton.GetBoneNodes();
-            }
-            scene.AddEntity(entity.Hash, dynamicParts, boneNodes, entity.Gender);
-            entity.SaveMaterialsFromParts(scene, dynamicParts);
-            entity.SaveTexturePlates(savePath);
-        }
+        var dynamicParts = val.Load(ExportDetailLevel.MostDetailed);
+        scene.AddEntity(val.Hash, dynamicParts, boneNodes, DestinyGenderDefinition.None);
+        val.SaveMaterialsFromParts(scene, dynamicParts);
+        //val.SaveTexturePlates(savePath);
 
-        //if (exportType == ExportTypeFlag.Full)
-        //{
-        //    if (config.GetUnrealInteropEnabled())
-        //    {
-        //        AutomatedExporter.SaveInteropUnrealPythonFile(savePath, name, AutomatedExporter.ImportType.Entity, config.GetOutputTextureFormat());
-        //    }
-        //}
-
-        // Scale and rotate
-        // fbxHandler.ScaleAndRotateForBlender(boneNodes[0]);
         if (!aggregateOutput)
             Tiger.Exporters.Exporter.Get().Export();
         else
@@ -212,40 +194,40 @@ public partial class EntityView : UserControl
     }
 
     // I don't like this
-    public static void ExportGearShader(ApiItem item, string itemName, string savePath)
+    public static void ExportGearShader(ApiItem item, string itemName, string savePath) // TODO
     {
-        var config = ConfigSubsystem.Get();
+        //        var config = ConfigSubsystem.Get();
 
-        Log.Info($"Exporting Gear Shader for: {item.ItemName}");
+        //        Log.Info($"Exporting Gear Shader for: {item.ItemName}");
 
-        Dictionary<TigerHash, Dye> dyes = new Dictionary<TigerHash, Dye>();
-        if (item.Item.TagData.Unk90.GetValue(item.Item.GetReader()) is S77738080 translationBlock)
-        {
-            foreach (var dyeEntry in translationBlock.DefaultDyes)
-            {
-                Dye dye = Investment.Get().GetDyeFromIndex(dyeEntry.DyeIndex);
-                dyes.Add(Investment.Get().GetChannelHashFromIndex(dyeEntry.ChannelIndex), dye);
-#if DEBUG
-                System.Console.WriteLine($"{item.ItemName}: DefaultDye {dye.Hash}");
-#endif
-            }
-            foreach (var dyeEntry in translationBlock.LockedDyes)
-            {
-                Dye dye = Investment.Get().GetDyeFromIndex(dyeEntry.DyeIndex);
-                dyes.Add(Investment.Get().GetChannelHashFromIndex(dyeEntry.ChannelIndex), dye);
-#if DEBUG
-                System.Console.WriteLine($"{item.ItemName}: LockedDye {dye.Hash}");
-#endif
-            }
-        }
+        //        Dictionary<TigerHash, Dye> dyes = new Dictionary<TigerHash, Dye>();
+        //        if (item.Item.TagData.Unk90.GetValue(item.Item.GetReader()) is S77738080 translationBlock)
+        //        {
+        //            foreach (var dyeEntry in translationBlock.DefaultDyes)
+        //            {
+        //                Dye dye = Investment.Get().GetDyeFromIndex(dyeEntry.DyeIndex);
+        //                dyes.Add(Investment.Get().GetChannelHashFromIndex(dyeEntry.ChannelIndex), dye);
+        //#if DEBUG
+        //                System.Console.WriteLine($"{item.ItemName}: DefaultDye {dye.Hash}");
+        //#endif
+        //            }
+        //            foreach (var dyeEntry in translationBlock.LockedDyes)
+        //            {
+        //                Dye dye = Investment.Get().GetDyeFromIndex(dyeEntry.DyeIndex);
+        //                dyes.Add(Investment.Get().GetChannelHashFromIndex(dyeEntry.ChannelIndex), dye);
+        //#if DEBUG
+        //                System.Console.WriteLine($"{item.ItemName}: LockedDye {dye.Hash}");
+        //#endif
+        //            }
+        //        }
 
-        AutomatedExporter.SaveBlenderApiFile(savePath, itemName,
-            config.GetOutputTextureFormat(), dyes.Values.ToList());
+        //        AutomatedExporter.SaveBlenderApiFile(savePath, itemName,
+        //            config.GetOutputTextureFormat(), dyes.Values.ToList());
 
-        var iridesceneLookup = Globals.Get().RenderGlobals.TagData.Textures.TagData.IridescenceLookup;
-        TextureExtractor.SaveTextureToFile($"{savePath}/Textures/Iridescence_Lookup", iridesceneLookup.GetScratchImage());
+        //        var iridesceneLookup = Globals.Get().RenderGlobals.TagData.Textures.TagData.IridescenceLookup;
+        //        TextureExtractor.SaveTextureToFile($"{savePath}/Textures/Iridescence_Lookup", iridesceneLookup.GetScratchImage());
 
-        Log.Info($"Exported Gear Shader for: {item.ItemName}");
+        //        Log.Info($"Exported Gear Shader for: {item.ItemName}");
     }
 
     private List<MainViewModel.DisplayPart> MakeEntityDisplayParts(Entity entity, ExportDetailLevel detailLevel)

@@ -520,7 +520,7 @@ public struct S6E358080
     //[SchemaField(0x4E8, TigerStrategy.DESTINY1_RISE_OF_IRON)]
     //[SchemaField(TigerStrategy.DESTINY2_WITCHQUEEN_6307, Obsolete = true)]
     //[SchemaField(0x610, TigerStrategy.DESTINY2_LATEST)] // unsure if actually tag64
-    //public Tag<SA36F8080> FallbackAudioGroup;
+    //public Tag<S8080890B> FallbackAudioGroup;
 }
 
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "9B318080", 0x128)]
@@ -540,7 +540,7 @@ public struct S9B318080
     public Entity? WeaponSkeletonEntity;
 
     [SchemaField(0xD0, TigerStrategy.MARATHON_ALPHA, Tag64 = true)]
-    public Tag<SA36F8080> AudioGroup;
+    public Tag<S8080890B> AudioGroup;
 }
 
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "0D8C8080", 0x18)]
@@ -632,7 +632,7 @@ public struct SFA2C8080
     public Tag UnkD8;
 
     [SchemaField(0xF0, TigerStrategy.MARATHON_ALPHA, Tag64 = true)]
-    public Tag<SA36F8080> AudioEntityParent;
+    public Tag<S8080890B> AudioEntityParent;
 
     [SchemaField(0x120, TigerStrategy.MARATHON_ALPHA)]
     public TigerHash WeaponTypeHash2; // "weaponTypeHash" from API

@@ -21,7 +21,7 @@ public partial class MainMenuView : UserControl
     {
         InitializeComponent();
 
-        ApiButton.IsEnabled = false;
+        ApiButton.IsEnabled = true;
         BagsButton.IsEnabled = false;
         WeaponAudioButton.IsEnabled = false;
         StaticsButton.IsEnabled = true;
@@ -32,7 +32,7 @@ public partial class MainMenuView : UserControl
         {
             Dispatcher.Invoke(() =>
             {
-                ApiButton.IsEnabled = false;
+                ApiButton.IsEnabled = true;
                 BagsButton.IsEnabled = false;
                 WeaponAudioButton.IsEnabled = false;
                 StaticsButton.IsEnabled = true;
@@ -78,7 +78,7 @@ public partial class MainMenuView : UserControl
     {
         await LoadInvestment();
 
-        DareView apiView = new DareView();
+        APIView apiView = new APIView();
         apiView.LoadContent();
         _mainWindow.MakeNewTab("api", apiView);
         _mainWindow.SetNewestTabSelected();

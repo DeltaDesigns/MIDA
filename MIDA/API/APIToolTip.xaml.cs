@@ -9,7 +9,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Tiger;
-using Tiger.Schema.Investment;
 using static MIDA.APIItemView;
 
 namespace MIDA;
@@ -24,7 +23,7 @@ public partial class APITooltip : UserControl
         CompositionTarget.Rendering += OnRender;
     }
 
-    public async void MakeTooltip(PlugItem item)
+    public async void MakeTooltip(PlugItem item) // TODO
     {
         if (ActiveItem == null && InfoBox.Visibility == Visibility.Visible) // idk whats happening here, sometimes loads visible when it shouldnt be
         {
@@ -57,46 +56,46 @@ public partial class APITooltip : UserControl
                 InfoBox.DataContext = item;
             });
 
-            if (itemStrings?.TagData.Unk38.GetValue(itemStrings.GetReader()) is SD8548080 warning)
-            {
-                foreach (var rule in warning.InsertionRules)
-                {
-                    if (rule.FailureMessage.Value is null || rule.FailureMessage.Value.Value == "Requires Mod Item")
-                        continue;
+            //if (itemStrings?.TagData.Unk38.GetValue(itemStrings.GetReader()) is SD8548080 warning)
+            //{
+            //    foreach (var rule in warning.InsertionRules)
+            //    {
+            //        if (rule.FailureMessage.Value is null || rule.FailureMessage.Value.Value == "Requires Mod Item")
+            //            continue;
 
-                    AddToTooltip(new PlugItem
-                    {
-                        Description = rule.FailureMessage.Value,
-                        PlugRarityColor = Color.FromArgb(255, 174, 65, 65)
-                    }, TooltipType.Warning);
-                }
-            }
+            //        AddToTooltip(new PlugItem
+            //        {
+            //            Description = rule.FailureMessage.Value,
+            //            PlugRarityColor = Color.FromArgb(255, 174, 65, 65)
+            //        }, TooltipType.Warning);
+            //    }
+            //}
 
             //if (item.PlugDamageType != DestinyDamageTypeEnum.None)
             //{
             //    AddToTooltip(item, TooltipType.Element);
             //}
 
-            if (itemStrings?.TagData.Unk40.GetValue(itemStrings.GetReader()) is SD7548080 preview)
-            {
-                if (preview.ScreenStyle == DestinyScreenStyle.Emblem)
-                {
-                    AddToTooltip(new PlugItem
-                    {
-                        PlugOrderIndex = 1,
-                        PlugImageSource = ApiImageUtils.MakeFullIcon(itemStrings.TagData.EmblemContainerIndex)
-                    }, TooltipType.Emblem);
-                }
+            //if (itemStrings?.TagData.Unk40.GetValue(itemStrings.GetReader()) is SD7548080 preview)
+            //{
+            //    if (preview.ScreenStyle == DestinyScreenStyle.Emblem)
+            //    {
+            //        AddToTooltip(new PlugItem
+            //        {
+            //            PlugOrderIndex = 1,
+            //            PlugImageSource = ApiImageUtils.MakeFullIcon(itemStrings.TagData.EmblemContainerIndex)
+            //        }, TooltipType.Emblem);
+            //    }
 
-                PlugItem inputItem = new PlugItem
-                {
-                    PlugOrderIndex = 0,
-                    Name = $"", // Key glyph
-                    Type = $"", // 2nd key glyph (mouse left/right)
-                    Description = $"{(preview.PreviewActionString.Value ?? "Details")}"
-                };
-                AddToTooltip(inputItem, TooltipType.Input);
-            }
+            //    PlugItem inputItem = new PlugItem
+            //    {
+            //        PlugOrderIndex = 0,
+            //        Name = $"", // Key glyph
+            //        Type = $"", // 2nd key glyph (mouse left/right)
+            //        Description = $"{(preview.PreviewActionString.Value ?? "Details")}"
+            //    };
+            //    AddToTooltip(inputItem, TooltipType.Input);
+            //}
 
             if (item.Description is not null && item.Description != "")
             {
@@ -106,97 +105,97 @@ public partial class APITooltip : UserControl
 
             if (item.Item is not null)
             {
-                if (item.Item.TagData.Unk38.GetValue(item.Item.GetReader()) is SB0738080 objectives)
-                {
-                    foreach (var objective in objectives.Objectives)
-                    {
-                        var obj = Investment.Get().GetObjective(objective.ObjectiveIndex);
-                        if (obj is null)
-                            continue;
+                //if (item.Item.TagData.Unk38.GetValue(item.Item.GetReader()) is SB0738080 objectives)
+                //{
+                //    foreach (var objective in objectives.Objectives)
+                //    {
+                //        var obj = Investment.Get().GetObjective(objective.ObjectiveIndex);
+                //        if (obj is null)
+                //            continue;
 
-                        PlugItem objItem = new PlugItem
-                        {
-                            PlugOrderIndex = 4,
-                            Description = obj.Value.ProgressDescription.Value,
-                            Type = $"0/{Investment.Get().GetObjectiveValue(objective.ObjectiveIndex)}",
-                            PlugImageSource = obj.Value.IconIndex != -1 ? ApiImageUtils.MakeIcon(obj.Value.IconIndex) : null
-                        };
+                //        PlugItem objItem = new PlugItem
+                //        {
+                //            PlugOrderIndex = 4,
+                //            Description = obj.Value.ProgressDescription.Value,
+                //            Type = $"0/{Investment.Get().GetObjectiveValue(objective.ObjectiveIndex)}",
+                //            PlugImageSource = obj.Value.IconIndex != -1 ? ApiImageUtils.MakeIcon(obj.Value.IconIndex) : null
+                //        };
 
-                        TooltipType tooltipType = TooltipType.ObjectiveInteger;
-                        switch ((DestinyUnlockValueUIStyle)obj.Value.InProgressValueStyle)
-                        {
-                            case DestinyUnlockValueUIStyle.Percentage:
-                                tooltipType = TooltipType.ObjectivePercentage;
-                                break;
-                            case DestinyUnlockValueUIStyle.Integer:
-                                objItem.Type = $"{Investment.Get().GetObjectiveValue(objective.ObjectiveIndex)}";
-                                tooltipType = TooltipType.ObjectiveInteger;
-                                break;
-                        }
+                //        TooltipType tooltipType = TooltipType.ObjectiveInteger;
+                //        switch ((DestinyUnlockValueUIStyle)obj.Value.InProgressValueStyle)
+                //        {
+                //            case DestinyUnlockValueUIStyle.Percentage:
+                //                tooltipType = TooltipType.ObjectivePercentage;
+                //                break;
+                //            case DestinyUnlockValueUIStyle.Integer:
+                //                objItem.Type = $"{Investment.Get().GetObjectiveValue(objective.ObjectiveIndex)}";
+                //                tooltipType = TooltipType.ObjectiveInteger;
+                //                break;
+                //        }
 
-                        //if (item.PlugStyle == DestinySocketCategoryStyle.Reusable)
-                        //    AddToTooltip(null, TooltipType.Separator);
+                //        //if (item.PlugStyle == DestinySocketCategoryStyle.Reusable)
+                //        //    AddToTooltip(null, TooltipType.Separator);
 
-                        AddToTooltip(objItem, tooltipType); // TODO: Other styles
-                    }
-                }
+                //        AddToTooltip(objItem, tooltipType); // TODO: Other styles
+                //    }
+                //}
 
-                if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
-                {
-                    if (item.PlugStyle == DestinySocketCategoryStyle.Reusable)
-                        return;
+                //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
+                //{
+                //    if (item.PlugStyle == DestinySocketCategoryStyle.Reusable)
+                //        return;
 
-                    if (itemStrings is not null && itemStrings.TagData.DisplayStyle == DestinyUIDisplayStyle.EnergyMod)
-                    {
-                        foreach (var stat in stats.InvestmentStats)
-                        {
-                            var statItem = Investment.Get().StatStrings[stat.StatTypeIndex];
-                            if (statItem.StatHash.Hash32 is 3578062600 or 514071887)
-                            {
-                                PlugItem energy = new PlugItem
-                                {
-                                    PlugOrderIndex = -1,
-                                    Hash = statItem.StatHash,
-                                    Name = $"{stat.Value}",
-                                    Description = "ENERGY COST",
-                                    PlugImageSource = ApiImageUtils.MakeIcon(statItem.StatIconIndex, 3, 0)
-                                };
-                                AddToTooltip(energy, TooltipType.Cost);
-                            }
-                        }
-                    }
+                //    if (itemStrings is not null && itemStrings.TagData.DisplayStyle == DestinyUIDisplayStyle.EnergyMod)
+                //    {
+                //        foreach (var stat in stats.InvestmentStats)
+                //        {
+                //            var statItem = Investment.Get().StatStrings[stat.StatTypeIndex];
+                //            if (statItem.StatHash.Hash32 is 3578062600 or 514071887)
+                //            {
+                //                PlugItem energy = new PlugItem
+                //                {
+                //                    PlugOrderIndex = -1,
+                //                    Hash = statItem.StatHash,
+                //                    Name = $"{stat.Value}",
+                //                    Description = "ENERGY COST",
+                //                    PlugImageSource = ApiImageUtils.MakeIcon(statItem.StatIconIndex, 3, 0)
+                //                };
+                //                AddToTooltip(energy, TooltipType.Cost);
+                //            }
+                //        }
+                //    }
 
-                    foreach (var perk in stats.Perks)
-                    {
-                        var perkStrings = Investment.Get().SandboxPerkStrings[perk.PerkIndex];
-                        if (perkStrings.IconIndex == -1)
-                            continue;
+                //    foreach (var perk in stats.Perks)
+                //    {
+                //        var perkStrings = Investment.Get().SandboxPerkStrings[perk.PerkIndex];
+                //        if (perkStrings.IconIndex == -1)
+                //            continue;
 
-                        PlugItem perkItem = new PlugItem
-                        {
-                            PlugOrderIndex = 5,
-                            Hash = perkStrings.SandboxPerkHash,
-                            Description = perkStrings.SandboxPerkDescription.Value,
-                            PlugImageSource = ApiImageUtils.MakeIcon(perkStrings.IconIndex, 0, 1)
-                        };
+                //        PlugItem perkItem = new PlugItem
+                //        {
+                //            PlugOrderIndex = 5,
+                //            Hash = perkStrings.SandboxPerkHash,
+                //            Description = perkStrings.SandboxPerkDescription.Value,
+                //            PlugImageSource = ApiImageUtils.MakeIcon(perkStrings.IconIndex, 0, 1)
+                //        };
 
-                        AddToTooltip(perkItem, TooltipType.Grid);
-                    }
-                }
+                //        AddToTooltip(perkItem, TooltipType.Grid);
+                //    }
+                //}
 
 
-                foreach (var notif in itemStrings.TagData.TooltipNotifications)
-                {
-                    PlugItem notifItem = new PlugItem
-                    {
-                        PlugOrderIndex = 6,
-                        Description = $"{notif.DisplayString.Value}",
-                        PlugImageSource = null,
+                //foreach (var notif in itemStrings.TagData.TooltipNotifications)
+                //{
+                //    PlugItem notifItem = new PlugItem
+                //    {
+                //        PlugOrderIndex = 6,
+                //        Description = $"{notif.DisplayString.Value}",
+                //        PlugImageSource = null,
 
-                        TooltipNotificationStyle = (DestinyUIDisplayStyle)notif.DisplayStyle.Hash32
-                    };
-                    AddToTooltip(notifItem, TooltipType.Notification);
-                }
+                //        TooltipNotificationStyle = (DestinyUIDisplayStyle)notif.DisplayStyle.Hash32
+                //    };
+                //    AddToTooltip(notifItem, TooltipType.Notification);
+                //}
             }
         });
     }

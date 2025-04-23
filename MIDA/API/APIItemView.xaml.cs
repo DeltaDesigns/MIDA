@@ -51,13 +51,12 @@ public partial class APIItemView : UserControl
             Item = item,
             ItemName = name.ToUpper(),
             ItemType = type.ToUpper(),
-            ItemFlavorText = Investment.Get().GetItemStrings(item.TagData.InventoryItemHash).TagData.ItemFlavourText.Value.ToString(),
+            //ItemFlavorText = Investment.Get().GetItemStrings(item.TagData.InventoryItemHash).TagData.ItemFlavourText.Value.ToString(),
             ItemLore = Investment.Get().GetItemLore(item.TagData.InventoryItemHash)?.LoreDescription.Value.ToString(),
             ItemSource = sourceString,
             ImageSource = image.Keys.First(),
             FoundryIconSource = foundryBanner,
             ItemDamageType = (DestinyDamageType.GetDamageType(item.GetItemDamageTypeIndex())).GetEnumDescription(),
-            ItemPowerCap = item.GetItemPowerCap()
         };
         Load();
     }
@@ -76,13 +75,12 @@ public partial class APIItemView : UserControl
             Item = apiItem.Item,
             ItemName = apiItem.ItemName?.ToUpper(),
             ItemType = apiItem.ItemType?.ToUpper(),
-            ItemFlavorText = Investment.Get().GetItemStrings(hash).TagData.ItemFlavourText.Value.ToString(),
+            //ItemFlavorText = Investment.Get().GetItemStrings(hash).TagData.ItemFlavourText.Value.ToString(),
             ItemLore = Investment.Get().GetItemLore(hash)?.LoreDescription.Value.ToString(),
             ItemSource = sourceString,
             ImageSource = apiItem.ImageSource,
             FoundryIconSource = foundryBanner,
             ItemDamageType = (DestinyDamageType.GetDamageType(apiItem.Item.GetItemDamageTypeIndex())).GetEnumDescription(),
-            ItemPowerCap = apiItem.Item.GetItemPowerCap()
         };
         Load();
     }
@@ -129,17 +127,17 @@ public partial class APIItemView : UserControl
         _statItems = new();
         _plugItems = new();
 
-        if (ApiItem.ItemType == "EMBLEM")
-        {
-            var index = ApiItem.Item.GetItemStrings().TagData.EmblemContainerIndex;
-            EmblemItem emblem = new()
-            {
-                EmblemLarge = ApiImageUtils.MakeFullIcon(index, 5),
-                EmblemMedium = ApiImageUtils.MakeFullIcon(index),
-                EmblemSmall = ApiImageUtils.MakeFullIcon(index, 4),
-            };
-            EmblemContainer.DataContext = emblem;
-        }
+        //if (ApiItem.ItemType == "EMBLEM")
+        //{
+        //    var index = ApiItem.Item.GetItemStrings().TagData.EmblemContainerIndex;
+        //    EmblemItem emblem = new()
+        //    {
+        //        EmblemLarge = ApiImageUtils.MakeFullIcon(index, 5),
+        //        EmblemMedium = ApiImageUtils.MakeFullIcon(index),
+        //        EmblemSmall = ApiImageUtils.MakeFullIcon(index, 4),
+        //    };
+        //    EmblemContainer.DataContext = emblem;
+        //}
         if (ApiItem.ItemDamageType == "")
         {
             if (ApiItem.Item.TagData.Unk70.GetValue(ApiItem.Item.GetReader()) is SC0778080 sockets)
@@ -175,44 +173,45 @@ public partial class APIItemView : UserControl
 
     private PlugItem? CreatePlugItem(int plugIndex)
     {
-        if (plugIndex == -1)
-            return null;
+        return null;
+        //if (plugIndex == -1)
+        //    return null;
 
-        var item = Investment.Get().GetInventoryItem(plugIndex);
-        var strings = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(item.TagData.InventoryItemHash));
-        var type = strings.TagData.ItemType.Value.ToString();
-        if (type == "Shader" || type == "Ghost Projection" || type == "Transmat Effect") // Too slow atm, not really important either
-            return null;
+        //var item = Investment.Get().GetInventoryItem(plugIndex);
+        //var strings = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(item.TagData.InventoryItemHash));
+        //var type = strings.TagData.ItemType.Value.ToString();
+        //if (type == "Shader" || type == "Ghost Projection" || type == "Transmat Effect") // Too slow atm, not really important either
+        //    return null;
 
-        var icon = ApiImageUtils.MakeIcon(item);
-        var name = Investment.Get().GetItemName(item).ToUpper();
-        var description = strings.TagData.ItemDisplaySource.Value.ToString();
-        //var socketName = Investment.Get().SocketCategoryStringThings[socketIndex].SocketName.Value.ToString();
-        if (name == "" && type == "" && description == "")
-            return null;
+        //var icon = ApiImageUtils.MakeIcon(item);
+        //var name = Investment.Get().GetItemName(item).ToUpper();
+        //var description = strings.TagData.ItemDisplaySource.Value.ToString();
+        ////var socketName = Investment.Get().SocketCategoryStringThings[socketIndex].SocketName.Value.ToString();
+        //if (name == "" && type == "" && description == "")
+        //    return null;
 
-        TigerHash plugCategoryHash = null;
-        if (item.TagData.Unk48.GetValue(item.GetReader()) is SA1738080 plug)
-            plugCategoryHash = plug.PlugCategoryHash;
+        //TigerHash plugCategoryHash = null;
+        //if (item.TagData.Unk48.GetValue(item.GetReader()) is SA1738080 plug)
+        //    plugCategoryHash = plug.PlugCategoryHash;
 
-        PlugItem PlugItem = new PlugItem
-        {
-            Item = item,
-            Hash = item.TagData.InventoryItemHash,
-            Name = name,
-            Type = type,
-            Description = description,
-            PlugImageSource = icon.Keys.First(),
-            //PlugSocketIndex = socketIndex,
-            PlugCategoryHash = plugCategoryHash,
-            PlugWatermark = ApiImageUtils.GetPlugWatermark(item),
-            PlugRarity = (DestinyTierType)item.TagData.ItemRarity,
-            PlugRarityColor = ((DestinyTierType)item.TagData.ItemRarity).GetColor(),
-            PlugSelected = false,
-            PlugStyle = DestinySocketCategoryStyle.Reusable
-        };
+        //PlugItem PlugItem = new PlugItem
+        //{
+        //    Item = item,
+        //    Hash = item.TagData.InventoryItemHash,
+        //    Name = name,
+        //    Type = type,
+        //    Description = description,
+        //    PlugImageSource = icon.Keys.First(),
+        //    //PlugSocketIndex = socketIndex,
+        //    PlugCategoryHash = plugCategoryHash,
+        //    PlugWatermark = ApiImageUtils.GetPlugWatermark(item),
+        //    PlugRarity = (DestinyTierType)item.TagData.ItemRarity,
+        //    PlugRarityColor = ((DestinyTierType)item.TagData.ItemRarity).GetColor(),
+        //    PlugSelected = false,
+        //    PlugStyle = DestinySocketCategoryStyle.Reusable
+        //};
 
-        return PlugItem;
+        //return PlugItem;
     }
 
     private void CreateSocketCategories()
@@ -402,94 +401,94 @@ public partial class APIItemView : UserControl
 
     private void GetItemStats()
     {
-        if (ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader()) is S81738080 stats)
-        {
-            var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
+        //if (ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader()) is S81738080 stats)
+        //{
+        //    var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
 
-            if (statGroup is not null)
-            {
-                foreach (var scaledStat in statGroup.Value.ScaledStats)
-                {
-                    var statItem = Investment.Get().StatStrings[scaledStat.StatIndex];
+        //    if (statGroup is not null)
+        //    {
+        //        foreach (var scaledStat in statGroup.Value.ScaledStats)
+        //        {
+        //            var statItem = Investment.Get().StatStrings[scaledStat.StatIndex];
 
-                    int statValue = stats.InvestmentStats.Where(x => x.StatTypeIndex == scaledStat.StatIndex).FirstOrDefault().Value;
-                    int displayValue = MakeDisplayValue(scaledStat.StatIndex, statValue);
+        //            int statValue = stats.InvestmentStats.Where(x => x.StatTypeIndex == scaledStat.StatIndex).FirstOrDefault().Value;
+        //            int displayValue = MakeDisplayValue(scaledStat.StatIndex, statValue);
 
-                    var displayStat = new StatItem
-                    {
-                        Hash = statItem.StatHash,
-                        Name = statItem.StatName.Value.ToString(),
-                        Description = statItem.StatDescription.Value.ToString(),
-                        StatDisplayValue = displayValue,
-                        StatValue = statValue,
-                        StatDisplayNumeric = scaledStat.DisplayAsNumeric == 1,
-                        StatIsLinear = scaledStat.IsLinear == 1
-                    };
-                    _statItems.Add(displayStat);
-                    //Console.WriteLine($"{displayStat.Name} ({displayStat.Description}) : {displayStat.StatDisplayValue} ({displayStat.StatValue})");
-                }
-            }
-        }
+        //            var displayStat = new StatItem
+        //            {
+        //                Hash = statItem.StatHash,
+        //                Name = statItem.StatName.Value.ToString(),
+        //                Description = statItem.StatDescription.Value.ToString(),
+        //                StatDisplayValue = displayValue,
+        //                StatValue = statValue,
+        //                StatDisplayNumeric = scaledStat.DisplayAsNumeric == 1,
+        //                StatIsLinear = scaledStat.IsLinear == 1
+        //            };
+        //            _statItems.Add(displayStat);
+        //            //Console.WriteLine($"{displayStat.Name} ({displayStat.Description}) : {displayStat.StatDisplayValue} ({displayStat.StatValue})");
+        //        }
+        //    }
+        //}
 
-        // this is dumbbbbb
-        ItemStatsControl.ItemsSource = _statItems.Where(x => !x.StatDisplayNumeric);
-        ItemNumericStatsControl.ItemsSource = _statItems.Where(x => x.StatDisplayNumeric);
+        //// this is dumbbbbb
+        //ItemStatsControl.ItemsSource = _statItems.Where(x => !x.StatDisplayNumeric);
+        //ItemNumericStatsControl.ItemsSource = _statItems.Where(x => x.StatDisplayNumeric);
 
-        // For some unknown unholy reason, this breaks showing the lore tab if Visibility.Collapsed?????
-        //StatsContainer.Visibility = _statItems.Count != 0 ? Visibility.Visible : Visibility.Collapsed;
-        StatsContainer.Opacity = _statItems.Count != 0 ? 1 : 0;
+        //// For some unknown unholy reason, this breaks showing the lore tab if Visibility.Collapsed?????
+        ////StatsContainer.Visibility = _statItems.Count != 0 ? Visibility.Visible : Visibility.Collapsed;
+        //StatsContainer.Opacity = _statItems.Count != 0 ? 1 : 0;
     }
 
     private int MakeDisplayValue(int statIndex, int statValue)
     {
-        if (ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader()) is S81738080 investmentStats)
-        {
-            var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
-            if (!statGroup.HasValue || statGroup is null)
-                return statValue;
+        //if (ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader()) is S81738080 investmentStats)
+        //{
+        //    var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
+        //    if (!statGroup.HasValue || statGroup is null)
+        //        return statValue;
 
-            var stat = statGroup.Value.ScaledStats.FirstOrDefault(x => x.StatIndex == statIndex);
-            if (statValue < 0 || stat.DisplayInterpolation is null)
-                return statValue;
+        //    var stat = statGroup.Value.ScaledStats.FirstOrDefault(x => x.StatIndex == statIndex);
+        //    if (statValue < 0 || stat.DisplayInterpolation is null)
+        //        return statValue;
 
-            if (stat.DisplayInterpolation.Where(x => x.Value == statValue).Any())
-            {
-                return stat.DisplayInterpolation.First(x => x.Value == statValue).Weight;
-            }
-            else if (stat.IsLinear == 1)
-            {
-                return statValue;
-            }
-            else // value is likely between 2 values in DisplayInterpolation
-            {
-                int? lowerKey = null;
-                int? upperKey = null;
+        //    if (stat.DisplayInterpolation.Where(x => x.Value == statValue).Any())
+        //    {
+        //        return stat.DisplayInterpolation.First(x => x.Value == statValue).Weight;
+        //    }
+        //    else if (stat.IsLinear == 1)
+        //    {
+        //        return statValue;
+        //    }
+        //    else // value is likely between 2 values in DisplayInterpolation
+        //    {
+        //        int? lowerKey = null;
+        //        int? upperKey = null;
 
-                // Get all keys
-                var keys = stat.DisplayInterpolation;
+        //        // Get all keys
+        //        var keys = stat.DisplayInterpolation;
 
-                // Find the keys that are just below and above the targetKey
-                for (int i = 0; i < keys.Count - 1; i++)
-                {
-                    if (keys[i].Value <= statValue && keys[i + 1].Value >= statValue)
-                    {
-                        lowerKey = keys[i].Value;
-                        upperKey = keys[i + 1].Value;
-                        break;
-                    }
-                }
+        //        // Find the keys that are just below and above the targetKey
+        //        for (int i = 0; i < keys.Count - 1; i++)
+        //        {
+        //            if (keys[i].Value <= statValue && keys[i + 1].Value >= statValue)
+        //            {
+        //                lowerKey = keys[i].Value;
+        //                upperKey = keys[i + 1].Value;
+        //                break;
+        //            }
+        //        }
 
-                if (lowerKey != null && upperKey != null)
-                {
-                    var lowerValue = keys.First(x => x.Value == lowerKey).Weight;
-                    var upperValue = keys.First(x => x.Value == upperKey).Weight;
+        //        if (lowerKey != null && upperKey != null)
+        //        {
+        //            var lowerValue = keys.First(x => x.Value == lowerKey).Weight;
+        //            var upperValue = keys.First(x => x.Value == upperKey).Weight;
 
-                    // Interpolate median value between lower and upper values
-                    var interpolatedMedian = Interpolate(lowerKey.Value, lowerValue, upperKey.Value, upperValue, statValue);
-                    return (int)Math.Round(interpolatedMedian);
-                }
-            }
-        }
+        //            // Interpolate median value between lower and upper values
+        //            var interpolatedMedian = Interpolate(lowerKey.Value, lowerValue, upperKey.Value, upperValue, statValue);
+        //            return (int)Math.Round(interpolatedMedian);
+        //        }
+        //    }
+        //}
         return 0;
     }
 
@@ -501,50 +500,50 @@ public partial class APIItemView : UserControl
 
     private void PlugItem_MouseEnter(object sender, MouseEventArgs e)
     {
-        ToolTip.ActiveItem = (sender as Button);
-        PlugItem item = (PlugItem)(sender as Button).DataContext;
+        //ToolTip.ActiveItem = (sender as Button);
+        //PlugItem item = (PlugItem)(sender as Button).DataContext;
 
-        if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
-        {
-            foreach (var stat in stats.InvestmentStats)
-            {
-                var statItem = Investment.Get().StatStrings[stat.StatTypeIndex];
-                var adjustValue = MakeDisplayValue(stat.StatTypeIndex, stat.Value);
+        //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
+        //{
+        //    foreach (var stat in stats.InvestmentStats)
+        //    {
+        //        var statItem = Investment.Get().StatStrings[stat.StatTypeIndex];
+        //        var adjustValue = MakeDisplayValue(stat.StatTypeIndex, stat.Value);
 
-                if (statItem.StatName.Value is not null)
-                {
-                    var _stat = _statItems.FirstOrDefault(x => x.Hash == statItem.StatHash);
-                    if (_stat is null)
-                        continue;
-                    _stat.StatAdjustValue = adjustValue;
-                }
-            }
-        }
+        //        if (statItem.StatName.Value is not null)
+        //        {
+        //            var _stat = _statItems.FirstOrDefault(x => x.Hash == statItem.StatHash);
+        //            if (_stat is null)
+        //                continue;
+        //            _stat.StatAdjustValue = adjustValue;
+        //        }
+        //    }
+        //}
 
-        ToolTip.MakeTooltip(item);
+        //ToolTip.MakeTooltip(item);
     }
 
     private void PlugItem_MouseLeave(object sender, MouseEventArgs e)
     {
-        ToolTip.ClearTooltip();
-        ToolTip.ActiveItem = null;
+        //ToolTip.ClearTooltip();
+        //ToolTip.ActiveItem = null;
 
-        PlugItem item = (PlugItem)(sender as Button).DataContext;
-        if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
-        {
-            foreach (var stat in stats.InvestmentStats)
-            {
-                var statItem = Investment.Get().StatStrings[stat.StatTypeIndex];
+        //PlugItem item = (PlugItem)(sender as Button).DataContext;
+        //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
+        //{
+        //    foreach (var stat in stats.InvestmentStats)
+        //    {
+        //        var statItem = Investment.Get().StatStrings[stat.StatTypeIndex];
 
-                if (statItem.StatName.Value is not null)
-                {
-                    var _stat = _statItems.FirstOrDefault(x => x.Hash == statItem.StatHash);
-                    if (_stat is null)
-                        continue;
-                    _stat.StatAdjustValue = 0;
-                }
-            }
-        }
+        //        if (statItem.StatName.Value is not null)
+        //        {
+        //            var _stat = _statItems.FirstOrDefault(x => x.Hash == statItem.StatHash);
+        //            if (_stat is null)
+        //                continue;
+        //            _stat.StatAdjustValue = 0;
+        //        }
+        //    }
+        //}
     }
 
     private void PlugItem_OnClick(object sender, RoutedEventArgs e)
@@ -978,7 +977,7 @@ public static class ApiImageUtils
         if (container == null)
             return null;
 
-        List<Tag<SCF3E8080>> containers = new()
+        List<Tag<S80805350>> containers = new()
         {
             container.TagData.IconPrimaryContainer,
             container.TagData.IconAdContainer,
@@ -1000,18 +999,18 @@ public static class ApiImageUtils
         return dw.ImageSource;
     }
 
-    private static Texture? GetTexture(Tag<SCF3E8080> iconContainer, int texIndex = 0, int listIndex = 0)
+    private static Texture? GetTexture(Tag<S80805350> iconContainer, int texIndex = 0, int listIndex = 0)
     {
         using TigerReader reader = iconContainer.GetReader();
         dynamic? prim = iconContainer.TagData.Unk10.GetValue(reader);
-        if (prim is SCD3E8080 structCD3E8080)
+        if (prim is S4C538080 structCD3E8080)
         {
             // TextureList[0] is default, others are for colourblind modes
             if (listIndex >= structCD3E8080.Unk00.Count || texIndex >= structCD3E8080.Unk00[reader, listIndex].TextureList.Count)
                 return null;
             return structCD3E8080.Unk00[reader, listIndex].TextureList[reader, texIndex].IconTexture;
         }
-        if (prim is SCB3E8080 structCB3E8080)
+        if (prim is S48538080 structCB3E8080)
         {
             if (listIndex >= structCB3E8080.Unk00.Count || texIndex >= structCB3E8080.Unk00[reader, listIndex].TextureList.Count)
                 return null;

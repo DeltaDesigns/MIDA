@@ -18,12 +18,12 @@ using static MIDA.APIItemView;
 
 namespace MIDA;
 
-public partial class DareView : UserControl
+public partial class APIView : UserControl
 {
     private ConcurrentDictionary<uint, ApiItem> _allItems;
     private ObservableCollection<ApiItem> _selectedItems;
 
-    public DareView()
+    public APIView()
     {
         InitializeComponent();
     }
@@ -88,14 +88,14 @@ public partial class DareView : UserControl
             if (type == null)
                 type = "";
 
-            if (ShouldAddToList(item, type))
+            //if (ShouldAddToList(item, type))
             {
-                CreateOrnamentItems(item); // D1
-                var isOrnament = type.Contains("Ornament");
-                var isWeaponOrnament = type.Contains("Weapon Ornament");
-                var isNameNotEmpty = name != "";
+                //CreateOrnamentItems(item); // D1
+                //var isOrnament = type.Contains("Ornament");
+                //var isWeaponOrnament = type.Contains("Weapon Ornament");
+                //var isNameNotEmpty = name != "";
 
-                if ((!isOrnament && isNameNotEmpty) || (isNameNotEmpty && !isWeaponOrnament))
+                //if ((!isOrnament && isNameNotEmpty) || (isNameNotEmpty && !isWeaponOrnament))
                 {
                     var newItem = new ApiItem
                     {
@@ -122,7 +122,7 @@ public partial class DareView : UserControl
         if (_allItems.TryRemove(apiItem.Item.TagData.InventoryItemHash.Hash32, out _))
         {
             _selectedItems.Add(apiItem);
-
+            Console.WriteLine($"{apiItem.Item.TagData.InventoryItemHash} : {apiItem.Item.Hash}");
             //foreach (var a in Investment.Get().GetEntitiesFromHash(apiItem.Item.TagData.InventoryItemHash))
             //{
             //    if (a is null)
@@ -167,13 +167,14 @@ public partial class DareView : UserControl
             // Parallel.ForEach(_selectedItems, item =>
             {
 
-                if (item.ItemType == "Artifact" && item.Item.TagData.Unk28.GetValue(item.Item.GetReader()) is SC5738080 gearSet)
-                {
-                    if (gearSet.ItemList.Count != 0)
-                        item.Item = Investment.Get().GetInventoryItem(gearSet.ItemList.First().ItemIndex);
-                }
+                //if (item.ItemType == "Artifact" && item.Item.TagData.Unk28.GetValue(item.Item.GetReader()) is SC5738080 gearSet)
+                //{
+                //    if (gearSet.ItemList.Count != 0)
+                //        item.Item = Investment.Get().GetInventoryItem(gearSet.ItemList.First().ItemIndex);
+                //}
 
-                if (item.Item.GetArtArrangementIndex() != -1)
+                //if (item.Item.GetArtArrangementIndex() != -1)
+                if (item.Item.GetWeaponPatternIndex() != -1)
                 {
                     // if has a model
                     EntityView.ExportInventoryItem(item, savePath, aggregateOutput);
@@ -312,10 +313,7 @@ public partial class DareView : UserControl
 
         var a = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(item.TagData.InventoryItemHash));
         var b = a.TagData.ItemType.Value.ToString();
-        return (((b == "Artifact" || b == "Seasonal Artifact")
-            && item.TagData.Unk28.GetValue(a.GetReader()) is SC5738080)
-            || item.GetArtArrangementIndex() != -1
-            ||
+        return (item.GetArtArrangementIndex() != -1 ||
             // Whitelist
             whitelist.Any(x => type.ToLower().Contains(x.ToLower()))) &&
             // Blacklist
@@ -374,7 +372,6 @@ public class ApiItem
 
     public double ImageWidth { get; set; }
     public double ImageHeight { get; set; }
-    public bool IsD1 { get; set; }
     public bool IsPlaceholder { get; set; } = false;
     public int Weight { get; set; } = -1; // For display ordering purposes
 
@@ -393,18 +390,10 @@ public class ApiItem
             UnmanagedMemoryStream? bgOverlayStream = Item.GetIconBackgroundOverlayStream();
             var group = new DrawingGroup();
 
-            if (IsD1)
-            {
-                bgStream = ItemType != "Armor Ornament" ? Item.GetIconBackgroundStream() : Parent.GetTextureFromHash(new FileHash("1935A680"));
-                primaryStream = ItemType != "Armor Ornament" ? Item.GetIconPrimaryStream() : Parent.GetIconPrimaryStream();
-                overlayStream = ItemType != "Armor Ornament" ? Item.GetIconOverlayStream() : Parent.GetIconOverlayStream(); //parent.GetTextureFromHash(new FileHash("E1DBA580"));
-            }
-            else
-            {
-                bgStream = Item.GetIconBackgroundStream();
-                primaryStream = Item.GetIconPrimaryStream();
-                overlayStream = Item.GetIconOverlayStream();
-            }
+            bgStream = Item.GetIconBackgroundStream();
+            primaryStream = Item.GetIconPrimaryStream();
+            overlayStream = Item.GetIconOverlayStream();
+
 
             var primary = primaryStream != null ? ApiImageUtils.MakeBitmapImage(primaryStream, 96, 96) : null;
             var overlay = overlayStream != null ? ApiImageUtils.MakeBitmapImage(overlayStream, 96, 96) : null;
@@ -432,17 +421,7 @@ public class ApiItem
                 return _GridBackground;
             BitmapImage bg = null;
             UnmanagedMemoryStream? bgStream = Item.GetIconBackgroundStream();
-            if (IsD1)
-            {
-                bgStream = ItemType != "Armor Ornament" ? bgStream : Parent.GetTextureFromHash(new FileHash("1935A680"));
-                bg = bgStream != null ? ItemType != "Armor Ornament" ?
-                    ApiImageUtils.MakeBitmapImage(bgStream, 96, 96) :
-                    ApiImageUtils.MakeBitmapImage(bgStream, 256, 128) : null;
-            }
-            else
-            {
-                bg = bgStream != null ? ApiImageUtils.MakeBitmapImage(bgStream, 96, 96) : null;
-            }
+            bg = bgStream != null ? ApiImageUtils.MakeBitmapImage(bgStream, 96, 96) : null;
 
             System.Windows.Media.ImageBrush brush = new System.Windows.Media.ImageBrush(bg);
             brush.Freeze();

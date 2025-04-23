@@ -162,150 +162,150 @@ public partial class CategoryView : UserControl
         UIHelper.AnimateFadeIn(ItemSetList, 0.15f, 1f, 0.1f);
     }
 
-    private void LoadItems(int categoryIndex)
+    private void LoadItems(int categoryIndex) // TODO?
     {
-        Dictionary<int, InventoryItem> inventoryItems = GetInventoryItems(categoryIndex);
+        //Dictionary<int, InventoryItem> inventoryItems = GetInventoryItems(categoryIndex);
 
-        foreach (var item in inventoryItems)
-        {
-            string name = Investment.Get().GetItemName(item.Value);
-            var itemStrings = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(item.Value.TagData.InventoryItemHash)).TagData;
+        //foreach (var item in inventoryItems)
+        //{
+        //    string name = Investment.Get().GetItemName(item.Value);
+        //    var itemStrings = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(item.Value.TagData.InventoryItemHash)).TagData;
 
-            TigerHash plugCategoryHash = null;
-            if (item.Value.TagData.Unk48.GetValue(item.Value.GetReader()) is SA1738080 plug)
-                plugCategoryHash = plug.PlugCategoryHash;
+        //    TigerHash plugCategoryHash = null;
+        //    if (item.Value.TagData.Unk48.GetValue(item.Value.GetReader()) is SA1738080 plug)
+        //        plugCategoryHash = plug.PlugCategoryHash;
 
-            var newItem = new ApiItem
-            {
-                ItemName = name,
-                ItemType = itemStrings.ItemType?.Value,
-                ItemFlavorText = itemStrings.ItemFlavourText?.Value,
-                ItemRarity = (DestinyTierType)item.Value.TagData.ItemRarity,
-                ItemDamageType = DestinyDamageType.GetDamageType(item.Value.GetItemDamageTypeIndex()),
-                ItemHash = item.Value.TagData.InventoryItemHash.Hash32.ToString(),
-                ImageHeight = 96,
-                ImageWidth = 96,
-                Item = item.Value,
-                Weight = item.Key,
-                CollectableIndex = item.Key,
-            };
-            if (newItem.ItemDamageType == DestinyDamageTypeEnum.None)
-            {
-                if (newItem.Item.TagData.Unk70.GetValue(newItem.Item.GetReader()) is SC0778080 sockets)
-                {
-                    sockets.SocketEntries.ForEach(entry =>
-                    {
-                        if (entry.SocketTypeIndex == -1 || entry.SingleInitialItemIndex == -1)
-                            return;
-                        var socket = Investment.Get().GetSocketType(entry.SocketTypeIndex);
-                        foreach (var a in socket.PlugWhitelists)
-                        {
-                            if (a.PlugCategoryHash.Hash32 == 1466776700) // 'v300.weapon.damage_type.energy', Y1 weapon that uses a damage type mod from ye olden days
-                            {
-                                var item = Investment.Get().GetInventoryItem(entry.SingleInitialItemIndex);
-                                item.Load(true); // idk why the item sometimes isnt fully loaded
-                                var index = item.GetItemDamageTypeIndex();
-                                newItem.ItemDamageType = DestinyDamageType.GetDamageType(index);
-                            }
-                        }
-                    });
-                }
-            }
+        //    var newItem = new ApiItem
+        //    {
+        //        ItemName = name,
+        //        ItemType = itemStrings.ItemType?.Value,
+        //        ItemFlavorText = itemStrings.ItemFlavourText?.Value,
+        //        ItemRarity = (DestinyTierType)item.Value.TagData.ItemRarity,
+        //        ItemDamageType = DestinyDamageType.GetDamageType(item.Value.GetItemDamageTypeIndex()),
+        //        ItemHash = item.Value.TagData.InventoryItemHash.Hash32.ToString(),
+        //        ImageHeight = 96,
+        //        ImageWidth = 96,
+        //        Item = item.Value,
+        //        Weight = item.Key,
+        //        CollectableIndex = item.Key,
+        //    };
+        //    if (newItem.ItemDamageType == DestinyDamageTypeEnum.None)
+        //    {
+        //        if (newItem.Item.TagData.Unk70.GetValue(newItem.Item.GetReader()) is SC0778080 sockets)
+        //        {
+        //            sockets.SocketEntries.ForEach(entry =>
+        //            {
+        //                if (entry.SocketTypeIndex == -1 || entry.SingleInitialItemIndex == -1)
+        //                    return;
+        //                var socket = Investment.Get().GetSocketType(entry.SocketTypeIndex);
+        //                foreach (var a in socket.PlugWhitelists)
+        //                {
+        //                    if (a.PlugCategoryHash.Hash32 == 1466776700) // 'v300.weapon.damage_type.energy', Y1 weapon that uses a damage type mod from ye olden days
+        //                    {
+        //                        var item = Investment.Get().GetInventoryItem(entry.SingleInitialItemIndex);
+        //                        item.Load(true); // idk why the item sometimes isnt fully loaded
+        //                        var index = item.GetItemDamageTypeIndex();
+        //                        newItem.ItemDamageType = DestinyDamageType.GetDamageType(index);
+        //                    }
+        //                }
+        //            });
+        //        }
+        //    }
 
-            PlugItem plugItem = new PlugItem
-            {
-                Item = newItem.Item,
-                Hash = newItem.Item.TagData.InventoryItemHash,
-                Name = newItem.ItemName,
-                Type = newItem.ItemType,
-                Description = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(newItem.Item.TagData.InventoryItemHash)).TagData.ItemDisplaySource.Value.ToString(),
+        //    PlugItem plugItem = new PlugItem
+        //    {
+        //        Item = newItem.Item,
+        //        Hash = newItem.Item.TagData.InventoryItemHash,
+        //        Name = newItem.ItemName,
+        //        Type = newItem.ItemType,
+        //        Description = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(newItem.Item.TagData.InventoryItemHash)).TagData.ItemDisplaySource.Value.ToString(),
 
-                PlugCategoryHash = plugCategoryHash,
-                PlugWatermark = ApiImageUtils.GetPlugWatermark(newItem.Item),
-                PlugRarity = (DestinyTierType)newItem.Item.TagData.ItemRarity,
-                PlugRarityColor = ((DestinyTierType)newItem.Item.TagData.ItemRarity).GetColor(),
-                PlugStyle = DestinySocketCategoryStyle.Consumable,
-                PlugDamageType = newItem.ItemDamageType,
-                PlugSelected = false,
-                HasControls = true
-            };
-            newItem.PlugItem = plugItem;
+        //        PlugCategoryHash = plugCategoryHash,
+        //        PlugWatermark = ApiImageUtils.GetPlugWatermark(newItem.Item),
+        //        PlugRarity = (DestinyTierType)newItem.Item.TagData.ItemRarity,
+        //        PlugRarityColor = ((DestinyTierType)newItem.Item.TagData.ItemRarity).GetColor(),
+        //        PlugStyle = DestinySocketCategoryStyle.Consumable,
+        //        PlugDamageType = newItem.ItemDamageType,
+        //        PlugSelected = false,
+        //        HasControls = true
+        //    };
+        //    newItem.PlugItem = plugItem;
 
-            if (!_allItems.Any(x => x.ItemHash == newItem.ItemHash))
-                _allItems.Add(newItem);
-        }
+        //    if (!_allItems.Any(x => x.ItemHash == newItem.ItemHash))
+        //        _allItems.Add(newItem);
+        //}
     }
 
     private void LoadItemSets(int categoryIndex)
     {
-        var node = PresentationNodes.TagData.PresentationNodeDefinitions[categoryIndex];
-        var strings = PresentationNodeStrings.TagData.PresentationNodeDefinitionStrings;
+        //var node = PresentationNodes.TagData.PresentationNodeDefinitions[categoryIndex];
+        //var strings = PresentationNodeStrings.TagData.PresentationNodeDefinitionStrings;
 
-        for (int i = 0; i < node.PresentationNodes.Count; i++)
-        {
-            var CurNode = node.PresentationNodes[i];
-            Dictionary<int, InventoryItem> inventoryItems = GetInventoryItems(CurNode.PresentationNodeIndex);
+        //for (int i = 0; i < node.PresentationNodes.Count; i++)
+        //{
+        //    var CurNode = node.PresentationNodes[i];
+        //    Dictionary<int, InventoryItem> inventoryItems = GetInventoryItems(CurNode.PresentationNodeIndex);
 
-            CollectableSet collectableSet = new()
-            {
-                Items = new(),
-                ItemCategoryIndex = CurNode.PresentationNodeIndex,
-                ItemCategoryName = strings[CurNode.PresentationNodeIndex].Name.Value,
-                Index = i
-            };
+        //    CollectableSet collectableSet = new()
+        //    {
+        //        Items = new(),
+        //        ItemCategoryIndex = CurNode.PresentationNodeIndex,
+        //        ItemCategoryName = strings[CurNode.PresentationNodeIndex].Name.Value,
+        //        Index = i
+        //    };
 
-            foreach (var item in inventoryItems)
-            {
-                string name = Investment.Get().GetItemName(item.Value);
-                var itemStrings = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(item.Value.TagData.InventoryItemHash)).TagData;
+        //    foreach (var item in inventoryItems)
+        //    {
+        //        string name = Investment.Get().GetItemName(item.Value);
+        //        var itemStrings = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(item.Value.TagData.InventoryItemHash)).TagData;
 
-                TigerHash plugCategoryHash = null;
-                if (item.Value.TagData.Unk48.GetValue(item.Value.GetReader()) is SA1738080 plug)
-                    plugCategoryHash = plug.PlugCategoryHash;
+        //        TigerHash plugCategoryHash = null;
+        //        if (item.Value.TagData.Unk48.GetValue(item.Value.GetReader()) is SA1738080 plug)
+        //            plugCategoryHash = plug.PlugCategoryHash;
 
-                var newItem = new ApiItem
-                {
-                    ItemName = name,
-                    ItemType = itemStrings.ItemType?.Value,
-                    ItemFlavorText = itemStrings.ItemFlavourText?.Value,
-                    ItemRarity = (DestinyTierType)item.Value.TagData.ItemRarity,
-                    ItemHash = item.Value.TagData.InventoryItemHash.Hash32.ToString(),
-                    ImageHeight = 96,
-                    ImageWidth = 96,
-                    Item = item.Value,
-                    Weight = item.Key,
-                    CollectableIndex = item.Key,
-                };
-                PlugItem plugItem = new PlugItem
-                {
-                    Item = newItem.Item,
-                    Hash = newItem.Item.TagData.InventoryItemHash,
-                    Name = newItem.ItemName,
-                    Type = newItem.ItemType,
-                    Description = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(newItem.Item.TagData.InventoryItemHash)).TagData.ItemDisplaySource.Value.ToString(),
+        //        var newItem = new ApiItem
+        //        {
+        //            ItemName = name,
+        //            ItemType = itemStrings.ItemType?.Value,
+        //            ItemFlavorText = itemStrings.ItemFlavourText?.Value,
+        //            ItemRarity = (DestinyTierType)item.Value.TagData.ItemRarity,
+        //            ItemHash = item.Value.TagData.InventoryItemHash.Hash32.ToString(),
+        //            ImageHeight = 96,
+        //            ImageWidth = 96,
+        //            Item = item.Value,
+        //            Weight = item.Key,
+        //            CollectableIndex = item.Key,
+        //        };
+        //        PlugItem plugItem = new PlugItem
+        //        {
+        //            Item = newItem.Item,
+        //            Hash = newItem.Item.TagData.InventoryItemHash,
+        //            Name = newItem.ItemName,
+        //            Type = newItem.ItemType,
+        //            Description = Investment.Get().GetItemStrings(Investment.Get().GetItemIndex(newItem.Item.TagData.InventoryItemHash)).TagData.ItemDisplaySource.Value.ToString(),
 
-                    PlugCategoryHash = plugCategoryHash,
-                    PlugWatermark = ApiImageUtils.GetPlugWatermark(newItem.Item),
-                    PlugRarity = (DestinyTierType)newItem.Item.TagData.ItemRarity,
-                    PlugRarityColor = ((DestinyTierType)newItem.Item.TagData.ItemRarity).GetColor(),
-                    PlugStyle = DestinySocketCategoryStyle.Consumable,
-                    PlugDamageType = newItem.ItemDamageType,
-                    PlugSelected = false,
-                    HasControls = true
-                };
-                newItem.PlugItem = plugItem;
+        //            PlugCategoryHash = plugCategoryHash,
+        //            PlugWatermark = ApiImageUtils.GetPlugWatermark(newItem.Item),
+        //            PlugRarity = (DestinyTierType)newItem.Item.TagData.ItemRarity,
+        //            PlugRarityColor = ((DestinyTierType)newItem.Item.TagData.ItemRarity).GetColor(),
+        //            PlugStyle = DestinySocketCategoryStyle.Consumable,
+        //            PlugDamageType = newItem.ItemDamageType,
+        //            PlugSelected = false,
+        //            HasControls = true
+        //        };
+        //        newItem.PlugItem = plugItem;
 
-                collectableSet.Items.Add(newItem);
-            }
+        //        collectableSet.Items.Add(newItem);
+        //    }
 
-            int placeholderCount = 5 - collectableSet.Items.Count;
-            for (int j = 0; j < placeholderCount; j++)
-            {
-                collectableSet.Items.Add(new ApiItem { IsPlaceholder = true });
-            }
+        //    int placeholderCount = 5 - collectableSet.Items.Count;
+        //    for (int j = 0; j < placeholderCount; j++)
+        //    {
+        //        collectableSet.Items.Add(new ApiItem { IsPlaceholder = true });
+        //    }
 
-            _allItemSets.Add(collectableSet);
-        }
+        //    _allItemSets.Add(collectableSet);
+        //}
     }
 
     public Dictionary<int, InventoryItem> GetInventoryItems(int index)
@@ -572,7 +572,7 @@ public partial class CategoryView : UserControl
 
         ToolTip.MakeTooltip(item.PlugItem);
 
-        if (DareView.ShouldAddToList(item.Item, item.ItemType))
+        if (APIView.ShouldAddToList(item.Item, item.ItemType))
         {
             PlugItem inputItem2 = new PlugItem
             {
@@ -625,17 +625,17 @@ public partial class CategoryView : UserControl
         if (e.Key == Key.Return)
         {
             ApiItem item = (ApiItem)(ToolTip.ActiveItem).DataContext;
-            if (!DareView.ShouldAddToList(item.Item, item.ItemType))
+            if (!APIView.ShouldAddToList(item.Item, item.ItemType))
                 return;
 
             MainWindow.Progress.SetProgressStages(new() { $"Exporting {item.ItemName}" });
             await Task.Run(() =>
             {
-                if ((item.ItemType == "Artifact" || item.ItemType == "Seasonal Artifact") && item.Item.TagData.Unk28.GetValue(item.Item.GetReader()) is SC5738080 gearSet)
-                {
-                    if (gearSet.ItemList.Count != 0)
-                        item.Item = Investment.Get().GetInventoryItem(gearSet.ItemList.First().ItemIndex);
-                }
+                //if ((item.ItemType == "Artifact" || item.ItemType == "Seasonal Artifact") && item.Item.TagData.Unk28.GetValue(item.Item.GetReader()) is SC5738080 gearSet)
+                //{
+                //    if (gearSet.ItemList.Count != 0)
+                //        item.Item = Investment.Get().GetInventoryItem(gearSet.ItemList.First().ItemIndex);
+                //}
 
                 if (item.Item.GetArtArrangementIndex() != -1)
                 {

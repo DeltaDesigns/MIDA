@@ -90,7 +90,7 @@
 
       <Page Update="API\DareItemControl.xaml">
         <Generator>MSBuild:Compile</Generator>
-        <DependentUpon>DareView.xaml</DependentUpon>
+        <DependentUpon>APIView.xaml</DependentUpon>
       </Page>
     </ItemGroup>
 

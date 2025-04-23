@@ -786,7 +786,7 @@ public partial class TagListView : UserControl
                 case 0x8080987e:
                     tagType = ETagListType.BudgetSet;
                     break;
-                case 0x80809ad8:
+                case 0x8080BAAD:
                     tagType = ETagListType.Entity;
                     break;
                 default:
@@ -831,7 +831,7 @@ public partial class TagListView : UserControl
             string overrideType = String.Empty;
             switch (reference.Hash32)
             {
-                case 0x80809ad8:
+                case 0x8080BAAD:
                     tagType = ETagListType.Entity;
                     break;
                 default:
@@ -904,7 +904,7 @@ public partial class TagListView : UserControl
     /// <summary>
     /// We load all of them including no names, but add an option to only show names.
     /// Named: destination global tag bags 0x80808930, budget sets 0x80809eed
-    /// All others: reference 0x80809ad8
+    /// All others: reference 0x8080BAAD
     /// They're sorted into packages first.
     /// To check they have a model, I take an approach that means processing 40k entities happens quickly.
     /// To do so, I can't use the tag parser as this is way too slow. Instead, I check
@@ -1738,7 +1738,7 @@ public partial class TagListView : UserControl
             if (item.GetWeaponPatternIndex() == -1)
                 return;
             string name = Investment.Get().GetItemName(item);
-            string type = Investment.Get().InventoryItemStringThings[Investment.Get().GetItemIndex(item.TagData.InventoryItemHash)].TagData.ItemType.Value;
+            string type = Investment.Get().InventoryItemStringContainers[Investment.Get().GetItemIndex(item.TagData.InventoryItemHash)].TagData.ItemType.Value;
             if (type == null)
             {
                 type = "";
@@ -1894,7 +1894,7 @@ public partial class TagListView : UserControl
         //            var reference = tag.Hash.GetReferenceHash();
         //            if (reference == 0x80806fa3 || reference == 0x80803463)
         //            {
-        //                var entityData = FileResourcer.Get().GetSchemaTag<SA36F8080>(tag.Hash).TagData.EntityData;
+        //                var entityData = FileResourcer.Get().GetSchemaTag<S8080890B>(tag.Hash).TagData.EntityData;
         //                var reference2 = entityData.GetReferenceHash();
         //                if (reference2 == 0x80802d09 || reference2 == 0x80803165)
         //                {
@@ -1917,7 +1917,7 @@ public partial class TagListView : UserControl
         //                    throw new NotImplementedException();
         //                }
         //            }
-        //            else if (reference == 0x80809ad8)
+        //            else if (reference == 0x8080BAAD)
         //            {
         //                entities.Add(FileResourcer.Get().GetFile<Entity>(tag.Hash));
         //            }

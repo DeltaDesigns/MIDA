@@ -52,7 +52,7 @@ public struct SMaterialShader
     [SchemaField(0x64, TigerStrategy.MARATHON_ALPHA)]
     public int Unk64;
 
-    [SchemaField(0x84, TigerStrategy.MARATHON_ALPHA)] // unsure
+    [SchemaField(0x68, TigerStrategy.MARATHON_ALPHA)] // unsure
     public int BufferSlot;
     public FileHash Vector4Container;
 
