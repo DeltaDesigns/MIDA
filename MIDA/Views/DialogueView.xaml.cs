@@ -97,7 +97,7 @@ public partial class DialogueView : UserControl
                 MusicPlayer.Pause();
         });
 
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         Wem wem = FileResourcer.Get().GetFile<Wem>(info.Hash);
         string saveDirectory = config.GetExportSavePath() + $"/Sound/Dialogue/{info.Name}/";
         Directory.CreateDirectory(saveDirectory);

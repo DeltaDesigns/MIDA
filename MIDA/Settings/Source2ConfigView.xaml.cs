@@ -9,7 +9,7 @@ public partial class Source2ConfigView : UserControl
     public Source2ConfigView()
     {
         InitializeComponent();
-        _config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        _config = TigerInstance.GetSubsystem<ConfigSubsystem>();
     }
 
     public void OnControlLoaded(object sender, RoutedEventArgs e)

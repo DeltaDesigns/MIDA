@@ -21,7 +21,7 @@ public partial class MapView : UserControl
 
     private static MainWindow _mainWindow = null;
 
-    private static ConfigSubsystem _config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+    private static ConfigSubsystem _config = TigerInstance.GetSubsystem<ConfigSubsystem>();
 
     private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
     {
@@ -129,7 +129,7 @@ public partial class MapView : UserControl
     private bool LoadUI(FbxHandler fbxHandler)
     {
         MainViewModel MVM = (MainViewModel)ModelView.UCModelView.Resources["MVM"];
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         string filePath = $"{config.GetExportSavePath()}/temp.fbx";
         fbxHandler.ExportScene(filePath);
         bool loaded = MVM.LoadEntityFromFbx(filePath);

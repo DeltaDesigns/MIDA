@@ -7,7 +7,7 @@ public class GenerateFileReferenceGraphCommandlet : ICommandlet
     private string bytesStr;
     private byte[] bytes;
 
-    public void Run(MIDAArgs args)
+    public void Run(InstanceArgs args)
     {
         string packageFilter;
         if (!args.GetArgValue("packageFilter", out packageFilter))

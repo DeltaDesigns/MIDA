@@ -40,7 +40,7 @@ public class ConfigFieldAttribute : Attribute
 //
 //     protected internal override bool Initialise()
 //     {
-//         if (MIDAInstance.Args.GetArgValue("config", out string configPath))
+//         if (TigerInstance.Args.GetArgValue("config", out string configPath))
 //         {
 //             _configFilePath = configPath;
 //         }

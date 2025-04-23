@@ -84,7 +84,7 @@ public class Exporter : Subsystem<Exporter>
     {
         bool aggregateOutput = outputDirectory is not null;
         if (outputDirectory is null)
-            outputDirectory = MIDAInstance.GetSubsystem<ConfigSubsystem>().GetExportSavePath();
+            outputDirectory = TigerInstance.GetSubsystem<ConfigSubsystem>().GetExportSavePath();
 
         ExportEvent(new ExportEventArgs(_scenes, outputDirectory, aggregateOutput));
         Reset();

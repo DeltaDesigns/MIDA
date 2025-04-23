@@ -19,7 +19,7 @@ namespace MIDA;
 public partial class ActivityMapEntityView : UserControl
 {
     private FbxHandler _globalFbxHandler = null;
-    private static ConfigSubsystem _config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+    private static ConfigSubsystem _config = TigerInstance.GetSubsystem<ConfigSubsystem>();
 
     private IActivity _currentActivity;
     private DisplayEntBubble _currentBubble;

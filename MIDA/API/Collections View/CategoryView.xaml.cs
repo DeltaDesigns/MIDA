@@ -644,7 +644,7 @@ public partial class CategoryView : UserControl
                 else
                 {
                     // shader
-                    ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+                    ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
                     string savePath = config.GetExportSavePath();
                     string itemName = Helpers.SanitizeString(item.ItemName);
                     savePath += $"/{itemName}";

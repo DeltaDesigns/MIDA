@@ -23,7 +23,7 @@ namespace MIDA;
 public partial class TextureListView : UserControl
 {
     private static MainWindow _mainWindow = null;
-    private ConfigSubsystem Config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+    private ConfigSubsystem Config = TigerInstance.GetSubsystem<ConfigSubsystem>();
     private APITooltip ToolTip;
 
     private ConcurrentBag<PackageItem> PackageItems;

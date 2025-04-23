@@ -153,7 +153,7 @@ public partial class APIView : UserControl
     private void ExecuteQueue_OnClick(object sender, RoutedEventArgs e)
     {
         List<string> apiStages = _selectedItems.Select((_, i) => $"Exporting {_selectedItems[i].ItemName} ({i + 1}/{_selectedItems.Count})").ToList();
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         string savePath = config.GetExportSavePath();
         bool aggregateOutput = (bool)AggregateOutput.IsChecked;
 
@@ -224,7 +224,7 @@ public partial class APIView : UserControl
         MainWindow.Progress.SetProgressStages(apiStages);
         Task.Run(() =>
         {
-            ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+            ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
             string savePath = config.GetExportSavePath();
             savePath += $"/AllShaders";
             Directory.CreateDirectory(savePath);
@@ -247,7 +247,7 @@ public partial class APIView : UserControl
 
     private void OpenOutputFolder_OnClick(object sender, RoutedEventArgs e)
     {
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         Process.Start("explorer.exe", config.GetExportSavePath());
     }
 

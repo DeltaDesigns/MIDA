@@ -11,6 +11,6 @@ public abstract class Subsystem<T> : Subsystem where T : Subsystem
 {
     public static T Get()
     {
-        return MIDAInstance.GetSubsystem<T>();
+        return TigerInstance.GetSubsystem<T>();
     }
 }

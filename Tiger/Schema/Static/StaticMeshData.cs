@@ -128,14 +128,14 @@ namespace Tiger.Schema.Static.MARATHON_ALPHA
                 {
                     switch (detailLevel)
                     {
-                        case ExportDetailLevel.MostDetailed:
-                            Debug.Assert(part.DetailLevel != 0);
-                            Console.WriteLine($"{part.DetailLevel} {part.DetailLevel / 4}");
-                            //if (part.DetailLevel == 1 || part.DetailLevel == 2 || part.DetailLevel == 10)
-                            //{
-                            //    staticPartEntries.Add(i, part);
-                            //}
-                            staticPartEntries.Add(i, part);
+                        case ExportDetailLevel.MostDetailed: // TODO Figure out whats up with LODs
+                            //Debug.Assert(part.DetailLevel != 0);
+                            //Console.WriteLine($"{part.DetailLevel} {part.DetailLevel / 4}");
+                            if (part.DetailLevel == 1 || part.DetailLevel == 2 || part.DetailLevel == 10)
+                            {
+                                staticPartEntries.Add(i, part);
+                            }
+                            //staticPartEntries.Add(i, part);
                             break;
                         case ExportDetailLevel.LeastDetailed:
                             if (part.DetailLevel != 1 && part.DetailLevel != 2 && part.DetailLevel != 10)

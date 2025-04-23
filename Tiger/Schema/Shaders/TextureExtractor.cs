@@ -15,7 +15,7 @@ public class TextureExtractor
 
     public static void ExportTexture(FileHash fileHash, int index = 0)
     {
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         string pkgName = PackageResourcer.Get().GetPackage(fileHash.PackageId).GetPackageMetadata().Name.Split(".")[0];
         string savePath = config.GetExportSavePath() + $"/Textures/{pkgName}";
         Directory.CreateDirectory($"{savePath}/");

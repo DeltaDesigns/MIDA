@@ -20,7 +20,7 @@ public partial class GeneralConfigView : UserControl
     public GeneralConfigView()
     {
         InitializeComponent();
-        _config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        _config = TigerInstance.GetSubsystem<ConfigSubsystem>();
     }
 
     public void OnControlLoaded(object sender, RoutedEventArgs e)

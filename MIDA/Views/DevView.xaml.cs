@@ -156,7 +156,7 @@ public partial class DevView : UserControl
     private void ExportWem(ExportInfo info)
     {
         Wem wem = FileResourcer.Get().GetFile<Wem>(info.Hash as FileHash);
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         string saveDirectory = config.GetExportSavePath() + $"/Sound/{info.Hash}_{info.Name}/";
         Directory.CreateDirectory(saveDirectory);
         wem.SaveToFile($"{saveDirectory}/{info.Name}.wav");
@@ -361,7 +361,7 @@ public partial class DevView : UserControl
 
     public static void OpenHxD(FileHash hash)
     {
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         string savePath = config.GetExportSavePath() + "/temp";
         if (!Directory.Exists(savePath))
         {

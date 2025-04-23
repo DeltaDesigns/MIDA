@@ -74,7 +74,7 @@ public partial class TextureView : UserControl
         if (_currentTexture is null)
             return;
 
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         string pkgName = PackageResourcer.Get().GetPackage(_currentTexture.Hash.PackageId).GetPackageMetadata().Name.Split(".")[0];
         string savePath = config.GetExportSavePath() + $"/Textures/{pkgName}";
         Directory.CreateDirectory($"{savePath}/");

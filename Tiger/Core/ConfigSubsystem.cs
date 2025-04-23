@@ -441,7 +441,7 @@ public class ConfigSubsystem : Subsystem<ConfigSubsystem>
             Strategy.AddNewStrategy(strategy, packagesPath, false);
         }
 
-        if (MIDAInstance.Args.GetArgValue("strategy", out string strategyName))
+        if (TigerInstance.Args.GetArgValue("strategy", out string strategyName))
         {
             Strategy.SetStrategy(strategyName);
         }
@@ -473,7 +473,7 @@ public class ConfigSubsystem : Subsystem<ConfigSubsystem>
 
     protected internal override bool Initialise()
     {
-        if (MIDAInstance.Args.GetArgValue("config", out string configPath))
+        if (TigerInstance.Args.GetArgValue("config", out string configPath))
         {
             _configFilePath = configPath;
         }

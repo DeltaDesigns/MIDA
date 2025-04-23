@@ -87,7 +87,7 @@ public partial class MainWindow
 
         // Check if packages path exists in config
         // ConfigSubsystem.CheckPackagesPathIsValid();
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         if (config.GetPackagesPath(Strategy.CurrentStrategy) != "" && config.GetExportSavePath() != "")
         {
             MainMenuTab.Visibility = Visibility.Visible;
@@ -235,8 +235,8 @@ public partial class MainWindow
     {
         Arithmic.Log.Info("Initialising MIDA subsystems");
         string[] args = Environment.GetCommandLineArgs();
-        MIDAInstance.Args = new MIDAArgs(args);
-        MIDAInstance.InitialiseSubsystems();
+        TigerInstance.Args = new InstanceArgs(args);
+        TigerInstance.InitialiseSubsystems();
         Arithmic.Log.Info("Initialised MIDA subsystems");
 
     }
@@ -245,7 +245,7 @@ public partial class MainWindow
     {
         try
         {
-            ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+            ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
             var path = config.GetPackagesPath(Strategy.CurrentStrategy).Split("packages")[0] + "Marathon.exe";
             var versionInfo = FileVersionInfo.GetVersionInfo(path);
             string version = versionInfo.FileVersion;
@@ -318,7 +318,7 @@ public partial class MainWindow
     private async void InitialiseHandlers()
     {
         // Set texture format
-        ConfigSubsystem config = MIDAInstance.GetSubsystem<ConfigSubsystem>();
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
         TextureExtractor.SetTextureFormat(config.GetOutputTextureFormat());
     }
 
