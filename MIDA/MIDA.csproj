@@ -88,9 +88,8 @@
         <DependentUpon>MusicView.xaml</DependentUpon>
       </Page>
 
-      <Page Update="API\DareItemControl.xaml">
+      <Page Update="API\APIItemControl.xaml">
         <Generator>MSBuild:Compile</Generator>
-        <DependentUpon>APIView.xaml</DependentUpon>
       </Page>
     </ItemGroup>
 

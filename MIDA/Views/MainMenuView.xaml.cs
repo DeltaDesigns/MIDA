@@ -62,7 +62,7 @@ public partial class MainMenuView : UserControl
         {
             Name = $"{text[0]}",
             Description = $"{text[1]}",
-            PlugRarityColor = DestinyTierType.Legendary.GetColor(),
+            PlugRarityColor = MarathonTierType.Superior.GetColor(),
         };
 
         ToolTip.MakeTooltip(plugItem);

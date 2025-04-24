@@ -44,33 +44,24 @@ public struct S8080968B
     public ResourcePointer UnkB0;  // 7F928080
     [SchemaField(0xD0, TigerStrategy.MARATHON_ALPHA)]
     public ResourcePointer UnkD0;  // AD928080
+    [SchemaField(0xE0, TigerStrategy.MARATHON_ALPHA)]
+    public ResourcePointer UnkE0;  // A2928080 rarity?
 
     [SchemaField(0xE8, TigerStrategy.MARATHON_ALPHA)]
     public TigerHash InventoryItemHash;
     public TigerHash UnkAC;
 
     [SchemaField(0xFC, TigerStrategy.MARATHON_ALPHA)]
-    public byte ItemRarity; // No idea
-
-    [SchemaField(0x108, TigerStrategy.MARATHON_ALPHA)]
-    public short SummaryItemIndex;
+    public byte UnkFC;
 
     [SchemaField(0x160, TigerStrategy.MARATHON_ALPHA)]
     public DynamicArray<S89B18080> TraitIndices; // Seems right, no idea is that still its name though
 }
 
-[SchemaStruct("E4768080", 0x90)]
-public struct SE4768080
+[SchemaStruct("A2928080", 0x4)]
+public struct SA2928080
 {
-    [SchemaField(0x48)]
-    public TigerHash Unk48;
-    public TigerHash Unk4C;
-    [SchemaField(0x54)]
-    public int Unk54;
-    [SchemaField(0x70)]
-    public int Unk70;
-    [SchemaField(0x88)]
-    public float Unk88;
+    public int TierType;
 }
 
 /// <summary>

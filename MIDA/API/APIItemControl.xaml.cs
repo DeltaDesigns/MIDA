@@ -3,11 +3,11 @@ using System.Windows.Controls;
 
 namespace MIDA;
 
-public partial class DareItemControl : UserControl
+public partial class APIItemControl : UserControl
 {
     private static MainWindow _mainWindow = null;
 
-    public DareItemControl()
+    public APIItemControl()
     {
         InitializeComponent();
     }

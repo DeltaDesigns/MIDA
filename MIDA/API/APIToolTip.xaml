@@ -665,7 +665,7 @@
                                                 <Condition Binding="{Binding PlugRarity}" Value="Common" />
                                                 <Condition Binding="{Binding PlugStyle}" Value="Consumable" />
                                             </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="#0C0C0C" />
+                                            <Setter Property="Foreground" Value="{StaticResource ForegroundColour90}" />
                                         </MultiDataTrigger>
 
                                     </Style.Triggers>
@@ -703,13 +703,7 @@
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Visible" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding PlugRarity}" Value="Unknown">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding PlugRarity}" Value="Currency">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding PlugRarity}" Value="Common">
+                                    <DataTrigger Binding="{Binding PlugRarity}" Value="None">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>

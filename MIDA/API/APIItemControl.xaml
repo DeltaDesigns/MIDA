@@ -1,0 +1,137 @@
+﻿<UserControl
+    x:Class="MIDA.APIItemControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MIDA"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="100"
+    d:DesignWidth="288"
+    Loaded="OnControlLoaded"
+    mc:Ignorable="d">
+    <Grid Name="Container" Background="{Binding GridBackground}">
+
+        <Button
+            x:Name="ItemInspectButton"
+            Grid.Column="1"
+            Width="22"
+            Height="22"
+            Margin="0,1,1,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Click="InspectAPIItem_OnClick"
+            Style="{StaticResource API Inspect Button}">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="14"
+                Text="🔎" />
+        </Button>
+
+        <Border
+            Grid.RowSpan="3"
+            HorizontalAlignment="Left"
+            Panel.ZIndex="1"
+            BorderBrush="White"
+            BorderThickness="0">
+            <Image Source="{Binding ImageSource}" />
+        </Border>
+
+        <StackPanel Margin="10" Orientation="Vertical">
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Panel.ZIndex="1"
+                FontFamily="{DynamicResource KH Teka Bold}"
+                FontSize="18"
+                Foreground="{StaticResource BackgroundColour7}"
+                Text="{Binding ItemName}"
+                TextAlignment="Left"
+                TextWrapping="Wrap" />
+
+            <Border Margin="2" />
+
+            <StackPanel
+                Grid.Row="1"
+                Margin="0,0,0,0"
+                Orientation="Horizontal">
+                <Border
+                    Margin="0,0,5,0"
+                    BorderBrush="{StaticResource BackgroundColour7}"
+                    BorderThickness="2"
+                    CornerRadius="10">
+                    <TextBlock
+                        Margin="10,0,10,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="{DynamicResource PP Fraktion Mono Semibold}"
+                        FontSize="15"
+                        Foreground="{StaticResource BackgroundColour7}"
+                        Text="{Binding ItemRarity, FallbackValue={x:Null}}"
+                        TextWrapping="Wrap" />
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ItemRarity}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+
+                <Border
+                    Margin="0,0,5,0"
+                    Background="#3c3c3c"
+                    BorderBrush="#3c3c3c"
+                    BorderThickness="2"
+                    CornerRadius="10">
+                    <TextBlock
+                        Margin="10,0,10,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        FontFamily="{DynamicResource PP Fraktion Mono Semibold}"
+                        FontSize="15"
+                        Foreground="{StaticResource ForegroundColour100}"
+                        Text="{Binding ItemType, FallbackValue={x:Null}}"
+                        TextWrapping="Wrap" />
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ItemRarity}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+
+            </StackPanel>
+
+
+        </StackPanel>
+
+        <TextBlock
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="0,0,5,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Panel.ZIndex="1"
+            FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+            FontSize="12"
+            Foreground="{StaticResource BackgroundColour7}"
+            Text="{Binding ItemHash}"
+            TextAlignment="Left"
+            TextWrapping="Wrap" />
+
+    </Grid>
+</UserControl>
+
+
+
+

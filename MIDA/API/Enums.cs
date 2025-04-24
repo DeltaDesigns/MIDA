@@ -12,38 +12,6 @@ public static class DestinyDamageType
     {
         switch (index)
         {
-            case -1:
-                return DestinyDamageTypeEnum.None;
-            case 1319:
-            case 1373:
-            case 1405:
-            case 1473:
-                return DestinyDamageTypeEnum.Kinetic;
-            case 1320:
-            case 1374:
-            case 1406:
-            case 1474:
-                return DestinyDamageTypeEnum.Arc;
-            case 1321:
-            case 1375:
-            case 1407:
-            case 1475:
-                return DestinyDamageTypeEnum.Solar;
-            case 1322:
-            case 1376:
-            case 1408:
-            case 1476:
-                return DestinyDamageTypeEnum.Void;
-            case 1323:
-            case 1377:
-            case 1409:
-            case 1477:
-                return DestinyDamageTypeEnum.Stasis;
-            case 1324:
-            case 1378:
-            case 1410:
-            case 1478:
-                return DestinyDamageTypeEnum.Strand;
             default:
                 Log.Warning($"Unknown DestinyDamageTypeEnum {index}");
                 return DestinyDamageTypeEnum.None;
@@ -68,15 +36,15 @@ public enum DestinyDamageTypeEnum : int
     Strand
 }
 
-public enum DestinyTierType
+public enum MarathonTierType
 {
-    Unknown = -1,
-    Currency = 0,
-    Common = 1, // Basic
-    Uncommon = 2, // Common
-    Rare = 3,
-    Legendary = 4, // Superior
-    Exotic = 5,
+    None = -1,
+    Standard = 0,
+    Enhanced = 1,
+    Deluxe = 2,
+    Superior = 3,
+    Prestige = 4,
+    Contraband = 5, // unsure if highest
 }
 
 // https://bungie-net.github.io/multi/schema_Destiny-DestinyUnlockValueUIStyle.html#schema_Destiny-DestinyUnlockValueUIStyle
@@ -96,24 +64,24 @@ public enum DestinyUnlockValueUIStyle
     RawFloat = 13,
 }
 
-public static class DestinyTierTypeColor
+public static class MarathonTierTypeColor
 {
-    private static readonly Dictionary<DestinyTierType, Color> Colors = new Dictionary<DestinyTierType, Color>
+    private static readonly Dictionary<MarathonTierType, Color> Colors = new Dictionary<MarathonTierType, Color>
     {
-        { DestinyTierType.Unknown, Color.FromArgb(255, 56, 56, 56) },
-        { DestinyTierType.Currency, Color.FromArgb(255, 56, 56, 56) },
-        { DestinyTierType.Common, Color.FromArgb(255, 194, 187, 179) },
-        { DestinyTierType.Uncommon, Color.FromArgb(255, 51, 107, 62) },
-        { DestinyTierType.Rare, Color.FromArgb(255, 85, 125, 155) },
-        { DestinyTierType.Legendary, Color.FromArgb(255, 79, 55, 99) },
-        { DestinyTierType.Exotic, Color.FromArgb(255, 203, 171, 54) }
+        { MarathonTierType.None, Color.FromArgb(255, 56, 56, 56) },
+        { MarathonTierType.Standard, Color.FromArgb(255, 200, 203, 210) },
+        { MarathonTierType.Enhanced, Color.FromArgb(255, 1, 244, 134) },
+        { MarathonTierType.Deluxe, Color.FromArgb(255, 74, 170, 255) },
+        { MarathonTierType.Superior, Color.FromArgb(255, 195, 50, 255) },
+        { MarathonTierType.Prestige, Color.FromArgb(255, 255, 100, 0) }, // Unknown atm
+        { MarathonTierType.Contraband, Color.FromArgb(255, 200, 0, 0) } // Unknown atm
     };
 
-    public static Color GetColor(this DestinyTierType tierType)
+    public static Color GetColor(this MarathonTierType tierType)
     {
         if (Colors.ContainsKey(tierType))
             return Colors[tierType];
         else
-            return Colors[DestinyTierType.Unknown];
+            return Colors[MarathonTierType.None];
     }
 }

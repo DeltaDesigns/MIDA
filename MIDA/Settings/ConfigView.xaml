@@ -14,19 +14,22 @@
     <UserControl.Resources>
         <DataTemplate x:Key="SettingsButtonTemplate">
             <RadioButton
-                Margin="10"
+                Margin="2"
                 Checked="SettingsCategory_OnClick"
                 GroupName="SettingsCategory"
                 IsEnabled="{Binding IsEnabled}"
                 Style="{DynamicResource D2StyleRadioButton}">
-                <Border Background="#55515151">
-                    <TextBlock
-                        Margin="75,25,75,25"
-                        d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="32"
-                        Text="{Binding Text}" />
-                </Border>
+                <TextBlock
+                    Margin="10,25,150,25"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    d:FontFamily="Haas Grot Text 55 Roman"
+                    FontFamily="{DynamicResource KH Teka Bold}"
+                    FontSize="32"
+                    FontStyle="Normal"
+                    Foreground="{StaticResource BackgroundColour7}"
+                    Text="{Binding Text}" />
+
             </RadioButton>
         </DataTemplate>
     </UserControl.Resources>
@@ -52,10 +55,10 @@
         </Grid.ColumnDefinitions>
 
 
-        <Grid Grid.Column="0" Background="#30000000">
+        <Grid Grid.Column="0" Background="Transparent">
             <StackPanel
                 Margin="0,0,25,0"
-                HorizontalAlignment="Right"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center">
                 <ItemsControl x:Name="Settings" ItemTemplate="{StaticResource SettingsButtonTemplate}">
                     <ItemsControl.ItemsPanel>

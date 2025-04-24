@@ -474,6 +474,69 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
         return null;
     }
 
+    public List<Entity.Entity> GetEntitiesFromPattern(Entity.Entity pattern)
+    {
+        List<Entity.Entity> entities = new();
+        if (pattern is null)
+            return entities;
+
+        Console.WriteLine($"Pattern {pattern.Hash}");
+        if (pattern.Model != null)
+            entities.Add(pattern);
+
+        foreach (var resourceHash in pattern.TagData.EntityResources.Select(pattern.GetReader(), r => r.Resource))
+        {
+            EntityResource resource = FileResourcer.Get().GetFile<EntityResource>(resourceHash);
+            Console.WriteLine($"- {resource.Hash}");
+            switch (resource.TagData.Unk10.GetValue(resource.GetReader()))
+            {
+                case SB1328080:
+                    Console.WriteLine($"-- SB3328080");
+                    foreach (var entry in ((SB3328080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk108)
+                    {
+                        Console.WriteLine($"-- {entry.Unk04}: {entry.Entity?.Hash}");
+                        if (entry.Entity is not null)
+                            entities.Add(entry.Entity);
+                    }
+                    break;
+
+                case S03468080:
+                    Console.WriteLine($"-- S144A8080");
+                    foreach (var entry in ((S144A8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk3A8)
+                    {
+                        Console.WriteLine($"--- {entry.Unk00}: {entry.UnkEntity?.Hash}");
+                        if (entry.UnkEntity is not null)
+                            entities.Add(entry.UnkEntity);
+                    }
+                    break;
+
+                case S9AB68080:
+                    Console.WriteLine($"-- S519F8080");
+                    foreach (var entry in ((S519F8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Array2)
+                    {
+                        if (entry.Unk10.GetValue(resource.GetReader()) is S98A38080 entry2)
+                        {
+                            Console.WriteLine($"--- {entry2.Unk00}: {entry2.Entity?.Hash}");
+                            if (entry2.Entity is not null)
+                                entities.Add(entry2.Entity);
+                        }
+                    }
+                    break;
+
+                case S87328080:
+                    Console.WriteLine($"-- S88328080");
+                    var S88328080 = ((S88328080)resource.TagData.Unk18.GetValue(resource.GetReader()));
+                    Console.WriteLine($"--- : {S88328080.Entity?.Hash}");
+                    if (S88328080.Entity is not null)
+                        entities.Add(S88328080.Entity);
+                    break;
+            }
+        }
+
+
+        return entities;
+    }
+
     #region OBSOLETE?
 
     public DynamicArray<SD5778080> GetRandomizedPlugSet(int index)
@@ -850,6 +913,14 @@ public class InventoryItem : Tag<S8080968B>
 {
     public InventoryItem(FileHash hash, bool shouldParse) : base(hash, shouldParse)
     {
+    }
+
+    public int GetItemRarity()
+    {
+        if (_tag.UnkE0.GetValue(GetReader()) is SA2928080 rarity)
+            return rarity.TierType;
+
+        return -1;
     }
 
     public Tag<S80806EF6> GetItemStrings()

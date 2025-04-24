@@ -42,8 +42,8 @@ public partial class APITooltip : UserControl
             (itemStrings.TagData.TooltipStyle != DestinyTooltipStyle.None
             && itemStrings.TagData.TooltipStyle != DestinyTooltipStyle.Record))
         {
-            item.PlugRarity = DestinyTierType.Unknown;
-            item.PlugRarityColor = DestinyTierType.Unknown.GetColor();
+            item.PlugRarity = MarathonTierType.None;
+            item.PlugRarityColor = MarathonTierType.None.GetColor();
         }
 
         // Idk if Task.Run is actually doing anything here but it maybeeee feels a little more responsive?

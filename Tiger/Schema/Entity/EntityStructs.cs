@@ -681,18 +681,18 @@ public struct S092D8080
 
 
 // Turns out this can be used for more than just sounds, recent findings have seen it used for map global channels?
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "79818080", 0x390)]
-public struct S79818080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "519F8080", 0x390)]
+public struct S519F8080
 {
-    [SchemaField(0x1A8, TigerStrategy.MARATHON_ALPHA)]
-    public DynamicArray<SF1918080> Array1;
+    [SchemaField(0x210, TigerStrategy.MARATHON_ALPHA)]
+    public DynamicArray<S6EB68080> Array1;
 
-    [SchemaField(0x1B8, TigerStrategy.MARATHON_ALPHA)]
-    public DynamicArray<SF1918080> Array2;
+    [SchemaField(0x220, TigerStrategy.MARATHON_ALPHA)]
+    public DynamicArray<S6EB68080> Array2;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "F1918080", 0x18)]
-public struct SF1918080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "6EB68080", 0x18)]
+public struct S6EB68080
 {
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA)]
     public ResourcePointer Unk10; // B9678080, 40668080
@@ -752,8 +752,8 @@ public struct S00488080
 {
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "79948080", 0x300)]
-public struct S79948080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "9AB68080", 0x370)]
+public struct S9AB68080
 {
 }
 
@@ -951,3 +951,121 @@ public struct S625B8080
     public Tag<SMapDataTable> DataTable;
     public StringHash Name;
 }
+
+#region Gear + Gear attachments
+
+// Relating to base weapon model?
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B1328080", 0x170)] // Ent resource 0x10
+public struct SB1328080
+{
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B3328080", 0x170)] // Ent resource 0x18
+public struct SB3328080
+{
+    [SchemaField(0x108)]
+    public DynamicArray<SBA328080> Unk108;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "BA328080", 0x20)]
+public struct SBA328080
+{
+    public int Unk00;
+    public TigerHash Unk04;
+    [SchemaField(0x10, Tag64 = true), NoLoad]
+    public Entity Entity;
+}
+//-------------------------------------------
+
+// Relating to weapon attachments?
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "03468080", 0x2D0)] // Ent resource 0x10
+public struct S03468080
+{
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "144A8080", 0x2D0)] // Ent resource 0x18
+public struct S144A8080
+{
+    [SchemaField(0x38)]
+    public DynamicArray<SCCBA8080> Unk38;
+
+    [SchemaField(0x208)]
+    public DynamicArray<S9EBA8080> Unk208;
+
+    [SchemaField(0x280)]
+    public DynamicArray<S9EBA8080> Unk280;
+
+    [SchemaField(0x310, Tag64 = true)] // Contains the skeleton for attachments?
+    public Entity UnkEntity310;
+
+    [SchemaField(0x320)]
+    public DynamicArray<S412F8080> Unk320;
+
+    [SchemaField(0x3A8)]
+    public DynamicArray<S0A468080> Unk3A8;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "CCBA8080", 0x4)] // Size unsure
+public struct SCCBA8080
+{
+    public int Unk00;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "9EBA8080", 0x30)]
+public struct S9EBA8080
+{
+    public MapTransform Transform;
+
+    [SchemaField(0x28)]
+    public TigerHash Unk28;
+    public TigerHash Unk2C;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "412F8080", 0x20)]
+public struct S412F8080
+{
+    public TigerHash Unk00; // Runner name/type
+    [SchemaField(0x10, Tag64 = true), NoLoad]
+    public Entity UnkEntity;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "0A468080", 0x20)]
+public struct S0A468080
+{
+    public TigerHash Unk00; // Attachment name
+    [SchemaField(0x10, Tag64 = true), NoLoad]
+    public Entity UnkEntity;
+}
+
+//[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "9AB68080", 0x2D0)] // Ent resource 0x10
+//public struct S9AB68080 // already exists
+//{
+//}
+
+//[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "9AB68080", 0x2D0)] // Ent resource 0x18
+//public struct S519F8080 // already exists
+//{
+//}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "98A38080", 0x100)]
+public struct S98A38080
+{
+    public TigerHash Unk00;
+
+    [SchemaField(0x70, Tag64 = true), NoLoad]
+    public Entity Entity;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "87328080", 0x9F0)] // Ent resource 0x10
+public struct S87328080
+{
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "88328080", 0x750)] // Ent resource 0x18
+public struct S88328080
+{
+    [SchemaField(0x6B0, Tag64 = true), NoLoad]
+    public Entity Entity;
+}
+
+#endregion

@@ -90,7 +90,7 @@ public class Entity : Tag<SEntity>
                 //        EntityName = GlobalStrings.Get().GetString(specificName);
                 //    break;
 
-                //case S79948080 when Strategy.IsPreBL(): // No idea if this is SK only
+                //case S9AB68080 when Strategy.IsPreBL(): // No idea if this is SK only
                 //    if (EntityChildren2 is null)
                 //        EntityChildren2 = new();
 
@@ -227,9 +227,9 @@ public class Entity : Tag<SEntity>
 
         foreach (var resource in EntityChildren2)
         {
-            if (resource.TagData.Unk18.GetValue(resource.GetReader()) is S79818080)
+            if (resource.TagData.Unk18.GetValue(resource.GetReader()) is S519F8080)
             {
-                foreach (var entry in ((S79818080)resource.TagData.Unk18.GetValue(resource.GetReader())).Array2)
+                foreach (var entry in ((S519F8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Array2)
                 {
                     if (entry.Unk10.GetValue(resource.GetReader()) is S81888080 entry2)
                     {

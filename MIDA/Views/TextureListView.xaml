@@ -15,61 +15,37 @@
         <DataTemplate x:Key="PackageItemTemplate">
             <RadioButton
                 Margin="0,0,0,0"
-                local:StyleHelper.BorderThickness="1"
+                VerticalAlignment="Center"
+                local:StyleHelper.BorderThickness="0"
                 Checked="PackageItem_Checked"
                 Focusable="False"
                 Foreground="Transparent"
                 GroupName="PackageItem"
                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
                 Style="{DynamicResource D2StyleRadioButton}">
-                <StackPanel Background="{StaticResource BackgroundColour14a}">
+                <StackPanel Margin="0,0,0,0" Background="Transparent">
                     <TextBlock
-                        Margin="15,10,15,10"
+                        Margin="15,10,0,5"
                         HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                        FontSize="18"
-                        Foreground="{StaticResource ForegroundColour100}"
-                        Text="{Binding Name}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <!--  Trigger when IsSelected (IsChecked) is false  -->
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                                        <Setter Property="Opacity" Value="0.75" />
-                                    </DataTrigger>
-                                    <!--  Trigger when IsSelected (IsChecked) is true  -->
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                        <Setter Property="Opacity" Value="1.0" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                        FontSize="16"
+                        Foreground="{StaticResource BackgroundColour7}"
+                        Text="{Binding Name}"
+                        TextWrapping="WrapWithOverflow" />
 
                     <TextBlock
                         Margin="15,5,15,10"
                         HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="16"
-                        Foreground="{StaticResource ForegroundColour70}">
+                        Foreground="{StaticResource BackgroundColour7}">
                         <Run Text="Textures: " />
                         <Run Text="{Binding Count}" />
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <!--  Trigger when IsSelected (IsChecked) is false  -->
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                                        <Setter Property="Opacity" Value="0.75" />
-                                    </DataTrigger>
-                                    <!--  Trigger when IsSelected (IsChecked) is true  -->
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                        <Setter Property="Opacity" Value="1.0" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
+
                     </TextBlock>
                 </StackPanel>
 

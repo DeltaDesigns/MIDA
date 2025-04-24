@@ -205,8 +205,8 @@ public partial class APIItemView : UserControl
         //    //PlugSocketIndex = socketIndex,
         //    PlugCategoryHash = plugCategoryHash,
         //    PlugWatermark = ApiImageUtils.GetPlugWatermark(item),
-        //    PlugRarity = (DestinyTierType)item.TagData.ItemRarity,
-        //    PlugRarityColor = ((DestinyTierType)item.TagData.ItemRarity).GetColor(),
+        //    PlugRarity = (MarathonTierType)item.TagData.ItemRarity,
+        //    PlugRarityColor = ((MarathonTierType)item.TagData.ItemRarity).GetColor(),
         //    PlugSelected = false,
         //    PlugStyle = DestinySocketCategoryStyle.Reusable
         //};
@@ -738,7 +738,7 @@ public partial class APIItemView : UserControl
         public string ItemType { get; set; }
         public string ItemFlavorText { get; set; }
         public string ItemLore { get; set; }
-        public DestinyTierType ItemRarity => (DestinyTierType)Item.TagData.ItemRarity;
+        public MarathonTierType ItemRarity => (MarathonTierType)Item.GetItemRarity();
         public Color ItemRarityColor => ItemRarity.GetColor();
         public string ItemHash { get; set; }
         public string ItemSource { get; set; }
@@ -769,7 +769,7 @@ public partial class APIItemView : UserControl
         public int PlugOrderIndex { get; set; } = 0;
         public ImageSource PlugImageSource { get; set; }
         public ImageSource PlugWatermark { get; set; }
-        public DestinyTierType PlugRarity { get; set; } = DestinyTierType.Common;
+        public MarathonTierType PlugRarity { get; set; } = MarathonTierType.Standard;
         public Color PlugRarityColor { get; set; }
         public DestinyDamageTypeEnum PlugDamageType { get; set; }
         public DestinySocketCategoryStyle PlugStyle { get; set; }

@@ -11,7 +11,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Tiger;
 using Tiger.Schema.Investment;
 using static MIDA.APIItemView;
@@ -89,6 +88,7 @@ public partial class APIView : UserControl
                 type = "";
 
             //if (ShouldAddToList(item, type))
+            if (item.GetWeaponPatternIndex() != -1)
             {
                 //CreateOrnamentItems(item); // D1
                 //var isOrnament = type.Contains("Ornament");
@@ -101,7 +101,7 @@ public partial class APIView : UserControl
                     {
                         ItemName = name,
                         ItemType = type,
-                        ItemRarity = (DestinyTierType)item.TagData.ItemRarity,
+                        ItemRarity = (MarathonTierType)item.GetItemRarity(),
                         ItemHash = item.TagData.InventoryItemHash.Hash32.ToString(),
                         ImageHeight = 96,
                         ImageWidth = 96,
@@ -122,7 +122,7 @@ public partial class APIView : UserControl
         if (_allItems.TryRemove(apiItem.Item.TagData.InventoryItemHash.Hash32, out _))
         {
             _selectedItems.Add(apiItem);
-            Console.WriteLine($"{apiItem.Item.TagData.InventoryItemHash} : {apiItem.Item.Hash}");
+            Console.WriteLine($"{apiItem.Item.TagData.InventoryItemHash} : Item {apiItem.Item.Hash} | Strings {apiItem.Item.GetItemStrings().Hash}");
             //foreach (var a in Investment.Get().GetEntitiesFromHash(apiItem.Item.TagData.InventoryItemHash))
             //{
             //    if (a is null)
@@ -280,7 +280,7 @@ public partial class APIView : UserControl
             {
                 ItemName = name,
                 ItemType = type,
-                ItemRarity = (DestinyTierType)parent.TagData.ItemRarity,
+                ItemRarity = (MarathonTierType)parent.GetItemRarity(),
                 ItemHash = item.TagData.InventoryItemHash.Hash32.ToString(),
                 ImageHeight = 96,
                 ImageWidth = 96,
@@ -363,10 +363,17 @@ public class ApiItem
     public InventoryItem Parent { get; set; }
     public int CollectableIndex { get; set; }
 
-    public string ItemName { get; set; }
+    private string _itemName;
+    public string ItemName
+    {
+        get { return _itemName.ToUpper(); }
+        set { _itemName = value; }
+    }
+
+
     public string ItemType { get; set; }
     public string ItemFlavorText { get; set; }
-    public DestinyTierType ItemRarity { get; set; }
+    public MarathonTierType ItemRarity { get; set; }
     public DestinyDamageTypeEnum ItemDamageType { get; set; }
     public string ItemHash { get; set; }
 
@@ -376,7 +383,6 @@ public class ApiItem
     public int Weight { get; set; } = -1; // For display ordering purposes
 
     private System.Windows.Media.ImageSource _ImageSource { get; set; }
-    private System.Windows.Media.ImageBrush _GridBackground { get; set; }
     public System.Windows.Media.ImageSource ImageSource
     {
         get
@@ -413,23 +419,26 @@ public class ApiItem
         }
     }
 
-    public System.Windows.Media.ImageBrush GridBackground
-    {
-        get
-        {
-            if (_GridBackground != null)
-                return _GridBackground;
-            BitmapImage bg = null;
-            UnmanagedMemoryStream? bgStream = Item.GetIconBackgroundStream();
-            bg = bgStream != null ? ApiImageUtils.MakeBitmapImage(bgStream, 96, 96) : null;
+    public SolidColorBrush GridBackground => new SolidColorBrush(ItemRarity.GetColor());
 
-            System.Windows.Media.ImageBrush brush = new System.Windows.Media.ImageBrush(bg);
-            brush.Freeze();
-            _GridBackground = brush;
+    //private System.Windows.Media.ImageBrush _GridBackground { get; set; }
+    //public System.Windows.Media.ImageBrush GridBackground
+    //{
+    //    get
+    //    {
+    //        if (_GridBackground != null)
+    //            return _GridBackground;
+    //        BitmapImage bg = null;
+    //        UnmanagedMemoryStream? bgStream = Item.GetIconBackgroundStream();
+    //        bg = bgStream != null ? ApiImageUtils.MakeBitmapImage(bgStream, 96, 96) : null;
 
-            return brush;
-        }
-    }
+    //        System.Windows.Media.ImageBrush brush = new System.Windows.Media.ImageBrush(bg);
+    //        brush.Freeze();
+    //        _GridBackground = brush;
+
+    //        return brush;
+    //    }
+    //}
 
     public PlugItem PlugItem { get; set; }
 }

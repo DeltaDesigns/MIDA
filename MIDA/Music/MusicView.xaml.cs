@@ -24,18 +24,18 @@ public partial class MusicView : UserControl
             foreach (var resourceHash in entity.TagData.EntityResources.Select(entity.GetReader(), r => r.Resource))
             {
                 EntityResource e = FileResourcer.Get().GetFile<EntityResource>(resourceHash);
-                if (e.TagData.Unk18.GetValue(e.GetReader()) is S79818080 a)
+                if (e.TagData.Unk18.GetValue(e.GetReader()) is S519F8080 a)
                 {
-                    foreach (var d2ClassF1918080 in a.Array1)
+                    foreach (var d2ClasS6EB68080 in a.Array1)
                     {
-                        if (d2ClassF1918080.Unk10.GetValue(e.GetReader()) is S40668080 b)
+                        if (d2ClasS6EB68080.Unk10.GetValue(e.GetReader()) is S40668080 b)
                         {
                             sounds.Add(b);
                         }
                     }
-                    foreach (var d2ClassF1918080 in a.Array2)
+                    foreach (var d2ClasS6EB68080 in a.Array2)
                     {
-                        if (d2ClassF1918080.Unk10.GetValue(e.GetReader()) is S40668080 b)
+                        if (d2ClasS6EB68080.Unk10.GetValue(e.GetReader()) is S40668080 b)
                         {
                             sounds.Add(b);
                         }
