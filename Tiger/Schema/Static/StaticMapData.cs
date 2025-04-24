@@ -255,7 +255,7 @@ public struct S839D8080
     public StringHash EntityName;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "C16B8080", 0x130)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "A0848080", 0x130)]
 public struct SMapAtmosphere
 {
     // 0 and 1 used in...

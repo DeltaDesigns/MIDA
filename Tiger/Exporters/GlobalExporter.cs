@@ -267,13 +267,13 @@ public class GlobalExporter : AbstractExporter
 
     private void ExportGlobalChannels()
     {
-        if (GlobalScene.Any<SD1918080>())
+        if (GlobalScene.Any<S4EB68080>())
         {
             List<GlobalChannelData> channels = new();
             string dataSavePath = $"{SavePath}/Rendering";
             Directory.CreateDirectory(dataSavePath);
 
-            foreach (var globals in GlobalScene.GetAllOfType<SD1918080>())
+            foreach (var globals in GlobalScene.GetAllOfType<S4EB68080>())
             {
                 channels.Add(new GlobalChannelData
                 {

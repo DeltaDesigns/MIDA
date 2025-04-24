@@ -54,8 +54,8 @@ public static class GlobalChannels
     }
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "D1918080", 0x68)]
-public struct SD1918080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "4EB68080", 0x70)]
+public struct S4EB68080
 {
     [SchemaField(0x0, TigerStrategy.MARATHON_ALPHA)]
     public TigerHash Unk00; // Assuming name
@@ -64,7 +64,8 @@ public struct SD1918080
     [SchemaField(0x14, TigerStrategy.MARATHON_ALPHA)]
     public float Unk14;
     public float Unk18;
-    public int Unk1C;
+    public short Unk1C;
+    public short Unk1E;
 
     [SchemaField(0x28, TigerStrategy.MARATHON_ALPHA)]
     public int ChannelIndex;
