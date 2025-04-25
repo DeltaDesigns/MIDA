@@ -22,6 +22,7 @@
       <None Remove="Shaders\procedural_spinner.ps.hlsl" />
       <None Remove="Shaders\procedural_spinner.vs.cso" />
       <None Remove="Shaders\procedural_spinner.vs.hlsl" />
+      <None Remove="ThirdParty\fonts\marathonshapiro_wide65.otf" />
     </ItemGroup>
 
     <ItemGroup>
@@ -139,6 +140,11 @@
       <Content Include="Shaders\procedural_spinner.vs.hlsl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Resource Include="ThirdParty\fonts\marathonshapiro_wide65.otf" />
     </ItemGroup>
 
 </Project>

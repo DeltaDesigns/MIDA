@@ -12,7 +12,7 @@
     <UserControl.Resources>
         <DataTemplate x:Key="ItemTemplate">
             <Button
-                Width="300"
+                Width="325"
                 Height="100"
                 Margin="10"
                 Click="DareItemControl_OnClick"

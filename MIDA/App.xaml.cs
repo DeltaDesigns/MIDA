@@ -120,6 +120,23 @@ namespace MIDA
         {
             return (Brush)element.GetValue(BackgroundColorProperty);
         }
+
+        public static readonly DependencyProperty ButtonCornerRadiusProperty =
+        DependencyProperty.RegisterAttached(
+            "ButtonCornerRadius",
+            typeof(CornerRadius),
+            typeof(StyleHelper),
+            new PropertyMetadata(new CornerRadius(10))); // Default fallback
+
+        public static void SetButtonCornerRadius(UIElement element, CornerRadius value)
+        {
+            element.SetValue(ButtonCornerRadiusProperty, value);
+        }
+
+        public static CornerRadius GetButtonCornerRadius(UIElement element)
+        {
+            return (CornerRadius)element.GetValue(ButtonCornerRadiusProperty);
+        }
     }
 
     public static class UIHelper

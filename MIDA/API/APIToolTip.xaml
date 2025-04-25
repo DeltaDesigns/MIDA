@@ -520,7 +520,8 @@
         Panel.ZIndex="50"
         d:Visibility="Visible"
         Background="Transparent"
-        IsHitTestVisible="False">
+        IsHitTestVisible="False"
+        RenderTransformOrigin="0.5, 0.5">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -564,8 +565,7 @@
             Grid.RowSpan="5"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Background="#00f586" />
-        <!--  Background="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}"  -->
+            Background="{Binding PlugRarityColor, Converter={StaticResource InfoBoxColorConverter}, ConverterParameter=0.5}" />
 
         <!--  Main header  -->
         <Grid
@@ -612,7 +612,7 @@
                     VerticalAlignment="Center"
                     d:FontFamily="Marathon Shapiro 65"
                     d:Text="ADVANCED OS REBOOT"
-                    FontFamily="{DynamicResource KH Teka Bold}"
+                    FontFamily="{DynamicResource Marathon Shapiro}"
                     FontSize="30"
                     Text="{Binding Name}"
                     TextWrapping="WrapWithOverflow">

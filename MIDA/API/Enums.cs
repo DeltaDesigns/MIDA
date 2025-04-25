@@ -68,7 +68,7 @@ public static class MarathonTierTypeColor
 {
     private static readonly Dictionary<MarathonTierType, Color> Colors = new Dictionary<MarathonTierType, Color>
     {
-        { MarathonTierType.None, Color.FromArgb(255, 56, 56, 56) },
+        { MarathonTierType.None, Color.FromArgb(255, 200, 203, 210) },
         { MarathonTierType.Standard, Color.FromArgb(255, 200, 203, 210) },
         { MarathonTierType.Enhanced, Color.FromArgb(255, 1, 244, 134) },
         { MarathonTierType.Deluxe, Color.FromArgb(255, 74, 170, 255) },

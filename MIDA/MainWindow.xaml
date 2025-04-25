@@ -13,7 +13,7 @@
     PreviewKeyDown="MainWindow_PreviewKeyDown"
     WindowState="Maximized"
     mc:Ignorable="d">
-    <Grid Style="{StaticResource GradientBackground}">
+    <Grid x:Name="MainContainer" Style="{StaticResource GradientBackground}">
         <Grid.Triggers>
             <EventTrigger RoutedEvent="Grid.Loaded">
                 <BeginStoryboard>

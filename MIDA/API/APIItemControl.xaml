@@ -44,7 +44,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Panel.ZIndex="1"
-                FontFamily="{DynamicResource KH Teka Bold}"
+                FontFamily="{DynamicResource Marathon Shapiro}"
                 FontSize="18"
                 Foreground="{StaticResource BackgroundColour7}"
                 Text="{Binding ItemName}"
@@ -75,6 +75,9 @@
                         <Style TargetType="Border">
                             <Setter Property="Visibility" Value="Visible" />
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding ItemRarity}" Value="None">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding ItemRarity}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>

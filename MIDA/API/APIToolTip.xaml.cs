@@ -333,25 +333,33 @@ public partial class APITooltip : UserControl
             return;
         }
 
-
+        var item = ActiveItem as FrameworkElement;
+        Point activeItemPosition = item.TransformToVisual(this).Transform(new Point(0, 0));
         Point position = Mouse.GetPosition(this);
+        TranslateTransform infoBoxTransform = (TranslateTransform)InfoBox.RenderTransform;
 
-        float xOffset = 25;
-        float yOffset = 25;
-        float padding = 25;
+        float xOffset = 20;
+        float yOffset = (float)item.ActualHeight;
 
         if (position.X >= ActualWidth / 2)
-            xOffset = (-1 * xOffset + 10) - (float)InfoBox.ActualWidth;
+            xOffset = (-1 * xOffset) - (float)InfoBox.ActualWidth - (float)item.ActualWidth;
 
         if (position.Y <= ActualHeight / 2)
-            yOffset = (-1 * yOffset - 10) - (float)InfoBox.ActualHeight;
+            yOffset = yOffset + (float)InfoBox.ActualHeight - (float)item.ActualHeight;
 
-        if (position.Y - yOffset - padding - (float)InfoBox.ActualHeight <= 0)
-            yOffset += (float)(position.Y - yOffset - padding - (float)InfoBox.ActualHeight);
+        // TODO: Adjust if infobox would go out of Y bounds
+        if (item.ActualWidth + InfoBox.ActualWidth >= MainWindow.Current.ActualWidth - InfoBox.ActualWidth)
+        {
+            xOffset -= (float)item.ActualWidth + xOffset;
+            yOffset += (float)item.ActualHeight + 20;
+        }
 
-        TranslateTransform infoBoxTransform = (TranslateTransform)InfoBox.RenderTransform;
-        infoBoxTransform.X = position.X + xOffset;
-        infoBoxTransform.Y = position.Y - yOffset - ActualHeight;
+        //if (position.Y - yOffset - padding - (float)InfoBox.ActualHeight <= 0)
+        //    yOffset += (float)(position.Y - yOffset - padding - (float)InfoBox.ActualHeight);
+
+
+        infoBoxTransform.X = activeItemPosition.X + item.ActualWidth + xOffset;
+        infoBoxTransform.Y = activeItemPosition.Y - ActualHeight + yOffset;
     }
 
     public enum TooltipType // TODO: Simplify styles/templates

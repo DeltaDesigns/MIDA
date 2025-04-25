@@ -102,8 +102,6 @@ public class FontHandler : Strategy.StrategistSingleton<FontHandler>
             if (!Application.Current.Resources.Contains($"{key.Family} {key.Subfamily}"))
             {
                 Application.Current.Resources.Add($"{key.Family} {key.Subfamily}", value);
-
-                //Console.WriteLine($"{string.Join(", ", value.FamilyMaps)} | {string.Join(", ", value.FamilyNames)} | ");
             }
         }
 

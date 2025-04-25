@@ -11,7 +11,7 @@
     mc:Ignorable="d">
 
 
-    <Grid Background="Transparent">
+    <Grid x:Name="MainContainer" Background="Transparent">
         <Grid.Triggers>
             <EventTrigger RoutedEvent="Grid.Loaded">
                 <BeginStoryboard>
@@ -30,20 +30,18 @@
             <RowDefinition Height="90*" />
             <RowDefinition Height="10*" />
         </Grid.RowDefinitions>
-
+        <Grid.RenderTransform>
+            <TranslateTransform />
+        </Grid.RenderTransform>
 
 
         <Grid
-            x:Name="MainContainer"
             Grid.Row="0"
             Grid.Column="1"
             Margin="0,0,0,0"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Background="Transparent">
-            <Grid.RenderTransform>
-                <TranslateTransform />
-            </Grid.RenderTransform>
 
             <StackPanel>
                 <Grid Margin="0,0,0,10" Background="Transparent">
@@ -89,28 +87,21 @@
                     MouseLeave="CategoryButton_MouseLeave"
                     Style="{DynamicResource D2StyleButton}"
                     Tag="MAPS AND ACTIVITIES:View Maps and Activity related content.">
-                    <Border Background="#BB181818">
-                        <TextBlock
-                            d:FontFamily="Haas Grot Text 55 Roman"
-                            FontFamily="{DynamicResource KH Interference Light}"
-                            Text="MAPS AND ACTIVITIES"
-                            TextWrapping="WrapWithOverflow" />
-                    </Border>
+
+                    <TextBlock
+                        d:FontFamily="Haas Grot Text 55 Roman"
+                        FontFamily="{DynamicResource Marathon Shapiro}"
+                        Text="MAPS AND ACTIVITIES"
+                        TextWrapping="WrapWithOverflow" />
+
                 </Button>
 
                 <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
                     <StackPanel
                         Grid.Column="0"
                         Margin="0,0,35,0"
-                        Background="#18585867">
-                        <Border MinWidth="350" Style="{StaticResource ColumnHeaderBorder}">
-                            <Grid Style="{StaticResource ColumnHeader}">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="MODELS" />
-                            </Grid>
-                        </Border>
+                        Background="Transparent">
+                        <ContentControl Content="MODELS" Template="{StaticResource MarathonCategoryLabel}" />
 
                         <Button
                             x:Name="ApiButton"
@@ -121,12 +112,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="API VIEWER:View and export any Player Gear.">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="API" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="API" />
+
                         </Button>
 
                         <Button
@@ -153,12 +144,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="DYNAMICS:View and export entities, some are even named!">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="DYNAMICS" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="DYNAMICS" />
+
                         </Button>
 
                         <Button
@@ -169,12 +160,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="STATICS:View and export static models. These are what make a map.">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="STATICS" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="STATICS" />
+
                         </Button>
 
 
@@ -183,15 +174,8 @@
                     <StackPanel
                         Grid.Column="2"
                         Margin="35,0,35,0"
-                        Background="#18585867">
-                        <Border MinWidth="350" Style="{StaticResource ColumnHeaderBorder}">
-                            <Grid Style="{StaticResource ColumnHeader}">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="AUDIO" />
-                            </Grid>
-                        </Border>
+                        Background="Transparent">
+                        <ContentControl Content="AUDIO" Template="{StaticResource MarathonCategoryLabel}" />
 
                         <Button
                             Margin="10"
@@ -200,12 +184,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="ALL SOUNDS:View and export any audio in the game.">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="ALL SOUNDS" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="ALL SOUNDS" />
+
                         </Button>
 
                         <Button
@@ -216,12 +200,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="WEAPON SOUNDS:View and export specific weapon sounds.">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="WEAPON AUDIO" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="WEAPON AUDIO" />
+
                         </Button>
 
                         <Button
@@ -235,7 +219,7 @@
                             <Border Background="#BB181818">
                                 <TextBlock
                                     d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
                                     Text="SOUND BANKS" />
                             </Border>
                         </Button>
@@ -246,15 +230,8 @@
                     <StackPanel
                         Grid.Column="3"
                         Margin="35,0,0,0"
-                        Background="#18585867">
-                        <Border MinWidth="350" Style="{StaticResource ColumnHeaderBorder}">
-                            <Grid Style="{StaticResource ColumnHeader}">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="OTHER" />
-                            </Grid>
-                        </Border>
+                        Background="Transparent">
+                        <ContentControl Content="OTHER" Template="{StaticResource MarathonCategoryLabel}" />
 
                         <Button
                             Margin="10"
@@ -263,12 +240,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="STRINGS:View and export strings.">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="STRINGS" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="STRINGS" />
+
                         </Button>
 
                         <Button
@@ -278,12 +255,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="TEXTURES:View and export textures.">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="TEXTURES" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="TEXTURES" />
+
                         </Button>
 
                         <Button
@@ -293,12 +270,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="MATERIALS:View and export materials. These make everything look pretty.">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="MATERIALS" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="MATERIALS" />
+
                         </Button>
 
                         <Button
@@ -310,12 +287,12 @@
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="COLLECTIONS:View and inspect Player Gear in detail, just like in-game!">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="COLLECTIONS" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource Marathon Shapiro}"
+                                Text="COLLECTIONS" />
+
                         </Button>
 
 
@@ -389,11 +366,11 @@
                     Style="{DynamicResource D2StyleButton}"
                     Tag="GITHUB:View the source code for MIDA">
                     <TextBlock
-                        Margin="5"
-                        d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource KH Interference Light}"
+                        Margin="10"
+                        d:FontFamily="KH Interference Regular"
+                        FontFamily="{DynamicResource KH Interference Regular}"
                         FontSize="16"
-                        Foreground="{StaticResource ForegroundColour80}"
+                        Foreground="{StaticResource BackgroundColour7}"
                         Text="GITHUB" />
                 </Button>
 
@@ -405,11 +382,11 @@
                     Style="{DynamicResource D2StyleButton}"
                     Tag="ABOUT:View the credits for MIDA">
                     <TextBlock
-                        Margin="5"
-                        d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource KH Interference Light}"
+                        Margin="10"
+                        d:FontFamily="KH Interference Regular"
+                        FontFamily="{DynamicResource KH Interference Regular}"
                         FontSize="16"
-                        Foreground="{StaticResource ForegroundColour80}"
+                        Foreground="{StaticResource BackgroundColour7}"
                         Text="ABOUT" />
                 </Button>
 

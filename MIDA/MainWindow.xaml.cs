@@ -28,6 +28,8 @@ public partial class MainWindow
     private bool _bHasInitialised = false;
     public FileVersionInfo GameInfo = null;
 
+    public static MainWindow Current;
+
     public Spinner2 Spinner;
 
     private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
@@ -50,6 +52,8 @@ public partial class MainWindow
         }
         else
             SpinnerContainer.Visibility = Visibility.Hidden;
+
+        Current = this;
 
     }
 

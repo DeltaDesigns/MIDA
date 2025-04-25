@@ -396,7 +396,7 @@ public partial class TextureListView : UserControl
         {
             Name = $"{text[0]}",
             Description = $"{text[1]}",
-            PlugStyle = DestinySocketCategoryStyle.Reusable,
+            PlugRarityColor = MarathonTierType.Standard.GetColor(),
         };
 
         ToolTip.MakeTooltip(plugItem);

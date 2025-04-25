@@ -19,15 +19,14 @@
                 GroupName="SettingsCategory"
                 IsEnabled="{Binding IsEnabled}"
                 Style="{DynamicResource D2StyleRadioButton}">
+
                 <TextBlock
-                    Margin="10,25,150,25"
+                    Margin="10,30,150,30"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    d:FontFamily="Haas Grot Text 55 Roman"
-                    FontFamily="{DynamicResource KH Teka Bold}"
+                    d:FontFamily="Marathon Shapiro 65"
                     FontSize="32"
                     FontStyle="Normal"
-                    Foreground="{StaticResource BackgroundColour7}"
                     Text="{Binding Text}" />
 
             </RadioButton>
@@ -57,7 +56,7 @@
 
         <Grid Grid.Column="0" Background="Transparent">
             <StackPanel
-                Margin="0,0,25,0"
+                Margin="0,0,0,0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
                 <ItemsControl x:Name="Settings" ItemTemplate="{StaticResource SettingsButtonTemplate}">
@@ -76,6 +75,8 @@
         <Grid
             x:Name="SettingsPage"
             Grid.Column="1"
+            Margin="0,100,0,0"
+            VerticalAlignment="Top"
             Background="Transparent">
             <Grid.RenderTransform>
                 <TranslateTransform />

@@ -58,9 +58,11 @@
                 Height="128"
                 Margin="0,0,0,0"
                 local:StyleHelper.BorderThickness="1"
+                Background="Transparent"
                 Click="Texture_OnClick"
                 Focusable="False"
-                Style="{DynamicResource D2StyleButton}">
+                Foreground="Transparent"
+                Style="{DynamicResource ButtonTransparent}">
                 <Image
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
