@@ -1,9 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 using ConcurrentCollections;
-using Newtonsoft.Json;
 using Tiger.Schema.Entity;
 using Tiger.Schema.Strings;
 
@@ -981,9 +979,7 @@ public class InventoryItem : Tag<S8080968B>
         {
             if (entry.Arrangements.Count > 0)
             {
-#if DEBUG
                 Debug.Assert(entry.Arrangements.Count == 1);
-#endif
                 return entry.Arrangements[GetReader(), 0].Index;
             }
         }
