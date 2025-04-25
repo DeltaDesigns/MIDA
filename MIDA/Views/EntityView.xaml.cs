@@ -176,10 +176,15 @@ public partial class EntityView : UserControl
         }
 
         var entities = Investment.Get().GetEntitiesFromPattern(val);
-        //var entities = Investment.Get().GetEntitiesFromHash(item.Item.TagData.InventoryItemHash);
+        //var entities2 = Investment.Get().GetEntitiesFromHash(item.Item.TagData.InventoryItemHash);
+
+        entities.Add(Investment.Get().GetEntityFromCosmeticMap(item.Item));
 
         foreach (var entity in entities)
         {
+            if (entity is null)
+                continue;
+
             if (entity.Skeleton == null && overrideSkeleton != null)
                 entity.Skeleton = overrideSkeleton;
 

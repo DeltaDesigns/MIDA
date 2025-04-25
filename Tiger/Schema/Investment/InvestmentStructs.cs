@@ -179,7 +179,8 @@ public struct S26908080
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "D3918080", 0x70)]
 public struct SD3918080
 {
-    public DynamicArrayUnloaded<S7D738080> Arrangements;  // "arrangements" from API
+    [SchemaField(0x28, TigerStrategy.MARATHON_ALPHA)]
+    public DynamicArrayUnloaded<S30688080> Arrangements;
 
     //[SchemaField(0x28, TigerStrategy.MARATHON_ALPHA)]
     //public DynamicArray<S7B738080> CustomDyes;  // "customDyes" from API
@@ -197,11 +198,11 @@ public struct SD3918080
 /// <summary>
 /// "arrangement" from API
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "7D738080", 4)]
-public struct S7D738080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "30688080", 4)]
+public struct S30688080
 {
-    public short ClassHash;  // "classHash" from API
-    public short ArtArrangementHash;  // "artArrangementHash" from API, "gearArtArrangementIndex" in D1
+    public int Index; // SandboxPatternGlobalTagId Index, short?
+    public int UnkHash;
 }
 
 /// <summary>
@@ -647,6 +648,7 @@ public struct SB06C8080
 {
     public TigerHash ItemHash; // API item hash
     public TigerHash PatternGlobalTagIdHash;
+    public short SkinID; // index in 80A3A06B
 
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA)]
     public TigerHash WeaponContentGroupHash;
@@ -660,6 +662,24 @@ public struct S8080890B
 
     [SchemaField(8, TigerStrategy.MARATHON_ALPHA, Tag64 = true)]
     public FileHash EntityData;  // can be entity, can be audio group for entity
+}
+
+// This seems to contain the *real* base models of weapons + their cosmetic base versions
+// plus other things like runner skins and charms (CHARM REFERENCE??!!)
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80803081", 0x18)]
+public struct S80803081
+{
+    public long FileSize;
+    public DynamicArrayUnloaded<S87308080> InvestmentCosmetics;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "87308080", 0x20)]
+public struct S87308080
+{
+    public TigerHash APIHash;
+    [SchemaField(0x8, Tag64 = true), NoLoad]
+    public Entity.Entity Pattern;
+    // theres a TagGlobal after that just points right back the pattern, no idea why it exists
 }
 
 #endregion

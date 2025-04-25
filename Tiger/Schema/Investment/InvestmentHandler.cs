@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using ConcurrentCollections;
@@ -21,6 +22,7 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
     private Tag<S8080B61C> _sandboxPatternAssignmentsTag = null;
     private Tag<S80806CAC> _sandboxPatternGlobalTagIdTag = null;
     private Tag<S808071C8> _localizedStringsIndexTag = null;
+    private Tag<S80803081> _investmentCosmeticMap = null;
 
     // These still exist but are done differently I think?
     private Tag<SF2708080> _artArrangementMap = null;
@@ -134,6 +136,10 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
 
                 case 0x808051f2:  // shadowkeep is 0x80805bde
                     _dyeChannelTag = FileResourcer.Get().GetSchemaTag<SDyeChannels>(val);
+                    break;
+
+                case 0x80803081:
+                    _investmentCosmeticMap = FileResourcer.Get().GetSchemaTag<S80803081>(val);
                     break;
             }
         });
@@ -333,6 +339,16 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
     public TigerHash GetPatternGlobalTagId(InventoryItem item)
     {
         return _sandboxPatternGlobalTagIdTag.TagData.SandboxPatternGlobalTagId[_sandboxPatternGlobalTagIdTag.GetReader(), item.GetWeaponPatternIndex()].PatternGlobalTagIdHash;
+    }
+
+    public int GetPatternGlobalCosmeticID(InventoryItem item)
+    {
+        return _sandboxPatternGlobalTagIdTag.TagData.SandboxPatternGlobalTagId[_sandboxPatternGlobalTagIdTag.GetReader(), item.GetWeaponPatternIndex()].SkinID;
+    }
+
+    public int GetPatternGlobalCosmeticID(int index)
+    {
+        return _sandboxPatternGlobalTagIdTag.TagData.SandboxPatternGlobalTagId[_sandboxPatternGlobalTagIdTag.GetReader(), index].SkinID;
     }
 
     public TigerHash GetWeaponContentGroupHash(InventoryItem item)
@@ -535,6 +551,18 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
 
 
         return entities;
+    }
+
+    public Entity.Entity GetEntityFromCosmeticMap(InventoryItem item)
+    {
+        var index = item.GetArtArrangementIndex();
+        if (index == -1)
+            return null;
+
+        var cosmeticID = GetPatternGlobalCosmeticID(index);
+        Console.WriteLine($"Cosmetic ID {cosmeticID} : Pattern {_investmentCosmeticMap.TagData.InvestmentCosmetics.ElementAt(_investmentCosmeticMap.GetReader(), cosmeticID).Pattern.Hash}");
+
+        return _investmentCosmeticMap.TagData.InvestmentCosmetics.ElementAt(_investmentCosmeticMap.GetReader(), cosmeticID).Pattern;
     }
 
     #region OBSOLETE?
@@ -952,7 +980,12 @@ public class InventoryItem : Tag<S8080968B>
         if (_tag.Unk80.GetValue(GetReader()) is SD3918080 entry)
         {
             if (entry.Arrangements.Count > 0)
-                return entry.Arrangements[GetReader(), 0].ArtArrangementHash;
+            {
+#if DEBUG
+                Debug.Assert(entry.Arrangements.Count == 1);
+#endif
+                return entry.Arrangements[GetReader(), 0].Index;
+            }
         }
         return -1;
     }
