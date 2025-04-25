@@ -719,7 +719,7 @@ public partial class TagListView : UserControl
                     Hash = tagItem.Hash as FileHash,
                     Name = name,
                     SubPath = $"Bulk_{groupName}",
-                    ExportType = ExportTypeFlag.Minimal
+                    ExportType = ExportTypeFlag.Full
                 };
                 viewer.ExportControl.RoutedFunction(exportInfo);
                 MainWindow.Progress.CompleteStage();
