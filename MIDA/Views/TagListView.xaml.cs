@@ -138,13 +138,11 @@ public partial class TagListView : UserControl
     private TagListView _tagListControl = null;
     private ToggleButton _previouslySelected = null;
     private int _selectedIndex = -1;
-    private FbxHandler _globalFbxHandler = null;
     private string _weaponItemName = null;
 
     private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
     {
         _mainWindow = Window.GetWindow(this) as MainWindow;
-        _globalFbxHandler = new FbxHandler(false);
     }
 
     public TagListView()
@@ -862,7 +860,7 @@ public partial class TagListView : UserControl
     {
         var viewer = GetViewer();
         SetViewer(TagView.EViewerType.Entity);
-        bool bLoadedSuccessfully = viewer.EntityControl.LoadEntity(fileHash, _globalFbxHandler);
+        bool bLoadedSuccessfully = viewer.EntityControl.LoadEntity(fileHash);
         if (!bLoadedSuccessfully)
         {
             Log.Error($"UI failed to load entity for hash {fileHash}. You can still try to export the full model instead.");
@@ -871,7 +869,7 @@ public partial class TagListView : UserControl
         SetExportFunction(ExportEntity, (int)ExportTypeFlag.Full | (int)ExportTypeFlag.Minimal);
         viewer.ExportControl.ExportChildrenBox.Visibility = Visibility.Visible;
         viewer.ExportControl.SetExportInfo(fileHash);
-        viewer.EntityControl.ModelView.SetModelFunction(() => viewer.EntityControl.LoadEntity(fileHash, _globalFbxHandler));
+        viewer.EntityControl.ModelView.SetModelFunction(() => viewer.EntityControl.LoadEntity(fileHash));
     }
 
     private void ExportEntity(ExportInfo info)

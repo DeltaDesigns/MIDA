@@ -93,6 +93,46 @@
         <Setter Property="Background" Value="Transparent" />
     </Style>
 
+    <Style TargetType="Slider">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Track
+                            x:Name="PART_Track"
+                            Grid.Row="0"
+                            VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton
+                                    Background="#a9fb00"
+                                    Command="Slider.DecreaseLarge"
+                                    IsTabStop="False"
+                                    Style="{x:Null}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb
+                                    Width="12"
+                                    Height="10"
+                                    Background="#DAFF8D" />
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton
+                                    Background="#222428"
+                                    Command="Slider.IncreaseLarge"
+                                    IsTabStop="False"
+                                    Style="{x:Null}" />
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="GradientBackground" TargetType="Grid">
         <Setter Property="Background">
             <Setter.Value>

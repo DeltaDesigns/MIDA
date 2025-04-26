@@ -516,7 +516,7 @@
         x:Name="InfoBox"
         Width="450"
         HorizontalAlignment="Left"
-        VerticalAlignment="Bottom"
+        VerticalAlignment="Top"
         Panel.ZIndex="50"
         d:Visibility="Visible"
         Background="Transparent"

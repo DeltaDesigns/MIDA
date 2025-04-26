@@ -73,8 +73,8 @@ public static class MarathonTierTypeColor
         { MarathonTierType.Enhanced, Color.FromArgb(255, 1, 244, 134) },
         { MarathonTierType.Deluxe, Color.FromArgb(255, 74, 170, 255) },
         { MarathonTierType.Superior, Color.FromArgb(255, 195, 50, 255) },
-        { MarathonTierType.Prestige, Color.FromArgb(255, 255, 100, 0) }, // Unknown atm
-        { MarathonTierType.Contraband, Color.FromArgb(255, 200, 0, 0) } // Unknown atm
+        { MarathonTierType.Prestige, Color.FromArgb(255, 255, 233, 16) },
+        { MarathonTierType.Contraband, Color.FromArgb(255, 200, 0, 0) } // Unknown atm (is this even a rarity?)
     };
 
     public static Color GetColor(this MarathonTierType tierType)

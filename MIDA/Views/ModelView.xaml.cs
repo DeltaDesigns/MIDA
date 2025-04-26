@@ -13,6 +13,11 @@ public partial class ModelView : UserControl
         InitializeComponent();
     }
 
+    private void UCModelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+
+    }
+
     public ExportDetailLevel GetSelectedLod()
     {
         ExportDetailLevel selected = (ExportDetailLevel)LodCombobox.SelectedIndex;

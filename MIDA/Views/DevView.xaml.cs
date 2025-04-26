@@ -25,7 +25,6 @@ namespace MIDA;
 public partial class DevView : UserControl
 {
     private static MainWindow _mainWindow = null;
-    private FbxHandler _fbxHandler = null;
 
     public DevView()
     {
@@ -35,7 +34,6 @@ public partial class DevView : UserControl
     private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
     {
         _mainWindow = Window.GetWindow(this) as MainWindow;
-        _fbxHandler = new FbxHandler(false);
         HashLocation.Text = $"PKG:\nPKG ID:\nEntry Index:";
 
         //RipAndTear();
@@ -164,7 +162,6 @@ public partial class DevView : UserControl
 
     private void AddWindow(FileHash hash)
     {
-        _fbxHandler.Clear();
         // Adds a new tab to the tab control
         TigerHash reference = hash.GetReferenceHash();
         FileMetadata fileMetadata = PackageResourcer.Get().GetFileMetadata(hash);
@@ -202,7 +199,7 @@ public partial class DevView : UserControl
             {
                 case 0x8080BAAD: // Entity
                     EntityView entityView = new EntityView();
-                    entityView.LoadEntity(hash, _fbxHandler);
+                    entityView.LoadEntity(hash);
 
                     Entity entity = FileResourcer.Get().GetFile<Entity>(hash);
                     List<Entity> entities = new List<Entity> { entity };
@@ -226,7 +223,7 @@ public partial class DevView : UserControl
                     Exporter.Get().Export();
 
                     EntityView entityModelView = new EntityView();
-                    entityModelView.LoadEntityModel(hash, _fbxHandler);
+                    entityModelView.LoadEntityModel(hash);
                     _mainWindow.MakeNewTab(hash, entityModelView);
                     _mainWindow.SetNewestTabSelected();
                     break;

@@ -117,11 +117,11 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
 
                 case 0x80806CAC: // inventory item -> pattern global tag id -> entity assignment
                     _sandboxPatternGlobalTagIdTag = FileResourcer.Get().GetSchemaTag<S80806CAC>(val);
-                    for (int o = 0; o < _sandboxPatternGlobalTagIdTag.TagData.SandboxPatternGlobalTagId.Count; o++)
-                    {
-                        var ent = _sandboxPatternGlobalTagIdTag.TagData.SandboxPatternGlobalTagId.ElementAt(_sandboxPatternGlobalTagIdTag.GetReader(), o);
-                        Console.WriteLine($"{o} : {ent.ItemHash} {ent.PatternGlobalTagIdHash}");
-                    }
+                    //for (int o = 0; o < _sandboxPatternGlobalTagIdTag.TagData.SandboxPatternGlobalTagId.Count; o++)
+                    //{
+                    //    var ent = _sandboxPatternGlobalTagIdTag.TagData.SandboxPatternGlobalTagId.ElementAt(_sandboxPatternGlobalTagIdTag.GetReader(), o);
+                    //    Console.WriteLine($"{o} : {ent.ItemHash} {ent.PatternGlobalTagIdHash}");
+                    //}
                     break;
 
                 case 0x808071C0:
@@ -318,16 +318,15 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
     // Gets the actual entity now? Instead of using GetEntitiesFromHash/GetEntityFromAssignmentHash
     public Entity.Entity? GetPatternEntityFromHash(TigerHash hash)
     {
-        Console.WriteLine("GetPatternEntityFromHash");
         var item = GetInventoryItem(hash);
         if (item.GetWeaponPatternIndex() == -1)
             return null;
 
         var patternGlobalId = GetPatternGlobalTagId(item);
         var patternData = _sandboxPatternAssignmentsTag.TagData.AssignmentBSL.BinarySearch(_sandboxPatternAssignmentsTag.GetReader(), patternGlobalId);
-
+#if DEBUG
         Console.WriteLine($"GetPatternEntityFromHash {patternData.Value.ApiHash} : {patternData.Value.EntityRelationHash}");
-
+#endif
         if (patternData.HasValue && patternData.Value.EntityRelationHash.IsValid() && patternData.Value.EntityRelationHash.GetReferenceHash() == 0x8080BAAD)
             return FileResourcer.Get().GetFile<Entity.Entity>(patternData.Value.EntityRelationHash);
 
@@ -494,43 +493,35 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
         if (pattern is null)
             return entities;
 
-        Console.WriteLine($"Pattern {pattern.Hash}");
         if (pattern.Model != null)
             entities.Add(pattern);
 
         foreach (var resourceHash in pattern.TagData.EntityResources.Select(pattern.GetReader(), r => r.Resource))
         {
             EntityResource resource = FileResourcer.Get().GetFile<EntityResource>(resourceHash);
-            Console.WriteLine($"- {resource.Hash}");
             switch (resource.TagData.Unk10.GetValue(resource.GetReader()))
             {
                 case SB1328080:
-                    Console.WriteLine($"-- SB3328080");
                     foreach (var entry in ((SB3328080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk108)
                     {
-                        Console.WriteLine($"-- {entry.Unk04}: {entry.Entity?.Hash}");
                         if (entry.Entity is not null)
                             entities.Add(entry.Entity);
                     }
                     break;
 
                 case S03468080:
-                    Console.WriteLine($"-- S144A8080");
                     foreach (var entry in ((S144A8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk3A8)
                     {
-                        Console.WriteLine($"--- {entry.Unk00}: {entry.UnkEntity?.Hash}");
                         if (entry.UnkEntity is not null)
                             entities.Add(entry.UnkEntity);
                     }
                     break;
 
                 case S9AB68080:
-                    Console.WriteLine($"-- S519F8080");
                     foreach (var entry in ((S519F8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Array2)
                     {
                         if (entry.Unk10.GetValue(resource.GetReader()) is S98A38080 entry2)
                         {
-                            Console.WriteLine($"--- {entry2.Unk00}: {entry2.Entity?.Hash}");
                             if (entry2.Entity is not null)
                                 entities.Add(entry2.Entity);
                         }
@@ -538,9 +529,7 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
                     break;
 
                 case S87328080:
-                    Console.WriteLine($"-- S88328080");
                     var S88328080 = ((S88328080)resource.TagData.Unk18.GetValue(resource.GetReader()));
-                    Console.WriteLine($"--- : {S88328080.Entity?.Hash}");
                     if (S88328080.Entity is not null)
                         entities.Add(S88328080.Entity);
                     break;
@@ -558,8 +547,9 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
             return null;
 
         var cosmeticID = GetPatternGlobalCosmeticID(index);
+#if DEBUG
         Console.WriteLine($"Cosmetic ID {cosmeticID} : Pattern {_investmentCosmeticMap.TagData.InvestmentCosmetics.ElementAt(_investmentCosmeticMap.GetReader(), cosmeticID).Pattern.Hash}");
-
+#endif
         return _investmentCosmeticMap.TagData.InvestmentCosmetics.ElementAt(_investmentCosmeticMap.GetReader(), cosmeticID).Pattern;
     }
 
@@ -734,171 +724,6 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
         }
     }
     #endregion
-
-#if DEBUG
-    public void DebugAllInvestmentEntities()
-    {
-        Dictionary<string, Dictionary<dynamic, TigerHash>> data = new();
-        for (int i = (int)_entityAssignmentTag.TagData.ArtArrangementEntityAssignments.Count - 1; i >= 0; i--)
-        {
-            List<Entity.Entity> entities = GetEntitiesFromArrangementIndex(i);
-            foreach (var entity in entities)
-            {
-                bool bAllValid = true;
-                if (entity is null || entity.Model is null)
-                    continue;
-                foreach (var entry in entity.Model.TagData.Meshes[entity.Model.GetReader(), 0].Parts)
-                {
-                    foreach (var field in typeof(SD1878080).GetFields())
-                    {
-                        if (!data.ContainsKey(field.Name))
-                        {
-                            data.Add(field.Name, new Dictionary<dynamic, TigerHash>());
-                        }
-                        dynamic fieldValue = field.GetValue(entry);
-                        if (fieldValue is not null && !data[field.Name].ContainsKey(fieldValue) && data[field.Name].Count < 10)
-                        {
-                            data[field.Name].Add(fieldValue, _entityAssignmentTag.TagData.ArtArrangementEntityAssignments.ElementAt(_entityAssignmentTag.GetReader(), i).ArtArrangementHash);
-                        }
-
-                        bAllValid &= data[field.Name].Count > 1;
-                    }
-                }
-                if (bAllValid)
-                {
-                    var a = 0;
-                }
-            }
-        }
-    }
-
-    private static Random rng = new Random();
-
-    public void DebugAPIRequestAllInfo()
-    {
-        // get all inventory item hashes
-
-        // var itemHash = 138282166;
-        var l = _inventoryItemIndexmap.Keys.ToList();
-        var shuffled = l.OrderBy(a => rng.Next()).ToList();
-        foreach (var itemHash in shuffled)
-        {
-            if (itemHash != 731561450)
-                continue;
-            ManifestData? itemDef;
-            byte[] tgxm;
-            try
-            {
-                itemDef = MakeGetRequestManifestData($"https://www.light.gg/db/items/{itemHash}/?raw=2");
-                // ManifestData? itemDef = MakeGetRequestManifestData($"https://lowlidev.com.au/destiny/api/gearasset/{itemHash.Hash}?destiny2");
-                if (itemDef is null || itemDef.gearAsset is null || itemDef.gearAsset.content.Length == 0 || itemDef.gearAsset.content[0].geometry is null || itemDef.gearAsset.content[0].geometry.Length == 0)
-                    continue;
-                tgxm = MakeGetRequest(
-                    $"https://www.bungie.net/common/destiny2_content/geometry/platform/mobile/geometry/{itemDef.gearAsset.content[0].geometry[0]}");
-            }
-            catch (Exception e)
-            {
-                continue;
-            }
-
-            // Read TGXM
-            // File.WriteAllBytes("C:/T/geometry.tgxm", tgxm);
-            var br = new BinaryReader(new MemoryStream(tgxm));
-            // br.BaseStream.Seek(8, SeekOrigin.Begin);
-            var magic = br.ReadBytes(4);
-            if (magic.Equals(new byte[] { 0x54, 0x47, 0x58, 0x4d }))
-            {
-                continue;
-            }
-            var version = br.ReadUInt32();
-            var fileOffset = br.ReadInt32();
-            var fileCount = br.ReadInt32();
-            for (int i = 0; i < fileCount; i++)
-            {
-                br.BaseStream.Seek(fileOffset + 0x110 * i, SeekOrigin.Begin);
-                var fileName = Encoding.ASCII.GetString(br.ReadBytes(0x100)).TrimEnd('\0');
-                var offset = br.ReadInt32();
-                var type = br.ReadInt32();
-                var size = br.ReadInt32();
-                if (fileName.Contains(".js"))
-                {
-                    byte[] fileData;
-                    Array.Copy(tgxm, offset, fileData = new byte[size], 0, size);
-                    File.WriteAllBytes($"C:/T/geom/{itemHash}_{fileName}", fileData);
-                }
-            }
-        }
-    }
-
-    public void DebugAPIRenderMetadata()
-    {
-
-        var files = Directory.GetFiles("C:/T/geom");
-        foreach (var file in files)
-        {
-            dynamic json = JsonConvert.DeserializeObject(File.ReadAllText(file));
-            var data = json["render_model"]["render_meshes"];
-            var a = 0;
-        }
-    }
-
-    private ManifestData MakeGetRequestManifestData(string url)
-    {
-        using (var client = new HttpClient())
-        {
-            client.Timeout = TimeSpan.FromSeconds(2);
-            var response = client.GetAsync(url).Result;
-            var content = response.Content.ReadAsStringAsync().Result;
-            if (content.Contains("\"gearAsset\": false"))
-            {
-                return null;
-            }
-            ManifestData item = System.Text.Json.JsonSerializer.Deserialize<ManifestData>(content);
-            return item;
-        }
-    }
-
-    private byte[] MakeGetRequest(string url)
-    {
-        using (var client = new HttpClient())
-        {
-            client.Timeout = TimeSpan.FromSeconds(2);
-            var response = client.GetAsync(url).Result;
-            var content = response.Content.ReadAsByteArrayAsync().Result;
-            return content;
-        }
-    }
-#pragma warning disable S1144 // Unused private types or members should be removed
-    private class ManifestData
-    {
-        public dynamic requestedId { get; set; }
-        public DestinyGearAssetsDefinition gearAsset { get; set; }
-        public dynamic definition { get; set; }
-    }
-
-    private class DestinyGearAssetsDefinition
-    {
-        public string[] gear { get; set; }
-        public ContentDefinition[] content { get; set; }
-    }
-
-    private class ContentDefinition
-    {
-        public string platform { get; set; }
-        public string[] geometry { get; set; }
-        public string[] textures { get; set; }
-        public IndexSet male_index_set { get; set; }
-        public IndexSet female_index_set { get; set; }
-        public IndexSet dye_index_set { get; set; }
-        public Dictionary<string, IndexSet[]> region_index_sets { get; set; }
-    }
-
-    private class IndexSet
-    {
-        public int[] textures { get; set; }
-        public int[] geometry { get; set; }
-    }
-#endif
 
     public void ExportShader(InventoryItem item, string savePath, string name, TextureExportFormat outputTextureFormat) // TODO
     {

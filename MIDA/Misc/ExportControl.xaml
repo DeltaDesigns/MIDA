@@ -51,20 +51,20 @@
                     Text="Export Entity Children"
                     TextAlignment="Center" />
             </CheckBox>
-            <Border
+
+            <Button
+                x:Name="ExportButton"
                 Grid.Column="1"
                 HorizontalAlignment="Center"
-                Background="{StaticResource BackgroundColour20}">
-                <Button x:Name="ExportButton" Style="{StaticResource D2StyleButton}">
-                    <TextBlock
-                        Margin="5"
-                        VerticalAlignment="Center"
-                        FontSize="16"
-                        IsHitTestVisible="False"
-                        Text="EXPORT"
-                        TextAlignment="Center" />
-                </Button>
-            </Border>
+                Style="{StaticResource D2StyleButton}">
+                <TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    IsHitTestVisible="False"
+                    Text="EXPORT"
+                    TextAlignment="Center" />
+            </Button>
 
         </Grid>
     </Grid>

@@ -89,7 +89,7 @@
                     Tag="MAPS AND ACTIVITIES:View Maps and Activity related content.">
 
                     <TextBlock
-                        d:FontFamily="Haas Grot Text 55 Roman"
+                        d:FontFamily="Marathon Shapiro 65 Wide"
                         FontFamily="{DynamicResource Marathon Shapiro}"
                         Text="MAPS AND ACTIVITIES"
                         TextWrapping="WrapWithOverflow" />
@@ -97,6 +97,7 @@
                 </Button>
 
                 <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+
                     <StackPanel
                         Grid.Column="0"
                         Margin="0,0,35,0"
@@ -106,7 +107,7 @@
                         <Button
                             x:Name="ApiButton"
                             Grid.Column="1"
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="ApiViewButton_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -114,7 +115,8 @@
                             Tag="API VIEWER:View and export any Player Gear.">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="API" />
 
@@ -122,23 +124,22 @@
 
                         <Button
                             x:Name="BagsButton"
-                            Margin="10"
                             Click="NamedEntitiesBagsViewButton_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
                             Style="{DynamicResource D2StyleButton}"
                             Tag="NAMED BAGS:View and export entities contained in developer named 'bags', like a collection of prefabs."
                             Visibility="Collapsed">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource KH Interference Light}"
-                                    Text="NAMED BAGS" />
-                            </Border>
+
+                            <TextBlock
+                                d:FontFamily="Marathon Shapiro 65 Wide"
+                                FontFamily="{DynamicResource KH Interference Light}"
+                                Text="NAMED BAGS" />
+
                         </Button>
 
                         <Button
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="AllEntitiesViewButton_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -146,7 +147,8 @@
                             Tag="DYNAMICS:View and export entities, some are even named!">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="DYNAMICS" />
 
@@ -154,7 +156,7 @@
 
                         <Button
                             x:Name="StaticsButton"
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="AllStaticsViewButton_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -162,7 +164,8 @@
                             Tag="STATICS:View and export static models. These are what make a map.">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="STATICS" />
 
@@ -186,7 +189,8 @@
                             Tag="ALL SOUNDS:View and export any audio in the game.">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="ALL SOUNDS" />
 
@@ -194,7 +198,7 @@
 
                         <Button
                             x:Name="WeaponAudioButton"
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="WeaponAudioViewButton_Click"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -202,28 +206,12 @@
                             Tag="WEAPON SOUNDS:View and export specific weapon sounds.">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="WEAPON AUDIO" />
 
                         </Button>
-
-                        <Button
-                            x:Name="SoundBanksButton"
-                            Margin="10"
-                            Click="AllBKHDViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="SOUND BANKS:View and export specific sounds from a named collection">
-                            <Border Background="#BB181818">
-                                <TextBlock
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource Marathon Shapiro}"
-                                    Text="SOUND BANKS" />
-                            </Border>
-                        </Button>
-
 
                     </StackPanel>
 
@@ -234,7 +222,7 @@
                         <ContentControl Content="OTHER" Template="{StaticResource MarathonCategoryLabel}" />
 
                         <Button
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="AllStringsViewButton_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -242,14 +230,15 @@
                             Tag="STRINGS:View and export strings.">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="STRINGS" />
 
                         </Button>
 
                         <Button
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="AllTexturesView2Button_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -257,14 +246,15 @@
                             Tag="TEXTURES:View and export textures.">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="TEXTURES" />
 
                         </Button>
 
                         <Button
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="AllMaterialsViewButton_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -272,7 +262,8 @@
                             Tag="MATERIALS:View and export materials. These make everything look pretty.">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="MATERIALS" />
 
@@ -281,7 +272,7 @@
                         <Button
                             x:Name="CollectionsButton"
                             Grid.Column="1"
-                            Margin="10"
+                            Margin="10,5,5,5"
                             Click="CollectionsViewButton_OnClick"
                             MouseEnter="CategoryButton_MouseEnter"
                             MouseLeave="CategoryButton_MouseLeave"
@@ -289,7 +280,8 @@
                             Tag="COLLECTIONS:View and inspect Player Gear in detail, just like in-game!">
 
                             <TextBlock
-                                d:FontFamily="Haas Grot Text 55 Roman"
+                                HorizontalAlignment="Left"
+                                d:FontFamily="Marathon Shapiro 65 Wide"
                                 FontFamily="{DynamicResource Marathon Shapiro}"
                                 Text="COLLECTIONS" />
 
@@ -347,7 +339,7 @@
                 Margin="15,0,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                d:FontFamily="Haas Grot Text 55 Roman"
+                d:FontFamily="KH Interference Light"
                 FontFamily="{DynamicResource KH Interference Light}"
                 FontSize="16"
                 Foreground="{StaticResource ForegroundColour80}"

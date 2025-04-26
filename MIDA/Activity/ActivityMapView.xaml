@@ -166,15 +166,10 @@
                 d:Visibility="Visible"
                 Orientation="Vertical"
                 Visibility="Hidden">
-                <Border Style="{StaticResource ColumnHeaderBorder}">
-                    <Grid Style="{StaticResource ColumnHeader}">
-                        <TextBlock
-                            d:FontFamily="Haas Grot Text 55 Roman"
-                            FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                            FontSize="24"
-                            Text="MANUAL EXPORT" />
-                    </Grid>
-                </Border>
+                <ContentControl
+                    Margin="0,10,0,10"
+                    Content="MANUAL EXPORT"
+                    Template="{StaticResource MarathonCategoryLabel}" />
 
                 <ListView
                     x:Name="StaticList"
@@ -221,15 +216,10 @@
                 Orientation="Vertical"
                 Visibility="Hidden">
 
-                <Border Style="{StaticResource ColumnHeaderBorder}">
-                    <Grid Style="{StaticResource ColumnHeader}">
-                        <TextBlock
-                            d:FontFamily="Haas Grot Text 55 Roman"
-                            FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                            FontSize="24"
-                            Text="QUICK EXPORT" />
-                    </Grid>
-                </Border>
+                <ContentControl
+                    Margin="0,10,0,10"
+                    Content="QUICK EXPORT"
+                    Template="{StaticResource MarathonCategoryLabel}" />
 
                 <Button
                     Margin="0,0,0,15"
@@ -240,9 +230,10 @@
                     Style="{DynamicResource D2StyleButton}"
                     Tag="EXPORT ALL:Export everything from this map. &#x0a;(Static Map and Resources only)">
                     <TextBlock
+                        HorizontalAlignment="Left"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="22"
+                        FontSize="24"
                         Text="EXPORT ALL"
                         TextWrapping="WrapWithOverflow" />
                 </Button>
@@ -257,9 +248,10 @@
                     Tag="EXPORT STATIC MAP:Export this maps statics + terrain">
 
                     <TextBlock
+                        HorizontalAlignment="Left"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="22"
+                        FontSize="24"
                         Text="EXPORT STATIC MAP"
                         TextWrapping="WrapWithOverflow" />
                 </Button>
@@ -273,9 +265,10 @@
                     Style="{DynamicResource D2StyleButton}"
                     Tag="EXPORT RESOURCES:Export this maps resources. These include...&#x0a; Entities&#x0a; Sky Objects&#x0a; Decorators (foliage, small rocks, etc)&#x0a; Lights&#x0a; Decal and Cubemap information">
                     <TextBlock
+                        HorizontalAlignment="Left"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="22"
+                        FontSize="24"
                         Text="EXPORT MAP RESOURCES"
                         TextWrapping="WrapWithOverflow" />
                 </Button>
@@ -290,9 +283,10 @@
                     Style="{DynamicResource D2StyleButton}"
                     Tag="EXPORT ACTIVITY ENTITIES:Export entities specific to the current activity and its ambient version.&#x0a;These entities aren't included in the base map.">
                     <TextBlock
+                        HorizontalAlignment="Left"
                         d:FontFamily="Haas Grot Text 55 Roman"
                         FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="22"
+                        FontSize="24"
                         Text="EXPORT ACTIVITY ENTITIES"
                         TextWrapping="WrapWithOverflow" />
                 </Button>

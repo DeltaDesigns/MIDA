@@ -12,27 +12,39 @@ namespace MIDA;
 
 public partial class StaticView : UserControl
 {
+    private MainViewModel MVM;
     public StaticView()
     {
         InitializeComponent();
     }
 
+    private FileHash currentHash;
+    private ExportDetailLevel currentDetailLevel;
+    private Window currentWindow;
+
     public void LoadStatic(FileHash hash, ExportDetailLevel detailLevel, Window window)
     {
+        currentHash = hash;
+        currentDetailLevel = detailLevel;
+        currentWindow = window;
+
+        SetupCheckboxHandlers();
         ModelView.Visibility = Visibility.Visible;
+        ModelView.TextureCheckBox.Visibility = Visibility.Visible;
+
         StaticMesh staticMesh = FileResourcer.Get().GetFile<StaticMesh>(hash);
         var parts = staticMesh.Load(detailLevel);
-        // await Task.Run(() =>
-        // {
-        //     parts = staticMesh.Load(detailLevel);
-        // });
-        MainViewModel MVM = (MainViewModel)ModelView.UCModelView.Resources["MVM"];
+
+        if (MVM is null)
+            MVM = (MainViewModel)ModelView.UCModelView.Resources["MVM"];
+
         MVM.Clear();
         var displayParts = MakeDisplayParts(parts);
         MVM.SetChildren(displayParts);
         MVM.Title = hash;
         MVM.SubTitle = $"{displayParts.Sum(p => p.BasePart.Indices.Count)} triangles";
     }
+
 
     public static void ExportStatic(FileHash hash, string name, ExportTypeFlag exportType, string extraPath = "")
     {
@@ -64,18 +76,52 @@ public partial class StaticView : UserControl
             Exporter.Get().Export();
     }
 
+
+
     private List<MainViewModel.DisplayPart> MakeDisplayParts(List<StaticPart> containerParts)
     {
-        List<MainViewModel.DisplayPart> displayParts = new List<MainViewModel.DisplayPart>();
-        foreach (StaticPart part in containerParts)
+        bool useTextures = ModelView.TextureCheckBox.IsChecked == true;
+        List<MainViewModel.DisplayPart> displayParts = new();
+
+        foreach (var part in containerParts)
         {
-            MainViewModel.DisplayPart displayPart = new MainViewModel.DisplayPart();
-            displayPart.BasePart = part;
-            displayPart.Translations.Add(Vector3.Zero);
-            displayPart.Rotations.Add(Vector4.Quaternion);
-            displayPart.Scales.Add(Vector3.One);
+            var displayPart = new MainViewModel.DisplayPart
+            {
+                BasePart = part,
+                Translations = { Vector3.Zero },
+                Rotations = { Vector4.Quaternion },
+                Scales = { Vector3.One }
+            };
+
+            if (useTextures && part.Material?.Pixel.Textures.Any() == true)
+            {
+                var texture = part.Material.Pixel.Textures[0].Texture.GetTexture();
+                displayPart.DiffuseMaterial = new()
+                {
+                    DiffuseMap = new HelixToolkit.SharpDX.Core.TextureModel(texture, true)
+                };
+            }
+
             displayParts.Add(displayPart);
         }
+
         return displayParts;
     }
+
+    private void SetupCheckboxHandlers()
+    {
+        // Detach first to prevent multiple subscriptions
+        ModelView.TextureCheckBox.Checked -= TextureCheckBox_Checked;
+        ModelView.TextureCheckBox.Unchecked -= TextureCheckBox_Unchecked;
+
+        ModelView.TextureCheckBox.Checked += TextureCheckBox_Checked;
+        ModelView.TextureCheckBox.Unchecked += TextureCheckBox_Unchecked;
+    }
+
+    private void TextureCheckBox_Checked(object sender, RoutedEventArgs e) =>
+        LoadStatic(currentHash, currentDetailLevel, currentWindow);
+
+    private void TextureCheckBox_Unchecked(object sender, RoutedEventArgs e) =>
+        LoadStatic(currentHash, currentDetailLevel, currentWindow);
+
 }

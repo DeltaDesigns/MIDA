@@ -292,13 +292,13 @@ public class ExporterScene
         EntityInstances[dynamicResource.Entity.Hash].Add((Transform)transform);
     }
 
-    public void AddMapModel(EntityModel model, Transform transform, bool transparentsOnly = false)
+    public void AddMapModel(EntityModel model, Transform transform)
     {
         ExporterMesh mesh = new(model.Hash);
 
         if (_addedEntities.TryAdd(model.Hash, true)) // Dont want duplicate entities being added
         {
-            var parts = model.Load(ExportDetailLevel.MostDetailed, null, transparentsOnly);
+            var parts = model.Load(ExportDetailLevel.MostDetailed, null);
             for (int i = 0; i < parts.Count; i++)
             {
                 DynamicMeshPart part = parts[i];

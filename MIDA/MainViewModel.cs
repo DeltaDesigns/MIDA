@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -70,6 +70,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public LineGeometry3D Grid { get; private set; }
     public Media3D.Transform3D GridTransform { get; private set; }
+    public TextureModel BackgroundTexture { get; private set; }
 
     public MainViewModel()
     {
@@ -93,6 +94,9 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         GridTransform = new TranslateTransform3D(-5, 0, -5);
 
         // EnvironmentMap = TextureModel.Create("C:/T/full/Textures/2D47A280.dds");
+        BackgroundTexture = new TextureModel(
+         BitmapExtensions.CreateSolidColorBitmapStream(EffectsManager, 2, 2,
+         Direct2DImageFormat.Bmp, new Color4(26 / 255f, 26 / 255f, 28 / 255f, 1)));
     }
 
     private void ResetCamera()
@@ -130,6 +134,12 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         public List<Vector3> Translations = new List<Vector3>();
         public List<Vector4> Rotations = new List<Vector4>();
         public List<Vector3> Scales = new List<Vector3>();
+        public DiffuseMaterial DiffuseMaterial = new DiffuseMaterial
+        {
+            DiffuseColor = new Color4(0.9f, 0.9f, 0.9f, 1.0f)
+        };
+
+        public List<BoneNode> BoneNodes = new();
 
         public DisplayPart()
         {
@@ -261,7 +271,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                     if (part.BasePart.VertexTexcoords0.Count > 0)
                     {
                         var v2t = part.BasePart.VertexTexcoords0[lookup[(int)vertexIndex]];
-                        SharpDX.Vector2 t = new SharpDX.Vector2(v2t.X, v2t.Y);
+                        SharpDX.Vector2 t = new SharpDX.Vector2(v2t.X, 1 - v2t.Y);
                         textureCoordinates.Add(t);
                     }
                 }
@@ -272,6 +282,10 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                     triangleIndices.Add(lookup[(int)face.Z]);
                 }
             }
+            if (part.BoneNodes.Count > 0)
+            {
+                AddSkeletonVisual(part.BoneNodes);
+            }
 
             mesh.Positions = positions;
             mesh.Normals = normals;
@@ -279,11 +293,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
             mesh.TriangleIndices = triangleIndices;
             model.Geometry = mesh;
 
-            model.Material = new DiffuseMaterial
-            {
-                DiffuseColor = new Color4(0.9f, 0.9f, 0.9f, 1.0f)
-                //DiffuseColor = rand.NextColor()
-            };
+            model.Material = part.DiffuseMaterial;
             model.CullMode = SharpDX.Direct3D11.CullMode.Back;
 
             List<Matrix> instances = new List<Matrix>();
@@ -304,6 +314,78 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
             model.Instances = ModelInstances;
             ModelGroup.AddNode(model);
         }
+    }
+
+    public void AddSkeletonVisual(List<BoneNode> bones)
+    {
+        var positions = new Vector3Collection();
+        var indices = new IntCollection();
+        var correction = SharpDX.Matrix.RotationX(-(float)Math.PI / 2) * SharpDX.Matrix.RotationY(-(float)Math.PI / 2);
+
+        foreach (var bone in bones)
+        {
+            if (bone.ParentNodeIndex > 0 && bone.ParentNodeIndex < bones.Count)
+            {
+                var parent = bones[bone.ParentNodeIndex];
+
+                int startIndex = positions.Count;
+
+                var childPos = SharpDX.Vector3.TransformCoordinate(
+                    new SharpDX.Vector3(bone.DefaultObjectSpaceTransform.Translation.X,
+                                        bone.DefaultObjectSpaceTransform.Translation.Y,
+                                        bone.DefaultObjectSpaceTransform.Translation.Z),
+                    correction);
+
+                var parentPos = SharpDX.Vector3.TransformCoordinate(
+                    new SharpDX.Vector3(parent.DefaultObjectSpaceTransform.Translation.X,
+                                        parent.DefaultObjectSpaceTransform.Translation.Y,
+                                        parent.DefaultObjectSpaceTransform.Translation.Z),
+                    correction);
+
+                positions.Add(childPos);
+                positions.Add(parentPos);
+
+                indices.Add(startIndex);
+                indices.Add(startIndex + 1);
+
+
+                // Adds sphere at joint
+                var jointPos = SharpDX.Vector3.TransformCoordinate(
+                    new SharpDX.Vector3(bone.DefaultObjectSpaceTransform.Translation.X,
+                                        bone.DefaultObjectSpaceTransform.Translation.Y,
+                                        bone.DefaultObjectSpaceTransform.Translation.Z),
+                    correction);
+
+                var sphereMeshBuilder = new MeshBuilder();
+                sphereMeshBuilder.AddSphere(new SharpDX.Vector3(jointPos.X, jointPos.Y, jointPos.Z), 0.0075, 6, 6);
+
+                var sphereModel = new MeshGeometryModel3D
+                {
+                    Geometry = sphereMeshBuilder.ToMeshGeometry3D(),
+                    Material = new DiffuseMaterial
+                    {
+                        DiffuseColor = new Color4(1, 0, 0, 1)
+                    },
+                    DepthBias = -int.MaxValue
+                };
+
+                ModelGroup.AddNode((SceneNode)sphereModel);
+            }
+        }
+
+        var skeletonLines = new LineGeometryModel3D
+        {
+            Geometry = new LineGeometry3D
+            {
+                Positions = positions,
+                Indices = indices
+            },
+            Color = System.Windows.Media.Colors.Red,
+            Thickness = 1.5,
+            DepthBias = -int.MaxValue,
+        };
+
+        ModelGroup.AddNode((SceneNode)skeletonLines);
     }
 
     private Vector3 ConsiderQuatToEulerConvert(Vector4 v4N)

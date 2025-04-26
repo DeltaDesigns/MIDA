@@ -339,13 +339,13 @@ public partial class APITooltip : UserControl
         TranslateTransform infoBoxTransform = (TranslateTransform)InfoBox.RenderTransform;
 
         float xOffset = 20;
-        float yOffset = (float)item.ActualHeight;
+        float yOffset = 0;
 
         if (position.X >= ActualWidth / 2)
             xOffset = (-1 * xOffset) - (float)InfoBox.ActualWidth - (float)item.ActualWidth;
 
-        if (position.Y <= ActualHeight / 2)
-            yOffset = yOffset + (float)InfoBox.ActualHeight - (float)item.ActualHeight;
+        if (position.Y >= ActualHeight / 2)
+            yOffset = (-1 * yOffset) - (float)InfoBox.ActualHeight + (float)item.ActualHeight;
 
         // TODO: Adjust if infobox would go out of Y bounds
         if (item.ActualWidth + InfoBox.ActualWidth >= MainWindow.Current.ActualWidth - InfoBox.ActualWidth)
@@ -354,12 +354,12 @@ public partial class APITooltip : UserControl
             yOffset += (float)item.ActualHeight + 20;
         }
 
-        //if (position.Y - yOffset - padding - (float)InfoBox.ActualHeight <= 0)
-        //    yOffset += (float)(position.Y - yOffset - padding - (float)InfoBox.ActualHeight);
-
+        //Console.WriteLine($"{item.ActualHeight + InfoBox.ActualHeight} : {MainWindow.Current.ActualHeight - InfoBox.ActualHeight}");
+        //if (item.ActualHeight + InfoBox.ActualHeight >= MainWindow.Current.ActualHeight - InfoBox.ActualHeight)
+        //    yOffset -= (float)item.ActualHeight + yOffset;
 
         infoBoxTransform.X = activeItemPosition.X + item.ActualWidth + xOffset;
-        infoBoxTransform.Y = activeItemPosition.Y - ActualHeight + yOffset;
+        infoBoxTransform.Y = activeItemPosition.Y + yOffset;
     }
 
     public enum TooltipType // TODO: Simplify styles/templates

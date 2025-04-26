@@ -25,7 +25,6 @@ public partial class MainMenuView : UserControl
         BagsButton.IsEnabled = false;
         WeaponAudioButton.IsEnabled = false;
         StaticsButton.IsEnabled = true;
-        SoundBanksButton.Visibility = Visibility.Hidden;
         CollectionsButton.IsEnabled = false;
 
         Strategy.OnStrategyChangedEvent += delegate (StrategyEventArgs args)
@@ -36,7 +35,6 @@ public partial class MainMenuView : UserControl
                 BagsButton.IsEnabled = false;
                 WeaponAudioButton.IsEnabled = false;
                 StaticsButton.IsEnabled = true;
-                SoundBanksButton.Visibility = Visibility.Hidden;
                 CollectionsButton.IsEnabled = false;
             });
         };

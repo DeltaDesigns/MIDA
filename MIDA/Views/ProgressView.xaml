@@ -66,7 +66,8 @@
                     x:Name="ProgressText"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    FontFamily="{DynamicResource Haas Grot Text 65 Medium Keys}"
+                    d:FontFamily="KH Interference Regular"
+                    FontFamily="{DynamicResource KH Interference Regular}"
                     FontSize="18"
                     Text="LOADING">
                     <TextBlock.Effect>
@@ -106,9 +107,9 @@
                                     <TranslateTransform x:Name="GradientTransform" X="1000" />
                                 </TransformGroup>
                             </LinearGradientBrush.Transform>
-                            <GradientStop Offset="0.0" Color="#FF6D99FF" />
-                            <GradientStop Offset="0.5" Color="#FFCEDDFF" />
-                            <GradientStop Offset="1.0" Color="#FF6D99FF" />
+                            <GradientStop Offset="0.0" Color="#a9fb00" />
+                            <GradientStop Offset="0.5" Color="#EDFFC9" />
+                            <GradientStop Offset="1.0" Color="#a9fb00" />
                         </LinearGradientBrush>
                     </ProgressBar.Foreground>
                 </ProgressBar>
