@@ -17,7 +17,7 @@ public partial class ConfigView : UserControl
     public ConfigView()
     {
         InitializeComponent();
-        MouseMove += UserControl_MouseMove;
+        //MouseMove += UserControl_MouseMove;
 
         controlMapping = new Dictionary<string, UIElement>
         {

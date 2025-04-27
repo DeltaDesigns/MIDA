@@ -22,6 +22,7 @@
       <None Remove="Shaders\procedural_spinner.ps.hlsl" />
       <None Remove="Shaders\procedural_spinner.vs.cso" />
       <None Remove="Shaders\procedural_spinner.vs.hlsl" />
+      <None Remove="ThirdParty\fonts\GoliathBeta-Encrypted.otf" />
       <None Remove="ThirdParty\fonts\marathonshapiro_wide65.otf" />
     </ItemGroup>
 
@@ -144,6 +145,7 @@
 
 
     <ItemGroup>
+      <Resource Include="ThirdParty\fonts\GoliathBeta-Encrypted.otf" />
       <Resource Include="ThirdParty\fonts\marathonshapiro_wide65.otf" />
     </ItemGroup>
 

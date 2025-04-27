@@ -20,7 +20,8 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Click="InspectAPIItem_OnClick"
-            Style="{StaticResource API Inspect Button}">
+            Style="{StaticResource API Inspect Button}"
+            Visibility="Visible">
             <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
@@ -33,7 +34,8 @@
             HorizontalAlignment="Left"
             Panel.ZIndex="1"
             BorderBrush="White"
-            BorderThickness="0">
+            BorderThickness="0"
+            Visibility="Collapsed">
             <Image Source="{Binding ImageSource}" />
         </Border>
 

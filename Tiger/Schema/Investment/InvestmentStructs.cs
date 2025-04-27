@@ -125,18 +125,21 @@ public struct S89B18080
     public short Unk00;
 }
 
-[SchemaStruct("81738080", 0x30)]
-public struct S81738080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "45928080", 0x40)] // 45928080?
+public struct S45928080
 {
-    public DynamicArray<S86738080> InvestmentStats;  // "investmentStats" from API
-    public DynamicArray<S87738080> Perks;  // 'perks'
+    public int StatGroupIndex; // unsure
+
+    [SchemaField(0x8)]
+    public DynamicArray<S4B928080> InvestmentStats;  // "investmentStats" from API
+    //public DynamicArray<S87738080> Perks;  // 'perks'
 }
 
 /// <summary>
 /// "investmentStat" from API
 /// </summary>
-[SchemaStruct("86738080", 0x28)]
-public struct S86738080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "4B928080", 0x28)] // 4B928080?
+public struct S4B928080
 {
     public int StatTypeIndex;  // "statTypeHash" from API
     public int Value;  // "value" from API
@@ -218,54 +221,55 @@ public struct S7B738080
 #endregion
 
 #region Stats
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "BE548080", 0x18)]
-public struct SBE548080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "808033FD", 0x18)]
+public struct S808033FD
 {
     public ulong FileSize;
-    public DynamicArrayUnloaded<SC4548080> StatGroupDefinitions;
+    public DynamicArrayUnloaded<S01348080> StatGroupDefinitions;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "C4548080", 0x38)]
-public struct SC4548080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "01348080", 0x18)]
+public struct S01348080
 {
     public TigerHash StatGroupHash;
-    public short Unk04;
-    [SchemaField(0x8)]
-    public TigerHash Unk08;
-    [SchemaField(0x10)]
-    public DynamicArray<SC8548080> ScaledStats;
-    [SchemaField(0x30)]
-    public int MaximumValue;
+
+    [SchemaField(0x8, TigerStrategy.MARATHON_ALPHA)]
+    public DynamicArray<S03348080> Stats;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "C8548080", 0x18)]
-public struct SC8548080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "03348080", 0x48)]
+public struct S03348080
 {
-    public byte StatIndex; // 'statHash'
-    public byte DisplayAsNumeric;
-    public byte Unk02;
-    public byte IsLinear; // not in api, means the value "isnt" interpolated? WYSIWYG
-    [SchemaField(0x8)]
-    public DynamicArray<S257A8080> DisplayInterpolation;
+    public TigerHash StatHash;
+    public StringIndexReference StatDisplayName;
+    public StringIndexReference StatDisplayDescription;
+    public StringIndexReference StatValueSuffix; // '%', 'm', 's'
+
+    //public byte DisplayAsNumeric;
+    //public byte Unk02;
+    //public byte IsLinear; // not in api, means the value "isnt" interpolated? WYSIWYG
+
+    [SchemaField(0x28, TigerStrategy.MARATHON_ALPHA)]
+    public DynamicArray<SF4288080> DisplayInterpolation;
 
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "257A8080", 0x8)]
-public struct S257A8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "F4288080", 0x8)]
+public struct SF4288080
 {
     public int Value;
     public int Weight;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "6B588080", 0x18)]
-public struct S6B588080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80806E50", 0x18)]
+public struct S80806E50
 {
     public ulong FileSize;
-    public DynamicArrayUnloaded<S6F588080> StatDefinitions;
+    public DynamicArrayUnloaded<S546E8080> StatDefinitions;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "6F588080", 0x24)]
-public struct S6F588080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "546E8080", 0x30)]
+public struct S546E8080
 {
     public TigerHash StatHash;
     public StringIndexReference StatName;
@@ -332,6 +336,9 @@ public struct S80806EF6
     [SchemaField(0xA8, TigerStrategy.MARATHON_ALPHA)]
     public ResourcePointer UnkA8;  // 752C8080
 
+    [SchemaField(0xB0, TigerStrategy.MARATHON_ALPHA)]
+    public short IconIndex;
+    public short UnkB2;
 
     [SchemaField(0xB4, TigerStrategy.MARATHON_ALPHA)]
     public StringIndexReference ItemName;

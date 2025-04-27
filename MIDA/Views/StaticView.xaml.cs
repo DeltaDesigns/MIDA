@@ -95,10 +95,10 @@ public partial class StaticView : UserControl
 
             if (useTextures && part.Material?.Pixel.Textures.Any() == true)
             {
-                var texture = part.Material.Pixel.Textures[0].Texture.GetTexture();
+                var texture = TextureView.RemoveAlpha(part.Material.Pixel.Textures[0].Texture.GetTexture());
                 displayPart.DiffuseMaterial = new()
                 {
-                    DiffuseMap = new HelixToolkit.SharpDX.Core.TextureModel(texture, true)
+                    DiffuseMap = new HelixToolkit.SharpDX.Core.TextureModel(texture, true),
                 };
             }
 

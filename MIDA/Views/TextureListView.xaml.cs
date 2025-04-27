@@ -45,7 +45,7 @@ public partial class TextureListView : UserControl
     private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
     {
         _mainWindow = Window.GetWindow(this) as MainWindow;
-        MouseMove += UserControl_MouseMove;
+        //MouseMove += UserControl_MouseMove;
 
         ToolTip = new();
         Panel.SetZIndex(ToolTip, 50);

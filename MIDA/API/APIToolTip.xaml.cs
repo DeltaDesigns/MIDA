@@ -140,7 +140,7 @@ public partial class APITooltip : UserControl
                 //    }
                 //}
 
-                //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
+                //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S45928080 stats)
                 //{
                 //    if (item.PlugStyle == DestinySocketCategoryStyle.Reusable)
                 //        return;

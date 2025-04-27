@@ -65,22 +65,22 @@ public partial class APIItemView : UserControl
     {
         InitializeComponent();
 
-        var source = Investment.Get().GetCollectibleStringsFromItemIndex(Investment.Get().GetItemIndex(apiItem.Item.TagData.InventoryItemHash));
-        var sourceString = source != null ? source.Value.SourceName.Value.ToString() : "";
+        //var source = Investment.Get().GetCollectibleStringsFromItemIndex(Investment.Get().GetItemIndex(apiItem.Item.TagData.InventoryItemHash));
+        //var sourceString = source != null ? source.Value.SourceName.Value.ToString() : "";
 
         var hash = apiItem.Item.TagData.InventoryItemHash;
-        ImageSource foundryBanner = apiItem.ItemType?.ToUpper() != "EMBLEM" ? ApiImageUtils.MakeFoundryBanner(apiItem.Item) : null;
+        //ImageSource foundryBanner = apiItem.ItemType?.ToUpper() != "EMBLEM" ? ApiImageUtils.MakeFoundryBanner(apiItem.Item) : null;
         ApiItem = new ApiItemView
         {
             Item = apiItem.Item,
             ItemName = apiItem.ItemName?.ToUpper(),
             ItemType = apiItem.ItemType?.ToUpper(),
             //ItemFlavorText = Investment.Get().GetItemStrings(hash).TagData.ItemFlavourText.Value.ToString(),
-            ItemLore = Investment.Get().GetItemLore(hash)?.LoreDescription.Value.ToString(),
-            ItemSource = sourceString,
-            ImageSource = apiItem.ImageSource,
-            FoundryIconSource = foundryBanner,
-            ItemDamageType = (DestinyDamageType.GetDamageType(apiItem.Item.GetItemDamageTypeIndex())).GetEnumDescription(),
+            //ItemLore = Investment.Get().GetItemLore(hash)?.LoreDescription.Value.ToString(),
+            //ItemSource = sourceString,
+            //ImageSource = apiItem.ImageSource,
+            //FoundryIconSource = foundryBanner,
+            //ItemDamageType = (DestinyDamageType.GetDamageType(apiItem.Item.GetItemDamageTypeIndex())).GetEnumDescription(),
         };
         Load();
     }
@@ -167,7 +167,7 @@ public partial class APIItemView : UserControl
             }
         }
 
-        CreateSocketCategories();
+        //CreateSocketCategories();
         GetItemStats();
     }
 
@@ -401,94 +401,121 @@ public partial class APIItemView : UserControl
 
     private void GetItemStats()
     {
-        //if (ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader()) is S81738080 stats)
-        //{
-        //    var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
+        if (ApiItem.Item.TagData.Unk70.GetValue(ApiItem.Item.GetReader()) is S45928080 stats)
+        {
+            var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
 
-        //    if (statGroup is not null)
-        //    {
-        //        foreach (var scaledStat in statGroup.Value.ScaledStats)
-        //        {
-        //            var statItem = Investment.Get().StatStrings[scaledStat.StatIndex];
+            if (statGroup is not null)
+            {
+                foreach (var stat2 in statGroup.Value.Stats)
+                {
+                    Console.WriteLine($"{stat2.StatHash} {stat2.StatDisplayName.Value}");
+                }
 
-        //            int statValue = stats.InvestmentStats.Where(x => x.StatTypeIndex == scaledStat.StatIndex).FirstOrDefault().Value;
-        //            int displayValue = MakeDisplayValue(scaledStat.StatIndex, statValue);
+                foreach (var stat in stats.InvestmentStats)
+                {
+                    if (!statGroup.Value.Stats.Any(x => x.StatHash == Investment.Get().StatStrings[stat.StatTypeIndex].StatHash))
+                        continue;
 
-        //            var displayStat = new StatItem
-        //            {
-        //                Hash = statItem.StatHash,
-        //                Name = statItem.StatName.Value.ToString(),
-        //                Description = statItem.StatDescription.Value.ToString(),
-        //                StatDisplayValue = displayValue,
-        //                StatValue = statValue,
-        //                StatDisplayNumeric = scaledStat.DisplayAsNumeric == 1,
-        //                StatIsLinear = scaledStat.IsLinear == 1
-        //            };
-        //            _statItems.Add(displayStat);
-        //            //Console.WriteLine($"{displayStat.Name} ({displayStat.Description}) : {displayStat.StatDisplayValue} ({displayStat.StatValue})");
-        //        }
-        //    }
-        //}
+                    var statEntry = statGroup.Value.Stats.First(x => x.StatHash == Investment.Get().StatStrings[stat.StatTypeIndex].StatHash);
+                    int displayValue = MakeDisplayValue(statEntry.StatHash, stat.Value);
 
-        //// this is dumbbbbb
-        //ItemStatsControl.ItemsSource = _statItems.Where(x => !x.StatDisplayNumeric);
-        //ItemNumericStatsControl.ItemsSource = _statItems.Where(x => x.StatDisplayNumeric);
+                    var displayStat = new StatItem
+                    {
+                        Hash = statEntry.StatHash,
+                        Name = statEntry.StatDisplayDescription.Value.ToString(),
+                        Description = statEntry.StatDisplayDescription.Value.ToString(),
+                        StatDisplayValue = displayValue,
+                        StatValue = stat.Value,
+                        StatDisplayNumeric = true,//scaledStat.DisplayAsNumeric == 1,
+                        StatIsLinear = false //scaledStat.IsLinear == 1
+                    };
+                    _statItems.Add(displayStat);
+                    Console.WriteLine($"{displayStat.Name} ({displayStat.Description}) : {displayStat.StatDisplayValue} ({displayStat.StatValue})");
+                }
 
-        //// For some unknown unholy reason, this breaks showing the lore tab if Visibility.Collapsed?????
-        ////StatsContainer.Visibility = _statItems.Count != 0 ? Visibility.Visible : Visibility.Collapsed;
-        //StatsContainer.Opacity = _statItems.Count != 0 ? 1 : 0;
+                //foreach (var scaledStat in statGroup.Value.Stats)
+                //{
+                //    var statItem = Investment.Get().StatStrings[scaledStat.StatIndex];
+
+                //    int statValue = stats.InvestmentStats.Where(x => x.StatTypeIndex == scaledStat.StatIndex).FirstOrDefault().Value;
+                //    int displayValue = MakeDisplayValue(scaledStat.StatHash, statValue);
+
+                //    var displayStat = new StatItem
+                //    {
+                //        Hash = scaledStat.StatHash,
+                //        Name = scaledStat.StatDisplayName.Value.ToString(),
+                //        Description = scaledStat.StatDisplayDescription.Value.ToString(),
+                //        StatDisplayValue = displayValue,
+                //        StatValue = statValue,
+                //        StatDisplayNumeric = true,//scaledStat.DisplayAsNumeric == 1,
+                //        StatIsLinear = false //scaledStat.IsLinear == 1
+                //    };
+                //    _statItems.Add(displayStat);
+                //    //Console.WriteLine($"{displayStat.Name} ({displayStat.Description}) : {displayStat.StatDisplayValue} ({displayStat.StatValue})");
+                //}
+            }
+        }
+
+        // this is dumbbbbb
+        ItemStatsControl.ItemsSource = _statItems.Where(x => !x.StatDisplayNumeric);
+        ItemNumericStatsControl.ItemsSource = _statItems.Where(x => x.StatDisplayNumeric);
+
+        // For some unknown unholy reason, this breaks showing the lore tab if Visibility.Collapsed?????
+        //StatsContainer.Visibility = _statItems.Count != 0 ? Visibility.Visible : Visibility.Collapsed;
+        StatsContainer.Opacity = _statItems.Count != 0 ? 1 : 0;
     }
 
-    private int MakeDisplayValue(int statIndex, int statValue)
+    private int MakeDisplayValue(TigerHash statHash, int statValue)
     {
-        //if (ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader()) is S81738080 investmentStats)
-        //{
-        //    var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
-        //    if (!statGroup.HasValue || statGroup is null)
-        //        return statValue;
+        if (ApiItem.Item.TagData.Unk70.GetValue(ApiItem.Item.GetReader()) is S45928080 investmentStats)
+        {
+            var statGroup = Investment.Get().GetStatGroup(ApiItem.Item);
+            if (!statGroup.HasValue || statGroup is null)
+                return statValue;
 
-        //    var stat = statGroup.Value.ScaledStats.FirstOrDefault(x => x.StatIndex == statIndex);
-        //    if (statValue < 0 || stat.DisplayInterpolation is null)
-        //        return statValue;
+            var stat = statGroup.Value.Stats.FirstOrDefault(x => x.StatHash == statHash);
+            if (statValue < 0 || stat.DisplayInterpolation is null)
+                return statValue;
 
-        //    if (stat.DisplayInterpolation.Where(x => x.Value == statValue).Any())
-        //    {
-        //        return stat.DisplayInterpolation.First(x => x.Value == statValue).Weight;
-        //    }
-        //    else if (stat.IsLinear == 1)
-        //    {
-        //        return statValue;
-        //    }
-        //    else // value is likely between 2 values in DisplayInterpolation
-        //    {
-        //        int? lowerKey = null;
-        //        int? upperKey = null;
+            if (stat.DisplayInterpolation.Where(x => x.Value == statValue).Any())
+            {
+                return stat.DisplayInterpolation.First(x => x.Value == statValue).Weight;
+            }
+            //else if (stat.IsLinear == 1)
+            //{
+            //    return statValue;
+            //}
+            else // value is likely between 2 values in DisplayInterpolation
+            {
+                int? lowerKey = null;
+                int? upperKey = null;
 
-        //        // Get all keys
-        //        var keys = stat.DisplayInterpolation;
+                // Get all keys
+                var keys = stat.DisplayInterpolation;
 
-        //        // Find the keys that are just below and above the targetKey
-        //        for (int i = 0; i < keys.Count - 1; i++)
-        //        {
-        //            if (keys[i].Value <= statValue && keys[i + 1].Value >= statValue)
-        //            {
-        //                lowerKey = keys[i].Value;
-        //                upperKey = keys[i + 1].Value;
-        //                break;
-        //            }
-        //        }
+                // Find the keys that are just below and above the targetKey
+                for (int i = 0; i < keys.Count - 1; i++)
+                {
+                    if (keys[i].Value <= statValue && keys[i + 1].Value >= statValue)
+                    {
+                        lowerKey = keys[i].Value;
+                        upperKey = keys[i + 1].Value;
+                        break;
+                    }
+                }
 
-        //        if (lowerKey != null && upperKey != null)
-        //        {
-        //            var lowerValue = keys.First(x => x.Value == lowerKey).Weight;
-        //            var upperValue = keys.First(x => x.Value == upperKey).Weight;
+                if (lowerKey != null && upperKey != null)
+                {
+                    var lowerValue = keys.First(x => x.Value == lowerKey).Weight;
+                    var upperValue = keys.First(x => x.Value == upperKey).Weight;
 
-        //            // Interpolate median value between lower and upper values
-        //            var interpolatedMedian = Interpolate(lowerKey.Value, lowerValue, upperKey.Value, upperValue, statValue);
-        //            return (int)Math.Round(interpolatedMedian);
-        //        }
-        //    }
-        //}
+                    // Interpolate median value between lower and upper values
+                    var interpolatedMedian = Interpolate(lowerKey.Value, lowerValue, upperKey.Value, upperValue, statValue);
+                    return (int)Math.Round(interpolatedMedian);
+                }
+            }
+        }
         return 0;
     }
 
@@ -503,7 +530,7 @@ public partial class APIItemView : UserControl
         //ToolTip.ActiveItem = (sender as Button);
         //PlugItem item = (PlugItem)(sender as Button).DataContext;
 
-        //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
+        //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S45928080 stats)
         //{
         //    foreach (var stat in stats.InvestmentStats)
         //    {
@@ -529,7 +556,7 @@ public partial class APIItemView : UserControl
         //ToolTip.ActiveItem = null;
 
         //PlugItem item = (PlugItem)(sender as Button).DataContext;
-        //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
+        //if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S45928080 stats)
         //{
         //    foreach (var stat in stats.InvestmentStats)
         //    {
@@ -553,7 +580,7 @@ public partial class APIItemView : UserControl
         Console.WriteLine($"{item.Name} {item.Item.Hash} ({item.PlugRarity})");
 #endif
 
-        //        if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S81738080 stats)
+        //        if (item.Item.TagData.Unk78.GetValue(item.Item.GetReader()) is S45928080 stats)
         //        {
         //            foreach (var stat in stats.InvestmentStats)
         //            {
@@ -561,7 +588,7 @@ public partial class APIItemView : UserControl
         //                if (statItem.StatName.Value is null)
         //                    continue;
 
-        //                var mainStat = ((S81738080)ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader())).InvestmentStats.FirstOrDefault(x => x.StatTypeIndex == stat.StatTypeIndex);
+        //                var mainStat = ((S45928080)ApiItem.Item.TagData.Unk78.GetValue(ApiItem.Item.GetReader())).InvestmentStats.FirstOrDefault(x => x.StatTypeIndex == stat.StatTypeIndex);
         //#if DEBUG
         //                Console.WriteLine($"{statItem.StatName.Value.ToString()} : {stat.Value} ({MakeDisplayValue(stat.StatTypeIndex, stat.Value)}) (perk) + {mainStat.Value} ({MakeDisplayValue(mainStat.StatTypeIndex, mainStat.Value)}) (main) = {stat.Value + mainStat.Value}");
         //#endif

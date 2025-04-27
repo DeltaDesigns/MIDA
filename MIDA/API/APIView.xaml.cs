@@ -88,7 +88,7 @@ public partial class APIView : UserControl
                 type = "";
 
             //if (ShouldAddToList(item, type))
-            if (item.GetWeaponPatternIndex() != -1)
+            //if (item.GetWeaponPatternIndex() != -1)
             {
                 //CreateOrnamentItems(item); // D1
                 //var isOrnament = type.Contains("Ornament");
@@ -122,13 +122,7 @@ public partial class APIView : UserControl
         if (_allItems.TryRemove(apiItem.Item.TagData.InventoryItemHash.Hash32, out _))
         {
             _selectedItems.Add(apiItem);
-            Console.WriteLine($"{apiItem.Item.TagData.InventoryItemHash} : Item {apiItem.Item.Hash} | Strings {apiItem.Item.GetItemStrings().Hash}");
-            //foreach (var a in Investment.Get().GetEntitiesFromHash(apiItem.Item.TagData.InventoryItemHash))
-            //{
-            //    if (a is null)
-            //        continue;
-            //    Console.WriteLine($"{a.Hash}");
-            //}
+            Console.WriteLine($"{apiItem.ItemName} {apiItem.Item.TagData.InventoryItemHash} : Item {apiItem.Item.Hash} | Strings {apiItem.Item.GetItemStrings().Hash}");
         }
         else
         {

@@ -58,10 +58,10 @@
                 VerticalContentAlignment="Center"
                 IsChecked="False"
                 Style="{StaticResource MaterialDesignCheckBox}"
-                ToolTipService.InitialShowDelay="1000"
+                ToolTipService.InitialShowDelay="150"
                 Visibility="Collapsed">
                 <CheckBox.ToolTip>
-                    <TextBlock Foreground="Black" Text="Applies the first texture of each material. Not represenitive of the final look." />
+                    <TextBlock Foreground="Black" Text="Applies the first texture of each material. Not representative of the final look." />
                 </CheckBox.ToolTip>
                 Apply Texture
             </CheckBox>

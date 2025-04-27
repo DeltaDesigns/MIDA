@@ -87,21 +87,28 @@ public partial class TextureView : UserControl
 
     public static Stream RemoveAlpha(Stream originalStream)
     {
-        using var originalBitmap = new System.Drawing.Bitmap(originalStream);
-
-        // Create new bitmap with no alpha
-        var noAlphaBitmap = new System.Drawing.Bitmap(originalBitmap.Width, originalBitmap.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-
-        using (var g = System.Drawing.Graphics.FromImage(noAlphaBitmap))
+        try
         {
-            g.Clear(System.Drawing.Color.Black);
-            g.DrawImage(originalBitmap, 0, 0, originalBitmap.Width, originalBitmap.Height);
-        }
+            using var originalBitmap = new System.Drawing.Bitmap(originalStream);
 
-        var ms = new MemoryStream();
-        noAlphaBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-        ms.Position = 0;
-        return ms;
+            // Create new bitmap with no alpha
+            var noAlphaBitmap = new System.Drawing.Bitmap(originalBitmap.Width, originalBitmap.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            using (var g = System.Drawing.Graphics.FromImage(noAlphaBitmap))
+            {
+                g.Clear(System.Drawing.Color.Black);
+                g.DrawImage(originalBitmap, 0, 0, originalBitmap.Width, originalBitmap.Height);
+            }
+
+            var ms = new MemoryStream();
+            noAlphaBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            ms.Position = 0;
+            return ms;
+        }
+        catch
+        {
+            return originalStream;
+        }
     }
 
     public struct TextureDisplayData

@@ -34,17 +34,20 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
 
     private Dictionary<uint, Tag<S8080890B>> _sortedArrangementHashmap = null;
 
+    private Tag<S80806E50> _statDefinitionMap = null;
+    private Tag<S808033FD> _statGroupDefinitionMap = null; // unsure
+
     // Possibly obsolete things
     #region OBSOLETE?
     private Tag<S808071C0> _inventoryItemIconTag = null;
     private Tag<S2D548080> _sandboxPerkMap = null;
     private Tag<SAA768080> _sandboxPerkMap2 = null;
-    private Tag<S6B588080> _statDefinitionMap = null;
-    private Tag<SBE548080> _statGroupDefinitionMap = null;
+
+
 
     public ConcurrentDictionary<int, SD3508080> InventoryItemLoreStrings = null;
     public ConcurrentDictionary<int, S33548080> SandboxPerkStrings = null;
-    public ConcurrentDictionary<int, S6F588080> StatStrings = null;
+    public ConcurrentDictionary<int, S546E8080> StatStrings = null;
     public ConcurrentDictionary<int, SAE7680800> SandboxPerkMap2 = null;
     public ConcurrentDictionary<int, S50588080> ObjectiveStrings = null;
 
@@ -149,51 +152,51 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
 
         Parallel.ForEach(allHashes, (val, state, i) =>
         {
-            //switch (val.GetReferenceHash().Hash32)
-            //{
-            //    case 0x808077CD:
-            //        _randomizedPlugSetMap = FileResourcer.Get().GetSchemaTag<SCD778080>(val);
-            //        break;
-            //    case 0x808076B6:
-            //        _socketTypeMap = FileResourcer.Get().GetSchemaTag<SB6768080>(val);
-            //        break;
-            //    case 0x80804F59:
-            //        _socketCategoryMap = FileResourcer.Get().GetSchemaTag<S594F8080>(val);
-            //        break;
-            //    case 0x808050CF:
-            //        _loreStringMap = FileResourcer.Get().GetSchemaTag<SCF508080>(val);
-            //        break;
-            //    case 0x8080542D:
-            //        _sandboxPerkMap = FileResourcer.Get().GetSchemaTag<S2D548080>(val);
-            //        break;
-            //    case 0x808076AA:
-            //        _sandboxPerkMap2 = FileResourcer.Get().GetSchemaTag<SAA768080>(val);
-            //        break;
-            //    case 0x8080586B:
-            //        _statDefinitionMap = FileResourcer.Get().GetSchemaTag<S6B588080>(val);
-            //        break;
-            //    case 0x808054BE:
-            //        _statGroupDefinitionMap = FileResourcer.Get().GetSchemaTag<SBE548080>(val);
-            //        break;
-            //    case 0x80807828:
-            //        _collectableDefinitionMap = FileResourcer.Get().GetSchemaTag<S28788080>(val);
-            //        break;
-            //    case 0x808059BF:
-            //        _collectableStringsMap = FileResourcer.Get().GetSchemaTag<SBF598080>(val);
-            //        break;
-            //    case 0x8080753C:
-            //        _objectiveDefinitionMap = FileResourcer.Get().GetSchemaTag<S3C758080>(val);
-            //        break;
-            //    case 0x8080584C:
-            //        _objectiveStringsMap = FileResourcer.Get().GetSchemaTag<S4C588080>(val);
-            //        break;
-            //    case 0x808078D7:
-            //        _presentationNodeDefinitionMap = FileResourcer.Get().GetSchemaTag<SD7788080>(val);
-            //        break;
-            //    case 0x80805803:
-            //        _presentationNodeDefinitionStringMap = FileResourcer.Get().GetSchemaTag<S03588080>(val);
-            //        break;
-            //}
+            switch (val.GetReferenceHash().Hash32)
+            {
+                //case 0x808077CD:
+                //    _randomizedPlugSetMap = FileResourcer.Get().GetSchemaTag<SCD778080>(val);
+                //    break;
+                //case 0x808076B6:
+                //    _socketTypeMap = FileResourcer.Get().GetSchemaTag<SB6768080>(val);
+                //    break;
+                //case 0x80804F59:
+                //    _socketCategoryMap = FileResourcer.Get().GetSchemaTag<S594F8080>(val);
+                //    break;
+                //case 0x808050CF:
+                //    _loreStringMap = FileResourcer.Get().GetSchemaTag<SCF508080>(val);
+                //    break;
+                //case 0x8080542D:
+                //    _sandboxPerkMap = FileResourcer.Get().GetSchemaTag<S2D548080>(val);
+                //    break;
+                //case 0x808076AA:
+                //    _sandboxPerkMap2 = FileResourcer.Get().GetSchemaTag<SAA768080>(val);
+                //    break;
+                case 0x80806E50:
+                    _statDefinitionMap = FileResourcer.Get().GetSchemaTag<S80806E50>(val);
+                    break;
+                case 0x808033FD:
+                    _statGroupDefinitionMap = FileResourcer.Get().GetSchemaTag<S808033FD>(val);
+                    break;
+                    //case 0x80807828:
+                    //    _collectableDefinitionMap = FileResourcer.Get().GetSchemaTag<S28788080>(val);
+                    //    break;
+                    //case 0x808059BF:
+                    //    _collectableStringsMap = FileResourcer.Get().GetSchemaTag<SBF598080>(val);
+                    //    break;
+                    //case 0x8080753C:
+                    //    _objectiveDefinitionMap = FileResourcer.Get().GetSchemaTag<S3C758080>(val);
+                    //    break;
+                    //case 0x8080584C:
+                    //    _objectiveStringsMap = FileResourcer.Get().GetSchemaTag<S4C588080>(val);
+                    //    break;
+                    //case 0x808078D7:
+                    //    _presentationNodeDefinitionMap = FileResourcer.Get().GetSchemaTag<SD7788080>(val);
+                    //    break;
+                    //case 0x80805803:
+                    //    _presentationNodeDefinitionStringMap = FileResourcer.Get().GetSchemaTag<S03588080>(val);
+                    //    break;
+            }
         });
 
 
@@ -205,7 +208,7 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
             //Task.Run(GetSocketCategoryStrings),
             //Task.Run(GetInventoryItemLoreStrings),
             //Task.Run(GetSandboxPerkStrings),
-            //Task.Run(GetStatStrings),
+            Task.Run(GetStatStrings),
             //Task.Run(GetCollectableStrings),
             //Task.Run(GetObjectiveStrings),
             //Task.Run(GetSandboxPerkMap2),
@@ -226,7 +229,11 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
     public string GetItemName(TigerHash hash)
     {
         var entry = GetItemStrings(GetItemIndex(hash));
-        return entry.TagData.ItemName.Value.ToString();
+        var name = entry.TagData.ItemName.Value.ToString();
+        if (name.StartsWith("NotFound-")) // TODO, probably temp
+            return GlobalStrings.Get().GetString(new(hash.Hash32));
+        else
+            return entry.TagData.ItemName.Value.ToString();
     }
 
     public Tag<S80806EF6>? GetItemStrings(TigerHash hash)
@@ -248,11 +255,10 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
 
     public Tag<S80805335>? GetItemIconContainer(TigerHash hash) // TODO
     {
-        return null;
-        //int iconIndex = GetItemStrings(GetItemIndex(hash)).TagData.IconIndex;
-        //if (iconIndex == -1)
-        //    return null;
-        //return _inventoryItemIconTag.TagData.InventoryItemIconsMap.ElementAt(_inventoryItemIconTag.GetReader(), iconIndex).IconContainer;
+        int iconIndex = GetItemStrings(GetItemIndex(hash)).TagData.IconIndex;
+        if (iconIndex == -1)
+            return null;
+        return _inventoryItemIconTag.TagData.InventoryItemIconsMap.ElementAt(_inventoryItemIconTag.GetReader(), iconIndex).IconContainer;
     }
 
     public Tag<S80805335>? GetItemIconContainer(int index)
@@ -583,13 +589,13 @@ public class Investment : Strategy.LazyStrategistSingleton<Investment>
     {
         //var stringThing = GetItemStrings(item.TagData.InventoryItemHash);
 
-        //if (stringThing.TagData.Unk78.GetValue(stringThing.GetReader()) is SB4548080 details)
-        //    return details.StatGroupIndex;
+        if (item.TagData.Unk70.GetValue(item.GetReader()) is S45928080 details)
+            return details.StatGroupIndex;
 
         return -1;
     }
 
-    public SC4548080? GetStatGroup(InventoryItem item)
+    public S01348080? GetStatGroup(InventoryItem item)
     {
         var index = GetStatGroupIndex(item);
         if (index == -1 || index > _statGroupDefinitionMap.TagData.StatGroupDefinitions.Count)
@@ -786,7 +792,7 @@ public class InventoryItem : Tag<S8080968B>
 
     public int GetItemDamageTypeIndex() // TODO?
     {
-        //if (_tag.Unk78.GetValue(GetReader()) is S81738080 perks)
+        //if (_tag.Unk78.GetValue(GetReader()) is S45928080 perks)
         //{
         //    foreach (var perk in perks.Perks)
         //    {

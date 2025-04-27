@@ -34,6 +34,16 @@
             <TranslateTransform />
         </Grid.RenderTransform>
 
+        <TextBlock
+            x:Name="Symbols"
+            Grid.Row="1"
+            Margin="20,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontFamily="{StaticResource Goliath Beta Encrypted}"
+            FontSize="24"
+            Foreground="{StaticResource MarathonYellow}"
+            Text="A B C D E F 1 2 3 4 5 6 7 8 9 0" />
 
         <Grid
             Grid.Row="0"

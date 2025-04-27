@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -44,11 +46,12 @@ public partial class MainMenuView : UserControl
     {
         _mainWindow = Window.GetWindow(this) as MainWindow;
         GameVersion.Text = $"Game Version: {_mainWindow.GameInfo?.FileVersion}";
-        MouseMove += UserControl_MouseMove;
+        //MouseMove += UserControl_MouseMove; // I like the effect but Marathon doesnt use this
 
         ToolTip = new();
         Panel.SetZIndex(ToolTip, 50);
         MainContainer.Children.Add(ToolTip);
+        SetupTimer();
     }
 
     private void CategoryButton_MouseEnter(object sender, MouseEventArgs e)
@@ -219,5 +222,46 @@ public partial class MainMenuView : UserControl
             Style = PopupBanner.PopupStyle.Information
         };
         about.Show();
+    }
+
+    private static Random random = new Random();
+    private static Timer timer;
+    private void SetupTimer()
+    {
+        if (timer is not null)
+        {
+            timer?.Stop();
+            timer?.Dispose();
+            timer = null;
+        }
+
+        timer = new Timer(1500); // 5 seconds
+        timer.Elapsed += OnTimerElapsed;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
+
+    private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+    {
+        int randomLength = random.Next(8, 17);
+        Dispatcher.Invoke(() =>
+        {
+            Symbols.Text = GenerateRandomHexString(randomLength);
+        });
+    }
+
+    private static string GenerateRandomHexString(int length)
+    {
+        StringBuilder sb = new StringBuilder(length * 2);
+
+        for (int i = 0; i < length; i++)
+        {
+            int value = random.Next(0, 16);
+            sb.Append(value.ToString("X"));
+            if (i < length - 1)
+                sb.Append(' ');
+        }
+
+        return sb.ToString();
     }
 }

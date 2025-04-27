@@ -138,7 +138,7 @@ public class PackagePathsCache
     /// </summary>
     private uint GetGameVersionHash()
     {
-        var path = _packagesDirectory.Split("packages")[0] + "destiny2.exe";
+        var path = _packagesDirectory.Split("packages")[0] + "Marathon.exe";
         if (!File.Exists(path))
         {
             Log.Warning($"Could not get find game executable '{path}' for game version, assuming static.");
