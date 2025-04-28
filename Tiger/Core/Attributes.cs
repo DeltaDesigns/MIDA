@@ -240,3 +240,14 @@ public class StrategyMetadataAttribute : Attribute
         }
     }
 }
+
+[AttributeUsage(AttributeTargets.Method)]
+public class SchemaTestAttribute : Attribute
+{
+    public string DisplayName { get; }
+
+    public SchemaTestAttribute(string displayName = null)
+    {
+        DisplayName = displayName;
+    }
+}

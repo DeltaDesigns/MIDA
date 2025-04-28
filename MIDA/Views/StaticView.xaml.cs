@@ -20,13 +20,11 @@ public partial class StaticView : UserControl
 
     private FileHash currentHash;
     private ExportDetailLevel currentDetailLevel;
-    private Window currentWindow;
 
-    public void LoadStatic(FileHash hash, ExportDetailLevel detailLevel, Window window)
+    public void LoadStatic(FileHash hash, ExportDetailLevel detailLevel)
     {
         currentHash = hash;
         currentDetailLevel = detailLevel;
-        currentWindow = window;
 
         SetupCheckboxHandlers();
         ModelView.Visibility = Visibility.Visible;
@@ -119,9 +117,9 @@ public partial class StaticView : UserControl
     }
 
     private void TextureCheckBox_Checked(object sender, RoutedEventArgs e) =>
-        LoadStatic(currentHash, currentDetailLevel, currentWindow);
+        LoadStatic(currentHash, currentDetailLevel);
 
     private void TextureCheckBox_Unchecked(object sender, RoutedEventArgs e) =>
-        LoadStatic(currentHash, currentDetailLevel, currentWindow);
+        LoadStatic(currentHash, currentDetailLevel);
 
 }

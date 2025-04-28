@@ -12,13 +12,15 @@ public class EntityModel : Tag<SEntityModel>
 
     public Vector4 RotationOffset = new();
     public Vector4 TranslationOffset = new();
+    public ExportDetailLevel DetailLevel;
 
     /*
      * We need the parent resource to get access to the external materials
      */
     public List<DynamicMeshPart> Load(ExportDetailLevel detailLevel, EntityResource parentResource, bool hasSkeleton = false)
     {
-        Dictionary<int, Dictionary<int, SD1878080>> dynamicParts = GetPartsOfDetailLevel(detailLevel);
+        DetailLevel = detailLevel;
+        Dictionary<int, Dictionary<int, SD1878080>> dynamicParts = GetPartsOfDetailLevel();
         List<DynamicMeshPart> parts = GenerateParts(dynamicParts, parentResource, hasSkeleton);
         return parts;
     }
@@ -34,7 +36,7 @@ public class EntityModel : Tag<SEntityModel>
     /// </summary>
     /// <param name="detailLevel">The desired level of detail to get parts for.</param>
     /// <returns></returns>
-    private Dictionary<int, Dictionary<int, SD1878080>> GetPartsOfDetailLevel(ExportDetailLevel eDetailLevel)
+    private Dictionary<int, Dictionary<int, SD1878080>> GetPartsOfDetailLevel()
     {
         Dictionary<int, Dictionary<int, SD1878080>> parts = new();
 
@@ -61,21 +63,23 @@ public class EntityModel : Tag<SEntityModel>
                 //Console.WriteLine($"GearDyeChangeColorIndex {part.GearDyeChangeColorIndex}");
                 //Console.WriteLine($"LodCategory {part.LodCategory}");
 
-                if (eDetailLevel == ExportDetailLevel.AllLevels)
+                switch (DetailLevel)
                 {
-                    parts[meshIndex].Add(partIndex, part);
-                }
-                else
-                {
-                    if (eDetailLevel == ExportDetailLevel.MostDetailed && part.LodCategory is ELodCategory.MainGeom0 or ELodCategory.GripStock0 or ELodCategory.Stickers0 or ELodCategory.InternalGeom0 or ELodCategory.Detail0)
-                    {
+                    case ExportDetailLevel.MostDetailed:
+                        if (part.DetailLevel.IsHighestLevel())
+                            parts[meshIndex].Add(partIndex, part);
+                        break;
+
+                    case ExportDetailLevel.LeastDetailed:
+                        if (!part.DetailLevel.IsHighestLevel())
+                            parts[meshIndex].Add(partIndex, part);
+                        break;
+
+                    default:
                         parts[meshIndex].Add(partIndex, part);
-                    }
-                    else if (eDetailLevel == ExportDetailLevel.LeastDetailed && part.LodCategory == ELodCategory.LowPolyGeom3)
-                    {
-                        parts[meshIndex].Add(partIndex, part);
-                    }
+                        break;
                 }
+
                 partIndex++;
             }
 
@@ -98,14 +102,14 @@ public class EntityModel : Tag<SEntityModel>
             exportPartRange = GetExportRanges(mesh);
             foreach ((int i, SD1878080 part) in dynamicParts[meshIndex])
             {
-                if (!exportPartRange.Contains(i))
+                if (!exportPartRange.Contains(i) && DetailLevel != ExportDetailLevel.AllLevels)
                     continue;
 
                 DynamicMeshPart dynamicMeshPart = new(part, parentResource)
                 {
                     Index = i,
                     GroupIndex = part.ExternalIdentifier,
-                    LodCategory = part.LodCategory,
+                    DetailLevel = part.DetailLevel,
                     bAlphaClip = (part.Flags & 0x8) != 0,
                     GearDyeChangeColorIndex = part.GearDyeChangeColorIndex,
                     HasSkeleton = hasSkeleton,
@@ -117,12 +121,15 @@ public class EntityModel : Tag<SEntityModel>
 
                 //We only care about the vertex shader for now for mesh data
                 //But if theres also no pixel shader then theres no point in adding it
-                if (dynamicMeshPart.Material is null ||
-                dynamicMeshPart.Material.Vertex.Shader is null ||
-                dynamicMeshPart.Material.Pixel.Shader is null) // || dynamicMeshPart.Material.Unk08 != 1)
+                if (DetailLevel != ExportDetailLevel.AllLevels &&
+                    (dynamicMeshPart.Material is null
+                    || dynamicMeshPart.Material.Vertex.Shader is null
+                    || dynamicMeshPart.Material.Pixel.Shader is null))
                     continue;
 
-                dynamicMeshPart.Material.RenderStage = dynamicMeshPart.RenderStage;
+                if (dynamicMeshPart.Material is not null)
+                    dynamicMeshPart.Material.RenderStage = dynamicMeshPart.RenderStage;
+
                 dynamicMeshPart.GetAllData(mesh, _tag);
                 parts.Add(dynamicMeshPart);
             }
@@ -305,6 +312,9 @@ public class DynamicMeshPart : MeshPart
 
     private Material? GetMaterialFromExternalMaterial(short variantShaderIndex, EntityResource parentResource)
     {
+        if (parentResource is null)
+            return null;
+
         using TigerReader reader = parentResource.GetReader();
 
         var map = parentResource is EntityPhysicsModelParent ?
@@ -316,9 +326,8 @@ public class DynamicMeshPart : MeshPart
             ((S78868080)parentResource.TagData.Unk18.GetValue(reader)).ExternalMaterials;
 
         if (map.Count == 0 || mats.Count == 0)
-        {
             return null;
-        }
+
         if (variantShaderIndex >= map.Count)
             return null; // todo this is actually wrong ig...
 

@@ -21,6 +21,8 @@
             <RowDefinition Height="100*" />
         </Grid.RowDefinitions>
 
+        <StackPanel x:Name="TestsPanel" Grid.Column="1" />
+
         <TextBox
             x:Name="TagHashBox"
             Grid.Row="1"

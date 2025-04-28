@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -29,6 +30,10 @@ public partial class DevView : UserControl
     public DevView()
     {
         InitializeComponent();
+
+#if DEBUG
+        PopulateTestsPanel();
+#endif
     }
 
     private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
@@ -160,7 +165,7 @@ public partial class DevView : UserControl
         wem.SaveToFile($"{saveDirectory}/{info.Name}.wav");
     }
 
-    private void AddWindow(FileHash hash)
+    private void AddWindow(FileHash hash) // TODO correct reference hashes for Marathon
     {
         // Adds a new tab to the tab control
         TigerHash reference = hash.GetReferenceHash();
@@ -210,11 +215,11 @@ public partial class DevView : UserControl
                     _mainWindow.SetNewestTabSelected();
                     break;
 
-                case 0x8080881C: //Entity model
+                case 0x8080881C: // Entity model
                     EntityModel entityModel = FileResourcer.Get().GetFile<EntityModel>(hash);
                     ExporterScene scene = Exporter.Get().CreateScene(hash, ExportType.Entities);
-                    scene.AddModel(entityModel);
-                    var parts = entityModel.Load(ExportDetailLevel.MostDetailed, null);
+                    scene.AddModel(entityModel, ExportDetailLevel.AllLevels);
+                    var parts = entityModel.Load(ExportDetailLevel.AllLevels, null);
                     foreach (DynamicMeshPart part in parts)
                     {
                         if (part.Material == null) continue;
@@ -229,17 +234,10 @@ public partial class DevView : UserControl
                     break;
 
 
-                case 0x80806D44:
+                case 0x80808635:
                     StaticView staticView = new StaticView();
-                    staticView.LoadStatic(hash, ExportDetailLevel.MostDetailed, Window.GetWindow(this));
+                    staticView.LoadStatic(hash, ExportDetailLevel.AllLevels);
                     _mainWindow.MakeNewTab(hash, staticView);
-                    _mainWindow.SetNewestTabSelected();
-                    break;
-
-                case 0x808093AD:
-                    MapView mapView = new MapView();
-                    mapView.LoadMap(hash, ExportDetailLevel.LeastDetailed);
-                    _mainWindow.MakeNewTab(hash, mapView);
                     _mainWindow.SetNewestTabSelected();
                     break;
 
@@ -274,7 +272,7 @@ public partial class DevView : UserControl
                     material.Export($"{ConfigSubsystem.Get().GetExportSavePath()}/Materials/{hash}");
                     break;
 
-                case 0x80806C81:
+                case 0x80808567:
                     Terrain terrain = FileResourcer.Get().GetFile<Terrain>(hash);
                     ExporterScene terrainScene = Exporter.Get().CreateScene(hash, ExportType.Terrain);
                     terrain.LoadIntoExporter(terrainScene, ConfigSubsystem.Get().GetExportSavePath());
@@ -428,4 +426,35 @@ public partial class DevView : UserControl
         });
     }
 #endif
+
+    public void PopulateTestsPanel()
+    {
+        var tests = TestsSubsystem.Get();
+        foreach (var method in GetSchemaTestMethods(tests))
+        {
+            var attr = method.GetCustomAttribute<SchemaTestAttribute>();
+            string buttonText = attr?.DisplayName ?? method.Name;
+
+            Button btn = new Button
+            {
+                Content = buttonText,
+                Margin = new Thickness(5),
+            };
+
+            btn.Click += (s, e) =>
+            {
+                method.Invoke(tests, null);
+            };
+
+            TestsPanel.Children.Add(btn);
+        }
+    }
+
+    public static List<MethodInfo> GetSchemaTestMethods(object target)
+    {
+        return target.GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+            .Where(m => m.GetCustomAttribute<SchemaTestAttribute>() != null)
+            .ToList();
+    }
 }

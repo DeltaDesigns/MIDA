@@ -25,9 +25,11 @@ public partial class EntityView : UserControl
 
     private MainViewModel MVM;
     private FileHash currentHash;
+    private bool isEntityModel = false;
 
     public bool LoadEntity(FileHash entityHash)
     {
+        isEntityModel = false;
         currentHash = entityHash;
         SetupCheckboxHandlers();
 
@@ -50,6 +52,7 @@ public partial class EntityView : UserControl
 
     public bool LoadEntityModel(FileHash entityModelHash)
     {
+        isEntityModel = true;
         currentHash = entityModelHash;
         SetupCheckboxHandlers();
 
@@ -318,9 +321,19 @@ public partial class EntityView : UserControl
         ModelView.TextureCheckBox.Unchecked += TextureCheckBox_Unchecked;
     }
 
-    private void TextureCheckBox_Checked(object sender, RoutedEventArgs e) =>
-        LoadEntity(currentHash);
+    private void TextureCheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        if (isEntityModel)
+            LoadEntityModel(currentHash);
+        else
+            LoadEntity(currentHash);
+    }
 
-    private void TextureCheckBox_Unchecked(object sender, RoutedEventArgs e) =>
-        LoadEntity(currentHash);
+    private void TextureCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        if (isEntityModel)
+            LoadEntityModel(currentHash);
+        else
+            LoadEntity(currentHash);
+    }
 }

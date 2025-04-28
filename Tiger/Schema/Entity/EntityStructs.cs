@@ -297,8 +297,8 @@ public struct SD1878080
 
     [SchemaField(0x1C, TigerStrategy.MARATHON_ALPHA)]
     public int Flags; // Unsure
-    public byte GearDyeChangeColorIndex;
-    public ELodCategory LodCategory;
+    public byte GearDyeChangeColorIndex; // Unsure, if this even exists now
+    public ELodCategory DetailLevel;
 }
 
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "44868080", 0x320)]

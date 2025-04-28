@@ -85,7 +85,7 @@ public class FbxHandler
         FbxMesh mesh;
         lock (_fbxLock)
         {
-            mesh = FbxMesh.Create(_manager, $"{meshName}_Group{part.GroupIndex}_Index{part.Index}_{index}_{part.LodCategory}");
+            mesh = FbxMesh.Create(_manager, $"{meshName}_Group{part.GroupIndex}_Index{part.Index}_{index}_{part.DetailLevel}");
         }
 
         // Conversion lookup table

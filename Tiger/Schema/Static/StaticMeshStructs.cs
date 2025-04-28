@@ -34,7 +34,7 @@ public struct SStaticMeshDecal
 {
     public byte RenderStage;
     public byte VertexLayoutIndex;
-    public sbyte LODLevel;
+    public ELodCategory DetailLevel;
     public byte PrimitiveType;
     public IndexBuffer Indices;
     public VertexBuffer Vertices0;
@@ -85,7 +85,7 @@ public struct SStaticMeshPart
     public uint IndexOffset;
     public uint IndexCount;
     public ushort BufferIndex;
-    public sbyte DetailLevel;
+    public ELodCategory DetailLevel;
     public sbyte PrimitiveType;
 }
 

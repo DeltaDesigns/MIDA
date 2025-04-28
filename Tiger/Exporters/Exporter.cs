@@ -326,10 +326,10 @@ public class ExporterScene
         EntityInstances[model.Hash].Add(transform);
     }
 
-    public void AddModel(EntityModel model)
+    public void AddModel(EntityModel model, ExportDetailLevel detailLevel = ExportDetailLevel.MostDetailed)
     {
         ExporterMesh mesh = new(model.Hash);
-        var parts = model.Load(ExportDetailLevel.MostDetailed, null);
+        var parts = model.Load(detailLevel, null);
         for (int i = 0; i < parts.Count; i++)
         {
             DynamicMeshPart part = parts[i];
@@ -442,7 +442,7 @@ public class ExporterPart
     {
         MeshPart = meshPart;
         SubName = name;
-        Name = $"{name}_Group{meshPart.GroupIndex}_Index{meshPart.Index}_{index}_{meshPart.LodCategory}";
+        Name = $"{name}_Group{meshPart.GroupIndex}_Index{meshPart.Index}_{index}_{meshPart.DetailLevel}";
         Index = index;
     }
 }

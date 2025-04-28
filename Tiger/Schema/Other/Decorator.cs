@@ -115,7 +115,7 @@ public class Decorator : Tag<SDecorator>
             {
                 Index = i,
                 GroupIndex = part.ExternalIdentifier,
-                LodCategory = part.LodCategory,
+                DetailLevel = part.DetailLevel,
                 bAlphaClip = (part.Flags & 0x8) != 0,
                 VertexLayoutIndex = mesh.GetInputLayoutForStage(0)
             };
@@ -145,7 +145,7 @@ public class Decorator : Tag<SDecorator>
         for (int i = 0; i < mesh.Parts.Count; i++)
         {
             SD1878080 part = mesh.Parts[reader, i];
-            if (part.LodCategory is ELodCategory.MainGeom0 or ELodCategory.GripStock0 or ELodCategory.Stickers0 or ELodCategory.InternalGeom0 or ELodCategory.Detail0)
+            if (part.DetailLevel is ELodCategory.Unk0 or ELodCategory.Unk1 or ELodCategory.Unk2 or ELodCategory.Unk3)
                 parts[meshIndex].Add(partIndex, part);
 
             partIndex++;

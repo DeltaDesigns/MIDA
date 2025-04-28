@@ -60,7 +60,7 @@ public class Terrain : Tag<STerrain>
             foreach (var partEntry in _tag.StaticParts.Where(x => x.GroupIndex == i))
             {
                 // MainGeom0 LOD0, GripStock0 LOD1, Stickers0 LOD2?
-                if ((ELodCategory)partEntry.DetailLevel == ELodCategory.MainGeom0)
+                if (partEntry.DetailLevel == ELodCategory.Unk0)
                 {
                     if (partEntry.Material != null && partEntry.Material.Vertex.Shader != null)
                     {
@@ -271,5 +271,5 @@ public struct STerrainPart
     public uint IndexOffset;
     public ushort IndexCount;
     public byte GroupIndex;
-    public byte DetailLevel;
+    public ELodCategory DetailLevel;
 }

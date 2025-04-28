@@ -46,47 +46,6 @@ namespace Tiger.Schema.Static.MARATHON_ALPHA
             return parts;
         }
 
-        public List<BufferGroup> GetBuffers()
-        {
-            List<BufferGroup> bufferGroups = new();
-            foreach (SStaticMeshBuffers buffers in _tag.Meshes)
-            {
-                BufferGroup bufferGroup = new();
-                bufferGroup.IndexBuffer = buffers.Indices.ToBlob();
-                bufferGroup.VertexBuffers = new Blob[3];
-                bufferGroup.VertexBuffers[0] = buffers.Vertices0.ToBlob();
-                if (buffers.Vertices1 != null)
-                {
-                    bufferGroup.VertexBuffers[1] = buffers.Vertices1.ToBlob();
-                }
-                if (buffers.VertexColor != null)
-                {
-                    bufferGroup.VertexBuffers[2] = buffers.VertexColor.ToBlob();
-                }
-                //bufferGroup.IndexOffset = buffers.UnkOffset;
-                bufferGroups.Add(bufferGroup);
-            }
-
-            return bufferGroups;
-        }
-
-        public List<int> GetStrides()
-        {
-            List<int> strides = new();
-            if (_tag.Meshes.Count() == 0) return strides;
-            if (_tag.Meshes[0].Vertices0 != null) strides.Add(_tag.Meshes[0].Vertices0.TagData.Stride);
-            if (_tag.Meshes[0].Vertices1 != null) strides.Add(_tag.Meshes[0].Vertices1.TagData.Stride);
-            if (_tag.Meshes[0].VertexColor != null) strides.Add(_tag.Meshes[0].VertexColor.TagData.Stride);
-            return strides;
-        }
-
-        public Blob GetTransformsBlob()
-        {
-            using TigerReader reader = GetReader();
-            reader.Seek(0x40, SeekOrigin.Begin);
-            return new Blob(reader.ReadBytes(0x20));
-        }
-
         private List<StaticPart> GenerateParts(Dictionary<int, SStaticMeshPart> staticPartEntries, SStaticMesh parent)
         {
             List<StaticPart> parts = new();
@@ -126,23 +85,16 @@ namespace Tiger.Schema.Static.MARATHON_ALPHA
                 Debug.Assert(part.BufferIndex == 0, $"{Hash} has part with buffer index {part.BufferIndex}");
                 if (part.BufferIndex == 0)
                 {
-                    switch (detailLevel)
+                    switch (detailLevel) // TODO Figure out whats up with LODs
                     {
-                        case ExportDetailLevel.MostDetailed: // TODO Figure out whats up with LODs
-                            //Debug.Assert(part.DetailLevel != 0);
-                            //Console.WriteLine($"{part.DetailLevel} {part.DetailLevel / 4}");
-                            if (part.DetailLevel == 1 || part.DetailLevel == 2 || part.DetailLevel == 10)
-                            {
-                                staticPartEntries.Add(i, part);
-                            }
-                            //staticPartEntries.Add(i, part);
+                        case ExportDetailLevel.MostDetailed when part.DetailLevel.IsHighestLevel():
+                            staticPartEntries.Add(i, part);
                             break;
-                        case ExportDetailLevel.LeastDetailed:
-                            if (part.DetailLevel != 1 && part.DetailLevel != 2 && part.DetailLevel != 10)
-                            {
-                                staticPartEntries.Add(i, part);
-                            }
+
+                        case ExportDetailLevel.LeastDetailed when !part.DetailLevel.IsHighestLevel():
+                            staticPartEntries.Add(i, part);
                             break;
+
                         default:
                             staticPartEntries.Add(i, part);
                             break;
@@ -150,6 +102,48 @@ namespace Tiger.Schema.Static.MARATHON_ALPHA
                 }
             }
             return staticPartEntries;
+        }
+
+
+        public List<BufferGroup> GetBuffers()
+        {
+            List<BufferGroup> bufferGroups = new();
+            foreach (SStaticMeshBuffers buffers in _tag.Meshes)
+            {
+                BufferGroup bufferGroup = new();
+                bufferGroup.IndexBuffer = buffers.Indices.ToBlob();
+                bufferGroup.VertexBuffers = new Blob[3];
+                bufferGroup.VertexBuffers[0] = buffers.Vertices0.ToBlob();
+                if (buffers.Vertices1 != null)
+                {
+                    bufferGroup.VertexBuffers[1] = buffers.Vertices1.ToBlob();
+                }
+                if (buffers.VertexColor != null)
+                {
+                    bufferGroup.VertexBuffers[2] = buffers.VertexColor.ToBlob();
+                }
+                //bufferGroup.IndexOffset = buffers.UnkOffset;
+                bufferGroups.Add(bufferGroup);
+            }
+
+            return bufferGroups;
+        }
+
+        public List<int> GetStrides()
+        {
+            List<int> strides = new();
+            if (_tag.Meshes.Count() == 0) return strides;
+            if (_tag.Meshes[0].Vertices0 != null) strides.Add(_tag.Meshes[0].Vertices0.TagData.Stride);
+            if (_tag.Meshes[0].Vertices1 != null) strides.Add(_tag.Meshes[0].Vertices1.TagData.Stride);
+            if (_tag.Meshes[0].VertexColor != null) strides.Add(_tag.Meshes[0].VertexColor.TagData.Stride);
+            return strides;
+        }
+
+        public Blob GetTransformsBlob()
+        {
+            using TigerReader reader = GetReader();
+            reader.Seek(0x40, SeekOrigin.Begin);
+            return new Blob(reader.ReadBytes(0x20));
         }
     }
 }

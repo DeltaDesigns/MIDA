@@ -179,6 +179,16 @@ public static class Helpers
         parsedHash = 0;
         return false;
     }
+
+
+    public static bool IsHighestLevel(this ELodCategory eLod)
+    {
+        return eLod == ELodCategory.Unk0 ||
+               eLod == ELodCategory.Unk1 ||
+               eLod == ELodCategory.Unk3 ||
+               eLod == ELodCategory.Unk7 || // unsure
+               eLod == ELodCategory.Unk15; // unsure
+    }
 }
 
 public static class NestedTypeHelpers

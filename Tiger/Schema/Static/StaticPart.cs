@@ -8,7 +8,7 @@ public class StaticPart : MeshPart
     {
         IndexOffset = terrainPartEntry.IndexOffset;
         IndexCount = terrainPartEntry.IndexCount;
-        LodCategory = (ELodCategory)terrainPartEntry.DetailLevel;
+        DetailLevel = terrainPartEntry.DetailLevel;
         PrimitiveType = PrimitiveType.TriangleStrip;
     }
 
@@ -16,7 +16,7 @@ public class StaticPart : MeshPart
     {
         IndexOffset = staticPartEntry.IndexOffset;
         IndexCount = staticPartEntry.IndexCount;
-        LodCategory = (ELodCategory)staticPartEntry.DetailLevel;
+        DetailLevel = staticPartEntry.DetailLevel;
         PrimitiveType = (PrimitiveType)staticPartEntry.PrimitiveType;
     }
 
@@ -25,7 +25,7 @@ public class StaticPart : MeshPart
         VertexLayoutIndex = decalPartEntry.GetVertexLayoutIndex();
         IndexOffset = decalPartEntry.IndexOffset;
         IndexCount = decalPartEntry.IndexCount;
-        LodCategory = (ELodCategory)decalPartEntry.LODLevel;
+        DetailLevel = decalPartEntry.DetailLevel;
         PrimitiveType = (PrimitiveType)decalPartEntry.PrimitiveType;
     }
 

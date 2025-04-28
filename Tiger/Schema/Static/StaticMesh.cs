@@ -23,7 +23,7 @@ public class MeshPart
     public uint IndexOffset;
     public uint IndexCount;
     public PrimitiveType PrimitiveType;
-    public ELodCategory LodCategory;
+    public ELodCategory DetailLevel;
     public List<UIntVector3> Indices = new List<UIntVector3>();
     public List<uint> VertexIndices = new List<uint>();
     public List<Vector4> VertexPositions = new List<Vector4>();
@@ -166,20 +166,12 @@ public class StaticMesh : Tag<SStaticMesh>
             if (!Globals.Get().GetExportStages().Contains((TfxRenderStage)decalPartEntry.GetRenderStage()))
                 continue;
 
-            if (detailLevel == ExportDetailLevel.MostDetailed)
-            {
-                if (decalPartEntry.LODLevel != 1 && decalPartEntry.LODLevel != 2 && decalPartEntry.LODLevel != 10)
-                {
-                    continue;
-                }
-            }
-            else if (detailLevel == ExportDetailLevel.LeastDetailed)
-            {
-                if (decalPartEntry.LODLevel == 1 || decalPartEntry.LODLevel == 2 || decalPartEntry.LODLevel == 10)
-                {
-                    continue;
-                }
-            }
+            if (detailLevel == ExportDetailLevel.MostDetailed && !decalPartEntry.DetailLevel.IsHighestLevel())
+                continue;
+
+            if (detailLevel == ExportDetailLevel.LeastDetailed && decalPartEntry.DetailLevel.IsHighestLevel())
+                continue;
+
             StaticPart part = new StaticPart(decalPartEntry);
             part.GetDecalData(decalPartEntry, _tag);
             if (decalPartEntry.Material is not null)

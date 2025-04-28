@@ -29,33 +29,7 @@ public partial class MainWindow
     public FileVersionInfo GameInfo = null;
 
     public static MainWindow Current;
-
     public Spinner2 Spinner;
-
-    private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
-    {
-        if (MainMenuTab.Visibility == Visibility.Visible)
-        {
-            Task.Run(InitialiseHandlers);
-            _bHasInitialised = true;
-        }
-
-        Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        MIDAIcon.Source = GetBitmapSource(appIcon);
-
-        if (ConfigSubsystem.Get().GetAnimatedBackground())
-        {
-            if (Spinner is null)
-                Spinner = new Spinner2((int)Width, (int)Height);
-
-            SpinnerContainer.Children.Add(Spinner);
-        }
-        else
-            SpinnerContainer.Visibility = Visibility.Hidden;
-
-        Current = this;
-
-    }
 
     public MainWindow()
     {
@@ -129,6 +103,31 @@ public partial class MainWindow
         };
     }
 
+    private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
+    {
+        if (MainMenuTab.Visibility == Visibility.Visible)
+        {
+            Task.Run(InitialiseHandlers);
+            _bHasInitialised = true;
+        }
+
+        Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        MIDAIcon.Source = GetBitmapSource(appIcon);
+
+        if (ConfigSubsystem.Get().GetAnimatedBackground())
+        {
+            if (Spinner is null)
+                Spinner = new Spinner2((int)Width, (int)Height);
+
+            SpinnerContainer.Children.Add(Spinner);
+        }
+        else
+            SpinnerContainer.Visibility = Visibility.Hidden;
+
+        Current = this;
+
+    }
+
     private void ShowAgreement()
     {
         PopupBanner warn = new()
@@ -151,7 +150,6 @@ public partial class MainWindow
         warn.OnProgressComplete += () => ConfigSubsystem.Get().SetAcceptedAgreement(true);
         warn.Show();
     }
-
 
     private int InitialiseStrategistSingletons()
     {

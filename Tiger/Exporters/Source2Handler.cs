@@ -29,7 +29,7 @@ public static class Source2Handler
                     mats.AppendLine("{");
                     if (part.Material == null)
                     {
-                        mats.AppendLine($"    from = \"{name}_Group{part.GroupIndex}_Index{part.Index}_{i}_{part.LodCategory}.vmat\"");
+                        mats.AppendLine($"    from = \"{name}_Group{part.GroupIndex}_Index{part.Index}_{i}_{part.DetailLevel}.vmat\"");
                         mats.AppendLine($"    to = \"materials/black_matte.vmat\"");
                     }
                     else
@@ -41,7 +41,7 @@ public static class Source2Handler
 
                     if (part.Material?.Vertex.Unk64 != 0)
                     {
-                        exceptions.AppendLine($"\"{name}_Group{part.GroupIndex}_Index{part.Index}_{i}_{part.LodCategory}\",");
+                        exceptions.AppendLine($"\"{name}_Group{part.GroupIndex}_Index{part.Index}_{i}_{part.DetailLevel}\",");
                     }
 
                     i++;
