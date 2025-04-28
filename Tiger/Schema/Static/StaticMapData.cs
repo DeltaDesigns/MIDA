@@ -18,40 +18,91 @@ public class StaticMapData : Tag<SStaticMapData>
 
     public void LoadIntoExporterScene(ExporterScene scene)
     {
-        //List<SStaticMeshHash> extractedStatics = _tag.Statics.DistinctBy(x => x.Static.Hash).ToList();
-        // todo this loads statics twice
-        //Parallel.ForEach(extractedStatics, s =>
-        //{
-        //    var parts = s.Static.Load(ExportDetailLevel.MostDetailed);
-        //    scene.AddStatic(s.Static.Hash, parts);
-        //    s.Static.SaveMaterialsFromParts(scene, parts);
-        //});
+        //const int MaxStaticsPerScene = 650;
+        //string sceneName = scene.Name;
 
+        //int currentStaticCount = 0;
+        //int i = 1;
         //foreach (var c in _tag.InstanceCounts)
         //{
+        //    if (currentStaticCount >= MaxStaticsPerScene)
+        //    {
+        //        scene = Exporter.Get().CreateScene($"{sceneName}_{i}", ExportType.Statics, DataExportType.Map);
+        //        currentStaticCount = 0;
+        //        i++;
+        //    }
+
         //    var model = _tag.Statics[c.StaticIndex].Static;
-        //    scene.AddStaticInstancesToMesh(model.Hash, _tag.Instances.Skip(c.InstanceOffset).Take(c.InstanceCount).ToList());
+        //    var instances = _tag.Instances.Skip(c.InstanceOffset).Take(c.InstanceCount).ToList();
+        //    scene.AddStaticInstancesToMesh(model, instances);
+        //    currentStaticCount += 1;
         //}
 
-        const int MaxStaticsPerScene = 650;
-        string sceneName = scene.Name;
+        // Faster but keeping previous method just in case
+        var chunks = PreChunkStaticsAndInstances(650, scene.Name);
+        Parallel.ForEach(chunks, chunk =>
+        {
+            var newScene = Exporter.Get().CreateScene(chunk.SceneName, ExportType.Statics, DataExportType.Map);
 
-        int currentStaticCount = 0;
-        int i = 1;
+            for (int i = 0; i < chunk.Statics.Count; i++)
+            {
+                var model = chunk.Statics[i];
+                var instances = chunk.Instances[i];
+                newScene.AddStaticInstancesToMesh(model, instances);
+            }
+        });
+    }
+
+    public List<PreChunkedStaticGroup> PreChunkStaticsAndInstances(int maxStaticsPerChunk, string baseSceneName)
+    {
+        var result = new List<PreChunkedStaticGroup>();
+
+        var currentGroup = new PreChunkedStaticGroup
+        {
+            SceneName = $"{baseSceneName}_0"
+        };
+
+        int staticCounter = 0;
+        int sceneCounter = 0;
+
         foreach (var c in _tag.InstanceCounts)
         {
-            if (currentStaticCount >= MaxStaticsPerScene)
+            if (staticCounter >= maxStaticsPerChunk)
             {
-                scene = Exporter.Get().CreateScene($"{sceneName}_{i}", ExportType.Statics, DataExportType.Map);
-                currentStaticCount = 0;
-                i++;
+                result.Add(currentGroup);
+                sceneCounter++;
+                currentGroup = new PreChunkedStaticGroup
+                {
+                    SceneName = $"{baseSceneName}_{sceneCounter}"
+                };
+                staticCounter = 0;
             }
 
+            // Get the model and corresponding instances
             var model = _tag.Statics[c.StaticIndex].Static;
             var instances = _tag.Instances.Skip(c.InstanceOffset).Take(c.InstanceCount).ToList();
-            scene.AddStaticInstancesToMesh(model, instances);
-            currentStaticCount += 1;
+
+            // Add model and its instances together in the chunk
+            currentGroup.Statics.Add(model);
+            currentGroup.Instances.Add(instances);
+
+            staticCounter++;
         }
+
+        // Add the last group if there are any statics left
+        if (currentGroup.Statics.Count > 0)
+        {
+            result.Add(currentGroup);
+        }
+
+        return result;
+    }
+
+    public class PreChunkedStaticGroup
+    {
+        public string SceneName { get; set; }
+        public List<StaticMesh> Statics { get; } = new();
+        public List<List<SStaticMeshInstanceTransform>> Instances { get; } = new();
     }
 }
 

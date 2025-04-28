@@ -63,8 +63,9 @@ public class FbxExporter : AbstractExporter
 
                 // Not point in overwritting map static fbx, saves a lot of time on re-exports
                 // maybe add this as a config option?
-                if (scene.DataType == DataExportType.Map && File.Exists(Path.Join(savePath, mesh.Hash) + ".fbx"))
-                    return;
+                // nvm, somehow breaks things
+                //if (scene.DataType == DataExportType.Map && File.Exists(Path.Join(savePath, mesh.Hash) + ".fbx"))
+                //    return;
 
                 FbxScene fbxIndivScene = FbxScene.Create(_manager, mesh.Hash);
                 AddMesh(fbxIndivScene, mesh);
