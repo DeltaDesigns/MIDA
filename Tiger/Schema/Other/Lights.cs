@@ -43,7 +43,7 @@ public class Lights : Tag<SMapLights>
             }
 
             Vector3 size = GetSize(data.LightToWorld, lightType, $"{lightType}_{data.BufferData.Hash}_{i}");
-            var bounds = _tag.Bounds.TagData.InstanceBounds.ElementAt(_tag.Bounds.GetReader(), i);
+            var bounds = _tag.Bounds.TagData.Bounds.ElementAt(_tag.Bounds.GetReader(), i);
             var transforms = _tag.Transforms.ElementAt(reader, i);
             LightData lightData = new()
             {

@@ -61,6 +61,11 @@ public class FbxExporter : AbstractExporter
                 && scene.DataType == DataExportType.Individual
                 && args.AggregateOutput ? args.OutputDirectory : outputDirectory;
 
+                // Not point in overwritting map static fbx, saves a lot of time on re-exports
+                // maybe add this as a config option?
+                if (scene.DataType == DataExportType.Map && File.Exists(Path.Join(savePath, mesh.Hash) + ".fbx"))
+                    return;
+
                 FbxScene fbxIndivScene = FbxScene.Create(_manager, mesh.Hash);
                 AddMesh(fbxIndivScene, mesh);
                 ExportScene(fbxIndivScene, Path.Join(savePath, mesh.Hash));

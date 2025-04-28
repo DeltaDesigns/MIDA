@@ -199,17 +199,32 @@ public class ExporterScene
         ArrangedStaticMeshInstances.TryAdd(meshHash, InstancesToTransforms(instances));
     }
 
-    public void AddStaticInstancesToMesh(string modelHash, IEnumerable<SStaticMeshInstanceTransform> instances)
+    public void AddStaticInstancesToMesh(StaticMesh staticMesh, IEnumerable<SStaticMeshInstanceTransform> instances)
     {
-        if (!StaticMeshInstances.ContainsKey(modelHash))
+        var hash = staticMesh.Hash;
+        if (!StaticMeshes.Any(x => x.Hash == hash))
         {
-            StaticMeshInstances.TryAdd(modelHash, InstancesToTransforms(instances));
+            ExporterMesh mesh = new(hash);
+            var parts = staticMesh.Load(ExportDetailLevel.MostDetailed);
+            staticMesh.SaveMaterialsFromParts(this, parts);
+
+            for (int i = 0; i < parts.Count; i++)
+            {
+                StaticPart part = parts[i];
+                mesh.AddPart(staticMesh.Hash, part, i);
+            }
+            StaticMeshes.Add(mesh);
+        }
+
+        if (!StaticMeshInstances.ContainsKey(hash))
+        {
+            StaticMeshInstances.TryAdd(hash, InstancesToTransforms(instances));
         }
         else
         {
             foreach (Transform transform in InstancesToTransforms(instances))
             {
-                StaticMeshInstances[modelHash].Add(transform);
+                StaticMeshInstances[hash].Add(transform);
             }
         }
     }

@@ -231,7 +231,7 @@ public partial class ActivityMapView : UserControl
         });
 
         List<string> mapStages = maps.Select((x, i) => $"Preparing {x} ({i + 1}/{maps.Count()})").ToList();
-        mapStages.Add("Exporting Static Map");
+        mapStages.Add("Exporting Static Map...This may take some time");
         MainWindow.Progress.SetProgressStages(mapStages);
 
         Tiger.Exporters.Exporter.Get().GetOrCreateGlobalScene();
@@ -283,6 +283,7 @@ public partial class ActivityMapView : UserControl
         Log.Info($"Exporting {type}: {_currentBubble.Name}, {_currentBubble.Hash}");
         List<string> mapStages = maps.Select((x, i) => $"Preparing {_currentBubble.Name} ({i + 1}/{maps.Count()})").ToList();
         mapStages.Add($"Exporting {type}");
+
         MainWindow.Progress.SetProgressStages(mapStages);
 
         Tiger.Exporters.Exporter.Get().GetOrCreateGlobalScene();
@@ -292,7 +293,6 @@ public partial class ActivityMapView : UserControl
             ActivityMapEntityView.ExportFull(hashes, container, savePath);
             MainWindow.Progress.CompleteStage();
         }
-        ;
 
         Tiger.Exporters.Exporter.Get().Export(savePath);
         MainWindow.Progress.CompleteStage();
@@ -356,7 +356,7 @@ public partial class ActivityMapView : UserControl
         }
 
         List<string> mapStages = maps.Select((x, i) => $"Preparing {i + 1}/{maps.Count}").ToList();
-        mapStages.Add("Exporting");
+        mapStages.Add("Exporting...This may take some time");
         MainWindow.Progress.SetProgressStages(mapStages);
 
         Tiger.Exporters.Exporter.Get().GetOrCreateGlobalScene();

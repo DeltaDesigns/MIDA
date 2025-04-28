@@ -18,21 +18,39 @@ public class StaticMapData : Tag<SStaticMapData>
 
     public void LoadIntoExporterScene(ExporterScene scene)
     {
-
-        List<SStaticMeshHash> extractedStatics = _tag.Statics.DistinctBy(x => x.Static.Hash).ToList();
-
+        //List<SStaticMeshHash> extractedStatics = _tag.Statics.DistinctBy(x => x.Static.Hash).ToList();
         // todo this loads statics twice
-        Parallel.ForEach(extractedStatics, s =>
-        {
-            var parts = s.Static.Load(ExportDetailLevel.MostDetailed);
-            scene.AddStatic(s.Static.Hash, parts);
-            s.Static.SaveMaterialsFromParts(scene, parts);
-        });
+        //Parallel.ForEach(extractedStatics, s =>
+        //{
+        //    var parts = s.Static.Load(ExportDetailLevel.MostDetailed);
+        //    scene.AddStatic(s.Static.Hash, parts);
+        //    s.Static.SaveMaterialsFromParts(scene, parts);
+        //});
 
+        //foreach (var c in _tag.InstanceCounts)
+        //{
+        //    var model = _tag.Statics[c.StaticIndex].Static;
+        //    scene.AddStaticInstancesToMesh(model.Hash, _tag.Instances.Skip(c.InstanceOffset).Take(c.InstanceCount).ToList());
+        //}
+
+        const int MaxStaticsPerScene = 650;
+        string sceneName = scene.Name;
+
+        int currentStaticCount = 0;
+        int i = 1;
         foreach (var c in _tag.InstanceCounts)
         {
+            if (currentStaticCount >= MaxStaticsPerScene)
+            {
+                scene = Exporter.Get().CreateScene($"{sceneName}_{i}", ExportType.Statics, DataExportType.Map);
+                currentStaticCount = 0;
+                i++;
+            }
+
             var model = _tag.Statics[c.StaticIndex].Static;
-            scene.AddStaticInstancesToMesh(model.Hash, _tag.Instances.Skip(c.InstanceOffset).Take(c.InstanceCount).ToList());
+            var instances = _tag.Instances.Skip(c.InstanceOffset).Take(c.InstanceCount).ToList();
+            scene.AddStaticInstancesToMesh(model, instances);
+            currentStaticCount += 1;
         }
     }
 }
@@ -59,15 +77,15 @@ public struct SStaticMapData
 }
 
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B1938080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080A7F5", 0x18)]
 public struct SOcclusionBounds
 {
     public long FileSize;
-    public DynamicArrayUnloaded<SMeshInstanceOcclusionBounds> InstanceBounds;
+    public DynamicArrayUnloaded<SBounds> Bounds;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B3938080", 0x30)]
-public struct SMeshInstanceOcclusionBounds
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "F7A78080", 0x30)]
+public struct SBounds
 {
     public Vector4 Corner1;
     public Vector4 Corner2;
