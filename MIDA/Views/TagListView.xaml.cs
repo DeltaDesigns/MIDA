@@ -1265,7 +1265,6 @@ public partial class TagListView : UserControl
     {
         _allTagItems = new ConcurrentBag<TagItem>();
 
-        // Dialogue tables can be in the 0x80808948 entries
         ConcurrentDictionary<string, FileHash> dialogueTables = new();
         Activity activity = FileResourcer.Get().GetFile<Activity>(fileHash);
         if (activity.TagData.Unk18.GetValue(activity.GetReader()) is S6A988080 entry)
@@ -1276,13 +1275,13 @@ public partial class TagListView : UserControl
                     dialogueTables.TryAdd(dirtable.DialogueTable.Hash, dirtable.DialogueTable.Hash);
             }
         }
+
         Parallel.ForEach(activity.TagData.Unk50, val =>
         {
             foreach (var d2Class48898080 in val.Unk18)
             {
                 var resource = d2Class48898080.UnkEntityReference.TagData.Unk10.GetValue(d2Class48898080.UnkEntityReference.GetReader());
-                if (resource is SD5908080 || resource is S44938080 || resource is S45938080 ||
-                    resource is S18978080 || resource is S19978080)
+                if (resource is S34AB8080) // TODO resource is S44938080 || resource is S45938080 || resource is S18978080 || resource is S19978080)
                 {
                     if (resource.DialogueTable != null)
                         dialogueTables.TryAdd(resource.DialogueTable.Hash, resource.DialogueTable.Hash);

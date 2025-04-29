@@ -96,27 +96,24 @@ public struct S48898080
     public StringHash BubbleName;
     public TigerHash ActivityPhaseName;
     public TigerHash ActivityPhaseName2;
-    public Tag<S898E8080> UnkEntityReference;
+    public Tag<S8080B381> UnkEntityReference;
 }
 
-[SchemaStruct("898E8080", 0x30)]
-public struct S898E8080
+[SchemaStruct("8080B381", 0x30)]
+public struct S8080B381
 {
     public long FileSize;
     public long Unk08;
-    public ResourcePointer Unk10;  // 46938080 has dialogue table, 45938080 unk, 19978080 unk
+    public ResourcePointer Unk10;  // 34AB8080, 
     [SchemaField(0x18)]
-    public Tag Unk18;  // S898E8080 entity script stuff
+    public Tag Unk18;  // S8080B381 entity script stuff
 }
 
-[SchemaStruct("46938080", 0x58)]
-public struct S46938080
+[SchemaStruct("34AB8080", 0x58)]
+public struct S34AB8080
 {
     [SchemaField(Tag64 = true)]
     public Tag DialogueTable;
-    [SchemaField(0x3C)]
-    public int Unk3C;
-    public float Unk40;
 }
 
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "19978080", 0x20)]
@@ -510,21 +507,21 @@ public struct SUnkMusicE8BF8080
     public StringPointer EventDescription;
 }
 
-[SchemaStruct("BE8E8080", 0x20)]
-public struct SBE8E8080
+[SchemaStruct("8080B3EA", 0x20)]
+public struct S8080B3EA
 {
     public long FileSize;
-    public DynamicArray<S42898080> EntityResources;
+    public DynamicArray<S81AB8080> EntityResources;
 }
 
-[SchemaStruct("42898080", 0x4)]
-public struct S42898080
+[SchemaStruct("81AB8080", 0x4)]
+public struct S81AB8080
 {
-    public Tag<S43898080> EntityResourceParent;
+    public Tag<S8080AB82> EntityResourceParent;
 }
 
-[SchemaStruct("43898080", 0x28)]
-public struct S43898080
+[SchemaStruct("8080AB82", 0x28)]
+public struct S8080AB82
 {
     public long FileSize;
     public TigerHash Unk08;

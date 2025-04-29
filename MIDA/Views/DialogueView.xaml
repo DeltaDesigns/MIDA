@@ -20,17 +20,15 @@
                         <RowDefinition Height="80*" />
                         <RowDefinition Height="30*" />
                     </Grid.RowDefinitions>
-                    <Border
-                        Grid.RowSpan="2"
-                        Panel.ZIndex="1"
-                        BorderBrush="{StaticResource BackgroundColour30}"
-                        BorderThickness="1" />
+
                     <TextBlock
                         Grid.Row="0"
                         Margin="5,5,0,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
+                        FontFamily="{DynamicResource PP Fraktion Mono Semibold Keys}"
                         FontSize="16"
+                        Foreground="{StaticResource BackgroundColour14}"
                         Text="{Binding Voiceline}"
                         TextWrapping="WrapWithOverflow" />
                     <TextBlock
@@ -38,27 +36,27 @@
                         Margin="5,0,0,5"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Bottom"
-                        FontFamily="{DynamicResource Haas Grot Text 56 Italic}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="14"
-                        Foreground="{StaticResource ForegroundColour75}"
+                        Foreground="{StaticResource BackgroundColour30}"
                         Text="{Binding Narrator}" />
                     <TextBlock
                         Grid.Row="0"
-                        Margin="0,0,4,0"
+                        Margin="0,0,5,0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
-                        FontFamily="{DynamicResource Haas Grot Text 56 Italic}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="12"
-                        Foreground="{StaticResource ForegroundColour75}"
+                        Foreground="{StaticResource BackgroundColour30}"
                         Text="{Binding RecursionDepth}" />
                     <TextBlock
                         Grid.Row="1"
                         Margin="0,0,5,5"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
-                        FontFamily="{DynamicResource Haas Grot Text 56 Italic}"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
                         FontSize="14"
-                        Foreground="{StaticResource ForegroundColour75}"
+                        Foreground="{StaticResource BackgroundColour30}"
                         Text="{Binding Duration}" />
                 </Grid>
             </Button>

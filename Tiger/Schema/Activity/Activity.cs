@@ -108,8 +108,8 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
         private List<FileHash> CollapseResourceParent(FileHash hash)
         {
             ConcurrentBag<FileHash> items = new();
-            var entry = FileResourcer.Get().GetSchemaTag<S898E8080>(hash);
-            var Unk18 = FileResourcer.Get().GetSchemaTag<SBE8E8080>(entry.TagData.Unk18.Hash);
+            var entry = FileResourcer.Get().GetSchemaTag<S8080B381>(hash);
+            var Unk18 = FileResourcer.Get().GetSchemaTag<S8080B3EA>(entry.TagData.Unk18.Hash);
 
             foreach (var resource in Unk18.TagData.EntityResources)
             {
@@ -118,8 +118,8 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
                     var resourceValue = resource.EntityResourceParent.TagData.EntityResource.TagData.Unk18.GetValue(resource.EntityResourceParent.TagData.EntityResource.GetReader());
                     switch (resourceValue)
                     {
-                        case SD8928080:
-                            var tag = (SD8928080)resourceValue;
+                        case SA5B18080:
+                            var tag = (SA5B18080)resourceValue;
                             if (tag.Unk84 is not null && tag.Unk84.TagData.DataEntries.Count > 0)
                             {
                                 items.Add(tag.Unk84.Hash);
@@ -144,56 +144,52 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
         {
             Dictionary<ulong, ActivityEntity> items = new();
             Dictionary<uint, string> strings = new();
-            var entry = FileResourcer.Get().GetSchemaTag<S898E8080>(hash);
-            var Unk18 = FileResourcer.Get().GetSchemaTag<SBE8E8080>(entry.TagData.Unk18.Hash);
+            var entry = FileResourcer.Get().GetSchemaTag<S8080B381>(hash);
+            var Unk18 = FileResourcer.Get().GetSchemaTag<S8080B3EA>(entry.TagData.Unk18.Hash);
 
             foreach (var resource in Unk18.TagData.EntityResources)
             {
                 if (resource.EntityResourceParent != null)
                 {
-                    var resourceValue = resource.EntityResourceParent.TagData.EntityResource.TagData.Unk18.GetValue(resource.EntityResourceParent.TagData.EntityResource.GetReader());
-                    switch (resourceValue)
+                    var entResource = resource.EntityResourceParent.TagData.EntityResource;
+                    try // Fuck it, bruce forcing time
                     {
-                        //This is kinda dumb 
-                        case S95468080:
-                        case S26988080:
-                        case S6F418080:
-                        case SEF988080:
-                        case SF88C8080:
-                        case SFA988080:
-                            if (resource.EntityResourceParent.TagData.EntityResource.TagData.UnkHash80 != null)
+                        var resourceValue = (S99B18080)entResource.TagData.Unk18.GetValue(entResource.GetReader());
+
+                        if (entResource.TagData.UnkHash80 != null)
+                        {
+                            var unk80 = FileResourcer.Get().GetSchemaTag<S8080B1E2>(entResource.TagData.UnkHash80.Hash);
+                            foreach (var a in unk80.TagData.Unk08)
                             {
-                                var unk80 = FileResourcer.Get().GetSchemaTag<S6B908080>(resource.EntityResourceParent.TagData.EntityResource.TagData.UnkHash80.Hash);
-                                foreach (var a in unk80.TagData.Unk08)
+                                if (a.Unk00.Value?.Name.Value is not null)
                                 {
-                                    if (a.Unk00.Value?.Name.Value is not null)
-                                    {
-                                        strings.TryAdd(Helpers.Fnv(a.Unk00.Value.Value.Name.Value), a.Unk00.Value.Value.Name.Value);
-                                    }
+                                    strings.TryAdd(Helpers.Fnv(a.Unk00.Value.Value.Name.Value), a.Unk00.Value.Value.Name.Value);
                                 }
-                                foreach (var worldid in resourceValue.Unk58)
+                            }
+                            foreach (var worldid in resourceValue.Unk58)
+                            {
+                                if (strings.ContainsKey(worldid.FNVHash.Hash32) && strings.Any(kv => kv.Key == worldid.FNVHash.Hash32))
                                 {
-                                    if (strings.ContainsKey(worldid.FNVHash.Hash32) && strings.Any(kv => kv.Key == worldid.FNVHash.Hash32))
+                                    ActivityEntity ent = new();
+                                    if (strings.ContainsKey(resourceValue.FNVHash.Hash32))
                                     {
-                                        ActivityEntity ent = new();
-                                        if (strings.ContainsKey(resourceValue.FNVHash.Hash32))
-                                        {
-                                            ent.Name = strings[worldid.FNVHash.Hash32];
-                                            ent.SubName = strings[resourceValue.FNVHash.Hash32];
-                                            items.TryAdd(worldid.WorldID, ent);
-                                        }
-                                        else
-                                        {
-                                            ent.Name = strings[worldid.FNVHash.Hash32];
-                                            ent.SubName = "";
-                                            items.TryAdd(worldid.WorldID, ent);
-                                        }
+                                        ent.Name = strings[worldid.FNVHash.Hash32];
+                                        ent.SubName = strings[resourceValue.FNVHash.Hash32];
+                                        items.TryAdd(worldid.WorldID, ent);
+                                    }
+                                    else
+                                    {
+                                        ent.Name = strings[worldid.FNVHash.Hash32];
+                                        ent.SubName = "";
+                                        items.TryAdd(worldid.WorldID, ent);
                                     }
                                 }
                             }
-                            break;
-                        default:
-                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        //Log.Info(e.Message);
                     }
                 }
             }

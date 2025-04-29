@@ -796,8 +796,8 @@ public struct SMapCubemapResource //Dataresource for cubemaps
     public Tag Unk1D4; // 80807F5B, seems to hold colors?
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "D8928080", 0x190)]
-public struct SD8928080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "A5B18080", 0x190)]
+public struct SA5B18080
 {
     [SchemaField(0x84)]
     public Tag<SMapDataTable> Unk84;
@@ -813,96 +813,40 @@ public struct SEF8C8080
     public Tag<SMapDataTable> Unk58;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "FA988080", 0x80)]
-public struct SFA988080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "99B18080", 0x80)]
+public struct S99B18080
 {
     [SchemaField(0x28)]
     public TigerHash FNVHash;
     [SchemaField(0x30)]
     public ulong WorldID;
     [SchemaField(0x58)]
-    public DynamicArray<S05998080> Unk58;
+    public DynamicArray<SABB88080> Unk58;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "F88C8080", 0x80)]
-public struct SF88C8080
-{
-    [SchemaField(0x28)]
-    public TigerHash FNVHash;
-    [SchemaField(0x30)]
-    public ulong WorldID;
-    [SchemaField(0x58)]
-    public DynamicArray<S05998080> Unk58;
-}
-
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "EF988080", 0x80)]
-public struct SEF988080
-{
-    [SchemaField(0x28)]
-    public TigerHash FNVHash;
-    [SchemaField(0x30)]
-    public ulong WorldID;
-    [SchemaField(0x58)]
-    public DynamicArray<S05998080> Unk58;
-}
-
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "6F418080", 0xE0)]
-public struct S6F418080
-{
-    [SchemaField(0x28)]
-    public TigerHash FNVHash;
-    [SchemaField(0x30)]
-    public ulong WorldID;
-    [SchemaField(0x58)]
-    public DynamicArray<S05998080> Unk58;
-}
-
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "26988080", 0x98)]
-public struct S26988080
-{
-    [SchemaField(0x28)]
-    public TigerHash FNVHash;
-    [SchemaField(0x30)]
-    public ulong WorldID;
-    [SchemaField(0x58)]
-    public DynamicArray<S05998080> Unk58;
-}
-
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "95468080", 0x90)]
-public struct S95468080
-{
-    [SchemaField(0x28)]
-    public TigerHash FNVHash;
-    [SchemaField(0x30)]
-    public ulong WorldID;
-    [SchemaField(0x58)]
-    public DynamicArray<S05998080> Unk58;
-}
-
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "05998080", 0x10)]
-public struct S05998080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "ABB88080", 0x10)]
+public struct SABB88080
 {
     public TigerHash FNVHash;
     [SchemaField(0x8)]
     public ulong WorldID;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "6B908080", 0x28)]
-public struct S6B908080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080B1E2", 0x28)]
+public struct S8080B1E2
 {
     [SchemaField(0x8)]
-    public DynamicArray<S029D8080> Unk08;
+    public DynamicArray<SDBBC8080> Unk08;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "029D8080", 0x10)]
-public struct S029D8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "DBBC8080", 0x10)]
+public struct SDBBC8080
 {
-    public ResourceInTablePointer<S4D898080> Unk00;
-    public RelativePointer Unk08;
+    public ResourceInTablePointer<S89AB8080> Unk00;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "4D898080", 0xC)]
-public struct S4D898080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "89AB8080", 0xC)]
+public struct S89AB8080
 {
     public StringPointer Name;
 }

@@ -55,8 +55,10 @@ public partial class DialogueView : UserControl
             }
             else
             {
+                S3FAA8080 entry = dyn;
+                if (entry.SoundM is null || entry.VoicelineM is null)
+                    continue;
 
-                S33978080 entry = dyn;
                 result.Add(new VoicelineItem
                 {
                     Narrator = GlobalStrings.Get().GetString(entry.NarratorString),
