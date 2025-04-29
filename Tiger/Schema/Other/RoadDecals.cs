@@ -36,25 +36,25 @@ public class RoadDecals : Tag<SMapRoadDecals>
     }
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "E8688080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B0818080", 0x18)]
 public struct SMapRoadDecalsResource
 {
     [SchemaField(0x10), NoLoad]
     public RoadDecals RoadDecals; // Contrary to the name, it is more than just decals on roads
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "EA688080", 0x58)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "808081B2", 0x58)]
 public struct SMapRoadDecals
 {
     public ulong FileSize;
-    public DynamicArray<SE3688080> Entries;
+    public DynamicArray<SAB818080> Entries;
     public FileHash OcclusionBounds;
     [SchemaField(0x20)]
     public AABB UnkBounds;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "E3688080", 0x60)]
-public struct SE3688080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "AB818080", 0x60)]
+public struct SAB818080
 {
     public Material Material;
     public IndexBuffer IndexBuffer;

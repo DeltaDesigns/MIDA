@@ -40,7 +40,7 @@ public class WaterDecals
 /// Usually a flat plane for screen-space reflected water
 /// </summary>
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "D4688080", 0x70)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "9C818080", 0x70)]
 public struct SMapWaterDecal
 {
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA)]
