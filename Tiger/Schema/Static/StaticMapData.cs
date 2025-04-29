@@ -295,8 +295,8 @@ public struct SStaticMapParent
 /// <summary>
 /// Unk data resource.
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "A16D8080", 0x80)]
-public struct SA16D8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808691", 0x80)]
+public struct S80808691
 {
     public ulong FileSize;
     [SchemaField(0x30)]
@@ -423,17 +423,6 @@ public struct SStaticAmbientOcclusionMappings
     public uint Offset;
 }
 
-// /// <summary>
-// /// Unk data resource, maybe lights for entities?
-// /// </summary>
-// [SchemaStruct("636A8080", 0x18)]
-// public struct S636A8080
-// {
-//     [SchemaField(0x10), DestinyField(FieldType.FileHash)]
-//     public Tag Unk10;  // S656C8080, might be related to lights for entities?
-// }
-//
-//
 // /// <summary>
 // /// Audio data resource.
 // /// </summary>

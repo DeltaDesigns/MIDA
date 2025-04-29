@@ -157,44 +157,45 @@ public class Decorator : Tag<SDecorator>
 }
 
 #region Decorator structs
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "C36C8080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "AA858080", 0x18)]
 public struct SDecoratorMapResource
 {
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
     public Decorator Decorator;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "986C8080", 0xA8)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080857D", 0xA8)]
 public struct SDecorator
 {
     public ulong Size;
-    public DynamicArray<SB16C8080> DecoratorModels;
+    public DynamicArray<S98858080> DecoratorModels;
     public DynamicArray<SInt32> InstanceRanges;
     public DynamicArray<SInt32> Unk28;
     public DynamicArray<SInt32> Unk38;
-    public Tag<SA46C8080> BufferData;
+    public Tag<S8080858B> BufferData;
     public Tag<SOcclusionBounds> OcculusionBounds;
     public DynamicArray<SInt32> Unk50;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B16C8080", 0x4)]
-public struct SB16C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "98858080", 0x4)]
+public struct S98858080
 {
-    public Tag<SB26C8080> DecoratorModel;
+    public Tag<S80808599> DecoratorModel;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B26C8080", 0x100)]
-public struct SB26C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808599", 0x100)]
+public struct S80808599
 {
     public long FileSize;
     public EntityModel Model;
     public int UnkC;
-    //public AABB BoundingBox; not in pre-bl, dont really care about it tho
+    //public AABB BoundingBox;
+
     [SchemaField(0x30, TigerStrategy.MARATHON_ALPHA)]
-    public Tag Unk30;  // SB46C8080
+    public Tag Unk30;  // 8080859B
 
     [SchemaField(0x34, TigerStrategy.MARATHON_ALPHA)]
-    public Tag<SB86C8080> SpeedTreeData; // Used for actual trees
+    public Tag<SB86C8080> SpeedTreeData; // Used for actual trees, TODO marathon (currently none in the alpha?)
 }
 
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B86C8080", 0x18)]
@@ -215,28 +216,28 @@ public struct SBA6C8080
     public Vector4 Unk40;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "A46C8080", 0x20)]
-public struct SA46C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080858B", 0x20)]
+public struct S8080858B
 {
     public ulong Size;
     public TigerHash Unk08;
     public TigerHash UnkC;
     public int Unk10;
-    public Tag<S9F6C8080> Unk14;
+    public Tag<S80808586> Unk14;
     public VertexBuffer InstanceBuffer;
     [NoLoad]
     public Tag<SDecoratorInstanceData> InstanceData;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "A76C8080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080858E", 0x18)]
 public struct SDecoratorInstanceData
 {
     [SchemaField(0x8)]
-    public DynamicArrayUnloaded<SA96C8080> InstanceElement;
+    public DynamicArrayUnloaded<S90858080> InstanceElement;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "A96C8080", 0x10)]
-public struct SA96C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "90858080", 0x10)]
+public struct S90858080
 {
     // Normalized position
     [SchemaField(TigerStrategy.MARATHON_ALPHA, ArraySizeConst = 4)]
@@ -249,8 +250,8 @@ public struct SA96C8080
     public byte[] Color;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "9F6C8080", 0x60)]
-public struct S9F6C8080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808586", 0x60)]
+public struct S80808586
 {
     // SpeedtreePlacements[2-7]
     public Vector4 Unk00;

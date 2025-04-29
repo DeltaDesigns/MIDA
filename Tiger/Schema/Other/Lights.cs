@@ -67,7 +67,7 @@ public class Lights : Tag<SMapLights>
         }
     }
 
-    public Vector4 GetColor(Tag<SA16D8080> data)
+    public Vector4 GetColor(Tag<S80808691> data)
     {
         //Console.WriteLine($"{data.TagData.Buffer2[0].Vec} : {data.TagData.Buffer2[1].Vec} : {data.TagData.Buffer2.Count(x => x.Vec.Magnitude != 0)}");
         //if ((Strategy.IsD1() || Strategy.IsPreBL()) && data.TagData.Buffer2.Count != 0 && !data.TagData.Buffer2[2].Vec.IsZero())
@@ -189,14 +189,14 @@ public class Lights : Tag<SMapLights>
 /// <summary>
 /// Map Light
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "636A8080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "35838080", 0x18)]
 public struct SMapLightResource
 {
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
     public Lights Lights;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "656C8080", 0x60)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080854B", 0x60)]
 public struct SMapLights
 {
     [SchemaField(0x10)]
@@ -210,7 +210,7 @@ public struct SMapLights
 }
 
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "706C8080", 0xF0)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "56858080", 0x100)]
 public struct SMapLightCollection
 {
     [SchemaField(0x60, TigerStrategy.MARATHON_ALPHA)]
@@ -221,8 +221,6 @@ public struct SMapLightCollection
     public Material Shading;
 
     [SchemaField(0xCC, TigerStrategy.MARATHON_ALPHA)]
-    public Tag<SA16D8080> BufferData;
-
-    [SchemaField(0xD0, TigerStrategy.MARATHON_ALPHA)]
-    public Tag<SA16D8080> BufferData2;
+    public Tag<S80808691> BufferData;
+    public Tag<S80808691> BufferData2;
 }

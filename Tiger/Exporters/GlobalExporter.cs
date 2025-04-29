@@ -143,7 +143,7 @@ public class GlobalExporter : AbstractExporter
             foreach (var cubemapEntry in GlobalScene.GetAllOfType<Cubemap>())
             {
                 var cubemap = cubemapEntry.CubemapEntry;
-                string name = cubemap.CubemapName != null ? cubemap.CubemapName.Value : $"Cubemap_{cubemap.WorldID:X}";
+                string name = $"Cubemap_{cubemap.WorldID:X}";
                 _ = data.GetOrAdd(name, _ => new CubemapData
                 {
                     Transform = new JsonInstance

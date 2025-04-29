@@ -775,27 +775,25 @@ public struct S0A2D8080
 
 #endregion
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "95668080", 0x1E0)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "3C7F8080", 0x1F0)]
 public struct SMapCubemapResource //Dataresource for cubemaps
 {
     [SchemaField(0x20)]
     public Vector4 CubemapSize; //XYZ, no W
     public Vector4 CubemapPosition; // Not actually right afaik
 
-    [SchemaField(0xB0)]
+    [SchemaField(0xC0)]
     public long WorldID; // Same as the ID in the datatable entry
 
-    [SchemaField(0x100, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x110, TigerStrategy.MARATHON_ALPHA)]
     public Vector4 CubemapRotation;
 
-    [SchemaField(0x1B0, TigerStrategy.MARATHON_ALPHA)]
-    public StringPointer CubemapName;
-
-    [SchemaField(0x1B8, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x1C8, TigerStrategy.MARATHON_ALPHA)]
     public Texture CubemapTexture;
 
-    [SchemaField(0x1C0, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x1D0, TigerStrategy.MARATHON_ALPHA)]
     public Texture CubemapIBLTexture; //Sometype of reflection tint texture idk
+    public Tag Unk1D4; // 80807F5B, seems to hold colors?
 }
 
 [SchemaStruct(TigerStrategy.MARATHON_ALPHA, "D8928080", 0x190)]

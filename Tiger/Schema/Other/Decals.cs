@@ -130,7 +130,7 @@ public class Decals : Tag<SMapDecals>
 /// </summary>
 /// Map Decals Resource
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "55698080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "1E828080", 0x18)]
 public struct SMapDecalsResource
 {
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
@@ -140,14 +140,14 @@ public struct SMapDecalsResource
 /// <summary>
 /// Map Decals
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "5B698080", 0x78)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808224", 0x78)]
 public struct SMapDecals
 {
     public ulong FileSize;
-    public DynamicArrayUnloaded<S63698080> DecalResources;
+    public DynamicArrayUnloaded<S2C828080> DecalResources;
 
     [SchemaField(0x18)]
-    public DynamicArrayUnloaded<S64698080> UnkLocations;
+    public DynamicArrayUnloaded<S2D828080> UnkLocations;
 
     [SchemaField(0x28)]
     public VertexBuffer Transforms;
@@ -165,8 +165,8 @@ public struct SMapDecals
 /// <summary>
 /// Decal resources
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "63698080", 0x8)]
-public struct S63698080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "2C828080", 0x8)]
+public struct S2C828080
 {
     public Material Material;
     public short StartIndex;
@@ -176,8 +176,8 @@ public struct S63698080
 /// <summary>
 /// Decal Location
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "64698080", 0x10)]
-public struct S64698080
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "2D828080", 0x10)]
+public struct S2D828080
 {
     public Vector4 Location;
 }

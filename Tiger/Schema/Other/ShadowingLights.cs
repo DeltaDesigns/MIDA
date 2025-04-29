@@ -51,7 +51,7 @@ public class ShadowingLights : Tag<SMapShadowingLight>
         Exporter.Get().GetGlobalScene().AddToGlobalScene(lightData);
     }
 
-    public Vector4 GetColor(Tag<SA16D8080> data)
+    public Vector4 GetColor(Tag<S80808691> data)
     {
         //if (Strategy.IsD1() && data.TagData.Buffer2.Count != 0 && !data.TagData.Buffer2[2].Vec.IsZero())
         //{
@@ -120,14 +120,14 @@ public class ShadowingLights : Tag<SMapShadowingLight>
 /// <summary>
 /// Map Shadowing Light (Casts shadows)
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "5E6C8080", 0x20)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "44858080", 0x20)]
 public struct SMapShadowingLightResource
 {
     [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
     public ShadowingLights ShadowingLight;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "716C8080", 0x110)]
+[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808557", 0x120)]
 public struct SMapShadowingLight
 {
     [SchemaField(0x60, TigerStrategy.MARATHON_ALPHA)]
@@ -138,9 +138,8 @@ public struct SMapShadowingLight
     public float FarPlane;
     public float HalfFOV; // * 2, radians->degrees
 
-    // Not really a point in even loading these
     [SchemaField(0xD0, TigerStrategy.MARATHON_ALPHA)]
-    public FileHash Shading; // For some reason using Material breaks tag reading....?
+    public FileHash Shading;
     //public Material Shading_Shadowing;
     //public Material Volumetric;
     //public Material Volumetric_Shadowing;
@@ -148,8 +147,6 @@ public struct SMapShadowingLight
     //public Material Lightprobe_Shadowing;
 
     [SchemaField(0xE8, TigerStrategy.MARATHON_ALPHA)]
-    public Tag<SA16D8080> BufferData;
-
-    [SchemaField(0xEC, TigerStrategy.MARATHON_ALPHA)]
-    public Tag<SA16D8080> BufferData2;
+    public Tag<S80808691> BufferData;
+    public Tag<S80808691> BufferData2;
 }

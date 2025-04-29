@@ -47,7 +47,7 @@ public struct SLensFlare
 {
     public ulong FileSize;
     [SchemaField(0x18)]
-    public Tag<SA16D8080> Unk18;
+    public Tag<S80808691> Unk18;
     [SchemaField(0x20)]
     public DynamicArrayUnloaded<SLensFlareEntry> Entries;
     public TigerHash Unk30;
@@ -60,6 +60,6 @@ public struct SLensFlare
 public struct SLensFlareEntry
 {
     public Material Material;
-    public Tag<SA16D8080> Unk04;
+    public Tag<S80808691> Unk04;
     public int Unk08;
 }
