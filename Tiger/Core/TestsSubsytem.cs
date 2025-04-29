@@ -48,7 +48,7 @@ public class TestsSubsystem : Subsystem<TestsSubsystem>
             outputLines.Add($"Mesh: {meshData.Key}");
             foreach (var lodData in meshData.Value)
             {
-                outputLines.Add($"  LOD Category: {lodData.Key} ({(int)lodData.Key}), Part Count: {lodData.Value}");
+                outputLines.Add($"  LOD Category: {lodData.Key} ({(byte)lodData.Key & 1}), Part Count: {lodData.Value}");
             }
         }
 
@@ -93,7 +93,7 @@ public class TestsSubsystem : Subsystem<TestsSubsystem>
             outputLines.Add($"Mesh: {meshData.Key}");
             foreach (var lodData in meshData.Value)
             {
-                outputLines.Add($"  LOD Category: {lodData.Key} ({(int)lodData.Key}), Part Count: {lodData.Value}");
+                outputLines.Add($"  LOD Category: {lodData.Key} ({(byte)lodData.Key & 1}), Part Count: {lodData.Value}");
             }
         }
 

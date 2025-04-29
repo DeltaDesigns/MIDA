@@ -145,7 +145,7 @@ public class Decorator : Tag<SDecorator>
         for (int i = 0; i < mesh.Parts.Count; i++)
         {
             SD1878080 part = mesh.Parts[reader, i];
-            if (part.DetailLevel is ELodCategory.Unk0 or ELodCategory.Unk1 or ELodCategory.Unk2 or ELodCategory.Unk3)
+            if (part.DetailLevel.IsHighestLevel())
                 parts[meshIndex].Add(partIndex, part);
 
             partIndex++;

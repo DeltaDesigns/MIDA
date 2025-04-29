@@ -183,11 +183,7 @@ public static class Helpers
 
     public static bool IsHighestLevel(this ELodCategory eLod)
     {
-        return eLod == ELodCategory.Unk0 ||
-               eLod == ELodCategory.Unk1 ||
-               eLod == ELodCategory.Unk3 ||
-               eLod == ELodCategory.Unk7 || // unsure
-               eLod == ELodCategory.Unk15; // unsure
+        return eLod == ELodCategory.Unk0 || ((byte)eLod & 1) == 1;
     }
 }
 

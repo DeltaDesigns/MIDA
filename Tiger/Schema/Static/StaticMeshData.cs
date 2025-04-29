@@ -85,14 +85,16 @@ namespace Tiger.Schema.Static.MARATHON_ALPHA
                 Debug.Assert(part.BufferIndex == 0, $"{Hash} has part with buffer index {part.BufferIndex}");
                 if (part.BufferIndex == 0)
                 {
-                    switch (detailLevel) // TODO Figure out whats up with LODs
+                    switch (detailLevel)
                     {
-                        case ExportDetailLevel.MostDetailed when part.DetailLevel.IsHighestLevel():
-                            staticPartEntries.Add(i, part);
+                        case ExportDetailLevel.MostDetailed:
+                            if (part.DetailLevel.IsHighestLevel())
+                                staticPartEntries.Add(i, part);
                             break;
 
-                        case ExportDetailLevel.LeastDetailed when !part.DetailLevel.IsHighestLevel():
-                            staticPartEntries.Add(i, part);
+                        case ExportDetailLevel.LeastDetailed:
+                            if (!part.DetailLevel.IsHighestLevel())
+                                staticPartEntries.Add(i, part);
                             break;
 
                         default:
