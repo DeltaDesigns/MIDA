@@ -7,7 +7,7 @@
 
 ## What is this?
 
-MIDA is a fork of [Charm](https://github.com/MontagueM/Charm/tree/delta/TFS) designed soley for Marathon
+MIDA is a fork of [Charm](https://github.com/MontagueM/Charm/tree/delta/TFS) designed solely for Marathon
 
 The tool focuses on providing as much access to the information in the game files as possible, **ideal for artists and content preservation**.
 > [!CAUTION]
