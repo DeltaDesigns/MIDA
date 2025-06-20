@@ -1,5 +1,6 @@
 > [!CAUTION]
 > # !!! MOST THINGS WILL ***NOT WORK*** IN THE PROGRAMS CURRENT STATE !!!
+> # Due to circumstance, do not expect public updates or releases for quite some time after the official Marathon release.
 
 # MIDA - the Marathon tool that does (almost) everything
 ![mida logo idk](https://github.com/user-attachments/assets/dd168342-19ca-4bed-b8fd-9c182abf62f8)
