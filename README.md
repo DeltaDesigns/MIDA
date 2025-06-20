@@ -47,3 +47,4 @@ If you experience any issue, you can register an issue in this repository. If th
 ## License
 
 The MIDA source code is licensed under GPLv3. All other used code and DLLs are subject to their own licenses.
+Don't be THAT guy and reupload privated code, which in turn ruins public releases/support for others. You know who you are :)
