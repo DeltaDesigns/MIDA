@@ -1,6 +1,6 @@
 > [!CAUTION]
 > # !!! MOST THINGS WILL ***NOT WORK*** IN THE PROGRAMS CURRENT STATE !!!
-> # Due to circumstance, do not expect public updates or releases for quite some time after the official Marathon release.
+> # I haven't decided whether or not I will even update this for Marathon's official release. I do not have much interest in the game at the moment and leakers have been abusing similar tools for internet points which kills any motivation to continue work on this.
 
 # MIDA - the Marathon tool that does (almost) everything
 ![mida logo idk](https://github.com/user-attachments/assets/dd168342-19ca-4bed-b8fd-9c182abf62f8)
