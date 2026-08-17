@@ -1,323 +1,229 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Tiger;
 using Tiger.Schema;
 using Tiger.Schema.Shaders;
 
 namespace MIDA;
 
-public partial class MaterialView : UserControl
+/// <summary>
+/// Interaction logic for MaterialView2.xaml
+/// </summary>
+public partial class MaterialView : UserControl, INotifyPropertyChanged
 {
-    private MainWindow _mainWindow = null;
-    private Material Material;
+    private Material _material;
+    public List<KeyValuePair<string, SMaterialShader>> ShaderStages { get; set; } = new();
+
+    private ShaderStageItem _currentStage;
+    public ShaderStageItem CurrentStage
+    {
+        get => _currentStage;
+        set
+        {
+            _currentStage = value;
+            OnPropertyChanged(nameof(CurrentStage));
+        }
+    }
+
+    private TfxBytecodeInterpreter _bytecode;
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    private void OnPropertyChanged(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 
     public MaterialView()
     {
         InitializeComponent();
+        DataContext = this;
     }
 
-    private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
+    private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
-        _mainWindow = Window.GetWindow(this) as MainWindow;
-    }
 
-    private async void ExportMaterial_OnClick(object sender, RoutedEventArgs e)
-    {
-        await Task.Run(() =>
-        {
-            Dispatcher.Invoke(() =>
-            {
-                Material.Export($"{ConfigSubsystem.Get().GetExportSavePath()}/Materials/{Material.Hash}");
-            });
-        });
     }
 
     public void Load(FileHash hash)
     {
-        Material material = FileResourcer.Get().GetFile<Material>(hash);
-        ShaderDetail shaderDetail = new();
+        _material = FileResourcer.Get().GetFile<Material>(hash);
+        if (_material == null) return;
 
-        if (material is null)
-            return;
+        ShaderStages.Clear();
+        if (_material.Pixel.Shader != null)
+            ShaderStages.Add(new("Pixel", _material.Pixel));
+        if (_material.Vertex.Shader != null)
+            ShaderStages.Add(new("Vertex", _material.Vertex));
+        //if (_material.Compute.Shader != null)
+        //    ShaderStages.Add(new("Compute", _material.Compute));
 
-        Material = material;
-        SamplerDataList.ItemsSource = GetSamplerData(material);
-        TextureListView.ItemsSource = GetTextureDetails(material);
-        UsedScopesList.ItemsSource = material.EnumerateScopes();
-
-        if (material.Vertex.Shader is not null)
-        {
-            shaderDetail.VertexShaderHash = material.Vertex.Shader.Hash.ToString();
-            shaderDetail.VertexShader = material.Vertex.Shader.Decompile($"vs{material.Vertex.Shader.Hash}");
-
-            VS_CBufferList.ItemsSource = GetCBufferDetails(material, true);
-        }
-
-        if (material.Pixel.Shader is not null)
-        {
-            shaderDetail.PixelShaderHash = material.Pixel.Shader.Hash.ToString();
-            shaderDetail.PixelShader = material.Pixel.Shader.Decompile($"ps{material.Pixel.Shader.Hash}");
-
-            PS_CBufferList.ItemsSource = GetCBufferDetails(material);
-        }
-
-        DataContext = shaderDetail;
-
-#if DEBUG
-        System.Console.WriteLine($"BlendState: {material.RenderStates.BlendState()}");
-        System.Console.WriteLine($"RasterizerState: {material.RenderStates.RasterizerState()}");
-        System.Console.WriteLine($"DepthBiasState: {material.RenderStates.DepthBiasState()}");
-        System.Console.WriteLine($"DepthStencilState: {material.RenderStates.DepthStencilState()}");
-
-        System.Console.WriteLine($"{material.RenderStates.ToString()}");
-#endif
+        if (ShaderStages.Any())
+            UIHelper.SelectRadioButton(ShaderStagesList, 0);
     }
 
-    private List<TextureDetail> GetTextureDetails(Material material)
+    private async void ShaderStack_OnClick(object sender, RoutedEventArgs e)
     {
-        var items = new List<TextureDetail>();
-
-        foreach (var tex in material.Vertex.EnumerateTextures())
+        if (sender is RadioButton button && button.DataContext is KeyValuePair<string, SMaterialShader> kvp)
         {
-            if (tex.Texture is null)
-                continue;
+            var stage = kvp.Key;
+            var shader = kvp.Value;
 
-            items.Add(new TextureDetail
+            CurrentStage = new()
             {
-                Shader = "Vertex Shader",
-                Hash = $"{tex.Texture.Hash}",
-                Index = $"Index: {tex.TextureIndex}",
-                Type = $"Colorspace: {(tex.Texture.IsSrgb() ? "Srgb" : "Non-Color")}",
-                Dimension = $"Dimension: {EnumExtensions.GetEnumDescription(tex.Texture.GetDimension())}",
-                Format = $"Format: {tex.Texture.TagData.GetFormat()}",
-                Dimensions = $"{tex.Texture.TagData.Width}x{tex.Texture.TagData.Height}",
-                Texture = LoadTexture(tex.Texture)
-            });
+                HLSL = shader.Shader.Decompile($"{stage}_{shader.Shader.Hash}"),
+                ShaderHash = $"Shader {shader.Shader.Hash}",
+                CB0 = new MaterialViewer_CBuffer
+                {
+                    Name = "CB0",
+                    Data = await GetCB0(shader)
+                },
+                Constants = new MaterialViewer_CBuffer
+                {
+                    Name = "Constants",
+                    Data = shader.TFX_Bytecode_Constants.Select((vec, index) => new MaterialViewer_CBufferEntry
+                    {
+                        Index = index,
+                        StringVector = $"{vec.Vec.X}, {vec.Vec.Y}, {vec.Vec.Z}, {vec.Vec.W}",
+                        Vector = vec.Vec,
+                        Color = GetVectorColor(vec.Vec)
+                    }).ToList()
+                },
+                Textures = await GetTextures(shader),
+                Samplers = await GetSamplers(shader),
+                UsedScopes = _material.EnumerateScopes().ToList(),
+                UsedExterns = _material.GetExterns(),
+                States = new()
+                {
+                    Blend = _material.RenderStates.Blend?.ToString() ?? "",
+                    Rasterizer = _material.RenderStates.Rasterizer?.ToString() ?? "",
+                    DepthBias = _material.RenderStates.DepthBias?.ToString() ?? "",
+                },
+                PrintedOps = _bytecode.PrintedOps.ToString()
+            };
+
+            HLSLText.Text = CurrentStage.HLSL;
         }
-
-        foreach (var tex in material.Pixel.EnumerateTextures())
-        {
-            if (tex.Texture is null)
-                continue;
-
-            items.Add(new TextureDetail
-            {
-                Shader = "Pixel Shader",
-                Hash = $"{tex.Texture.Hash}",
-                Index = $"Index: {tex.TextureIndex}",
-                Type = $"Colorspace: {(tex.Texture.IsSrgb() ? "Srgb" : "Non-Color")}",
-                Dimension = $"Dimension: {EnumExtensions.GetEnumDescription(tex.Texture.GetDimension())}",
-                Format = $"Format: {tex.Texture.TagData.GetFormat()}",
-                Dimensions = $"{tex.Texture.TagData.Width}x{tex.Texture.TagData.Height}",
-                Texture = LoadTexture(tex.Texture)
-            });
-        }
-
-        //foreach (var tex in material.Compute.EnumerateTextures())
-        //{
-        //    if (tex.Texture is null)
-        //        continue;
-
-        //    items.Add(new TextureDetail
-        //    {
-        //        Shader = "Compute Shader",
-        //        Hash = $"{tex.Texture.Hash}",
-        //        Index = $"Index: {tex.TextureIndex}",
-        //        Type = $"Colorspace: {(tex.Texture.IsSrgb() ? "Srgb" : "Non-Color")}",
-        //        Dimension = $"Dimension: {EnumExtensions.GetEnumDescription(tex.Texture.GetDimension())}",
-        //        Format = $"Format: {tex.Texture.TagData.GetFormat()}",
-        //        Dimensions = $"{tex.Texture.TagData.Width}x{tex.Texture.TagData.Height}",
-        //        Texture = LoadTexture(tex.Texture)
-        //    });
-        //}
-
-        return items;
     }
 
-    private List<CBufferDetail> GetCBufferDetails(Material material, bool bVertexShader = false)
+    private async Task<List<MaterialViewer_TextureDetail>> GetTextures(SMaterialShader shader)
     {
-        var items = new List<CBufferDetail>();
-
-        //Only material provided cbuffer (cb0) is useful to show
-        List<Vector4> data = new();
-        List<Vector4> const_data = new();
-        if (bVertexShader)
-        {
-            data = material.Vertex.GetCBuffer0();
-            foreach (var vec in material.Vertex.TFX_Bytecode_Constants)
-            {
-                const_data.Add(vec.Vec);
-            }
-        }
-        else
-        {
-            data = material.Pixel.GetCBuffer0();
-            foreach (var vec in material.Pixel.TFX_Bytecode_Constants)
-            {
-                const_data.Add(vec.Vec);
-            }
-        }
-
-        if (data.Count > 0)
-        {
-            items.Add(new CBufferDetail
-            {
-                Index = "CB0",
-                Count = $"{data.Count}",
-                Data = data,
-                Stage = bVertexShader ? CBufferDetail.Shader.Vertex : CBufferDetail.Shader.Pixel
-            });
-        }
-        if (const_data.Count > 0)
-        {
-            items.Add(new CBufferDetail
-            {
-                Index = "TFX Constants",
-                Count = $"{const_data.Count}",
-                Data = const_data,
-                Stage = bVertexShader ? CBufferDetail.Shader.Vertex : CBufferDetail.Shader.Pixel
-            });
-        }
-
-        var sortedItems = new List<CBufferDetail>(items);
-        sortedItems.Sort((a, b) => a.Index.CompareTo(b.Index));
-        return sortedItems;
-    }
-
-    private async void LoadCBufferData(object sender, RoutedEventArgs e)
-    {
-        var s = sender as Button;
-        var dc = s.DataContext as CBufferDetail;
-
+        List<MaterialViewer_TextureDetail> items = new();
         await Task.Run(() =>
         {
-            Dispatcher.Invoke(() =>
+            foreach (STextureTag tex in shader.EnumerateTextures())
             {
-                TfxBytecodeInterpreter bytecode = new(TfxBytecodeOp.ParseAll(dc.Stage == CBufferDetail.Shader.Pixel ? Material.Pixel.TFX_Bytecode : Material.Vertex.TFX_Bytecode));
-                var bytecode_hlsl = bytecode.Evaluate(dc.Stage == CBufferDetail.Shader.Pixel ? Material.Pixel.TFX_Bytecode_Constants : Material.Vertex.TFX_Bytecode_Constants, dc.Index != "TFX Constants", Material);
+                if (tex.Texture is null)
+                    continue;
 
-                ConcurrentBag<CBufferDataDetail> items = new ConcurrentBag<CBufferDataDetail>();
-                for (int i = 0; i < dc.Data.Count; i++)
+                items.Add(new MaterialViewer_TextureDetail
                 {
-                    CBufferDataDetail dataEntry = new();
-
-                    dataEntry.Index = i;
-                    if (bytecode_hlsl.ContainsKey(i) && dc.Index != "TFX Constants")
-                        dataEntry.StringVector = $"Bytecode Assigned";
-                    else
-                    {
-                        dataEntry.StringVector = $"{dc.Data[i].X}, {dc.Data[i].Y}, {dc.Data[i].Z}, {dc.Data[i].W}";
-                        dataEntry.Vector = dc.Data[i];
-
-                        float[] data = { dc.Data[i].X, dc.Data[i].Y, dc.Data[i].Z };
-
-                        if (data.All(v => v >= 0.0f))
-                        {
-                            bool needsNormalization = data.Any(v => v > 1.0f);
-                            float[] floats;
-
-                            if (needsNormalization)
-                            {
-                                float factor = data.Max();
-                                floats = new float[]
-                                {
-                                    data[0] / factor,
-                                    data[1] / factor,
-                                    data[2] / factor,
-                                };
-                            }
-                            else
-                            {
-                                floats = (float[])data.Clone();
-                            }
-
-                            byte r = (byte)(Math.Abs(floats[0]) * 255);
-                            byte g = (byte)(Math.Abs(floats[1]) * 255);
-                            byte b = (byte)(Math.Abs(floats[2]) * 255);
-                            dataEntry.Color = Color.FromArgb(255, r, g, b);
-                        }
-                    }
-
-                    items.Add(dataEntry);
-                }
-                var sortedItems = new List<CBufferDataDetail>(items);
-                sortedItems.Sort((a, b) => a.Index.CompareTo(b.Index));
-                CBufferDataList.ItemsSource = sortedItems;
-            });
+                    Hash = $"{tex.Texture.Hash}",
+                    Index = $"Index: {tex.TextureIndex}",
+                    Type = $"Colorspace: {(tex.Texture.IsSrgb() ? "Srgb" : "Non-Color")}",
+                    Dimension = $"Dimension: {EnumExtensions.GetEnumDescription(tex.Texture.GetDimension())}",
+                    Format = $"Format: {tex.Texture.TagData.GetFormat()}",
+                    Dimensions = $"{tex.Texture.Width}x{tex.Texture.Height}x{tex.Texture.Depth}",
+                    Texture = TextureLoader.LoadTexture(tex.Texture, 128, 128)
+                });
+            }
         });
-    }
-
-    public BitmapImage LoadTexture(Texture textureHeader)
-    {
-        BitmapImage bitmapImage = new BitmapImage();
-        bitmapImage.BeginInit();
-        bitmapImage.StreamSource = (textureHeader.IsCubemap() || textureHeader.IsVolume()) ? textureHeader.GetCubemapFace(0) : textureHeader.GetTexture();
-        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-        bitmapImage.DecodePixelWidth = 256;
-        bitmapImage.DecodePixelHeight = 256;
-        bitmapImage.EndInit();
-        bitmapImage.Freeze();
-        return bitmapImage;
-    }
-
-    private void Texture_OnClick(object sender, RoutedEventArgs e)
-    {
-        var s = sender as Button;
-        var dc = s.DataContext as TextureDetail;
-
-        Texture textureHeader = FileResourcer.Get().GetFile<Texture>(dc.Hash);
-        if (textureHeader.IsCubemap())
-        {
-            var cubemapView = new CubemapView();
-            cubemapView.LoadCubemap(textureHeader);
-            _mainWindow.MakeNewTab(dc.Hash, cubemapView);
-        }
-        else
-        {
-            var textureView = new TextureView();
-            textureView.LoadTexture(textureHeader);
-            _mainWindow.MakeNewTab(dc.Hash, textureView);
-        }
-        _mainWindow.SetNewestTabSelected();
-    }
-
-    private List<SamplerDataDetail> GetSamplerData(Material material)
-    {
-        List<SamplerDataDetail> items = new();
-
-        for (int i = 0; i < material.PSSamplers.Count; i++)
-        {
-            if (material.PSSamplers[i].Hash.GetFileMetadata().Type != 34)
-                continue;
-
-            var sampler = material.PSSamplers[i].Sampler;
-            items.Add(new SamplerDataDetail
-            {
-                Slot = i + 1,
-                Filter = sampler.Filter.ToString(),
-                AddressU = sampler.AddressU.ToString(),
-                AddressV = sampler.AddressV.ToString(),
-            });
-        }
-
         return items;
+    }
+
+    private async Task<List<MaterialViewer_CBufferEntry>> GetCB0(SMaterialShader shader)
+    {
+        List<MaterialViewer_CBufferEntry> entries = new();
+        await Task.Run(() =>
+        {
+            _bytecode = shader.GetBytecode();
+            Dictionary<int, string> bytecode_hlsl = _bytecode.Evaluate(shader.TFX_Bytecode_Constants, true, _material);
+            var cb0 = shader.GetCBuffer0();
+
+            for (int i = 0; i < cb0.Count; i++)
+            {
+                MaterialViewer_CBufferEntry dataEntry = new();
+
+                dataEntry.Index = i;
+                if (bytecode_hlsl.ContainsKey(i))
+                    dataEntry.StringVector = $"Bytecode Assigned";
+                else
+                {
+                    dataEntry.StringVector = $"{cb0[i].X}, {cb0[i].Y}, {cb0[i].Z}, {cb0[i].W}";
+                    dataEntry.Vector = cb0[i];
+                    dataEntry.Color = GetVectorColor(cb0[i]);
+                }
+
+                entries.Add(dataEntry);
+            }
+            var sortedItems = new List<MaterialViewer_CBufferEntry>(entries);
+            sortedItems.Sort((a, b) => a.Index.CompareTo(b.Index));
+        });
+
+        return entries;
+    }
+
+    private async Task<List<MaterialViewer_SamplerDetail>> GetSamplers(SMaterialShader shader)
+    {
+        List<MaterialViewer_SamplerDetail> items = new();
+        await Task.Run(() =>
+        {
+            for (int i = 0; i < shader.Samplers.Count; i++)
+            {
+                if (shader.Samplers[i].GetSampler().Hash.GetFileMetadata().Type != 34)
+                    continue;
+
+                DirectXSampler.D3D11_SAMPLER_DESC sampler = shader.Samplers[i].GetSampler().Sampler;
+                items.Add(new MaterialViewer_SamplerDetail
+                {
+                    Slot = i + 1,
+                    Filter = sampler.Filter.ToString(),
+                    AddressU = sampler.AddressU.ToString(),
+                    AddressV = sampler.AddressV.ToString(),
+                    ComparisonFunc = sampler.ComparisonFunc.ToString()
+                });
+            }
+        });
+        return items;
+    }
+
+    private Color GetVectorColor(Vector4 vec4)
+    {
+        float[] data = { vec4.X, vec4.Y, vec4.Z };
+        if (data.All(v => v >= 0.0f))
+        {
+            bool needsNormalization = data.Any(v => v > 1.0f);
+            float[] floats;
+
+            if (needsNormalization)
+            {
+                float factor = data.Max();
+                floats = new float[]
+                {
+                    data[0] / factor,
+                    data[1] / factor,
+                    data[2] / factor,
+                };
+            }
+            else
+            {
+                floats = (float[])data.Clone();
+            }
+
+            byte r = (byte)(Math.Abs(floats[0]) * 255);
+            byte g = (byte)(Math.Abs(floats[1]) * 255);
+            byte b = (byte)(Math.Abs(floats[2]) * 255);
+            return Color.FromArgb(255, r, g, b);
+        }
+        return Color.FromArgb(255, 0, 0, 0);
     }
 
     private void CBufferColor_OnClick(object sender, RoutedEventArgs e)
     {
         var s = sender as Button;
-        var dc = s.DataContext as CBufferDataDetail;
-
-        //float r = dc.Color.R / 255;
-        //float g = dc.Color.R / 255;
-        //float b = dc.Color.R / 255;
+        var dc = s.DataContext as MaterialViewer_CBufferEntry;
 
         try
         {
@@ -327,7 +233,7 @@ public partial class MaterialView : UserControl
         {
             PopupBanner test = new()
             {
-                Icon = "⚠️",
+                //Icon = "⚠️",
                 Title = "ERROR",
                 Subtitle = "Idk why this breaks sometimes but it can...try again.",
                 Description = $"{ex.Message}",
@@ -338,51 +244,73 @@ public partial class MaterialView : UserControl
         }
     }
 
+    private void Texture_OnClick(object sender, RoutedEventArgs e)
+    {
+        var s = sender as Button;
+        var dc = s.DataContext as MaterialViewer_TextureDetail;
+
+        Texture textureHeader = FileResourcer.Get().GetFile<Texture>(dc.Hash);
+        if (textureHeader.IsCubemap())
+        {
+            var cubemapView = new CubemapView();
+            cubemapView.LoadCubemap(textureHeader);
+            MainWindow.Current.MakeNewTab(dc.Hash, cubemapView);
+        }
+        else
+        {
+            var textureView = new TextureView();
+            textureView.LoadTexture(textureHeader);
+            MainWindow.Current.MakeNewTab(dc.Hash, textureView);
+        }
+        MainWindow.Current.SetNewestTabSelected();
+    }
+
+    private async void ExportMaterial_OnClick(object sender, RoutedEventArgs e)
+    {
+        await Task.Run(() =>
+        {
+            Dispatcher.Invoke(() =>
+            {
+                _material.Export($"{ConfigSubsystem.Get().GetExportSavePath()}/Materials/{_material.Hash}", true);
+
+                NotificationBanner notify = new()
+                {
+                    Icon = "☑️",
+                    Title = "Export Complete",
+                    Description = $"Exported Material {_material.Hash} to \"{ConfigSubsystem.Get().GetExportSavePath()}/Materials/{_material.Hash}/\"",
+                    Style = NotificationBanner.PopupStyle.Information
+                };
+                notify.Show();
+            });
+        });
+    }
+
     private void OpenMaterial_OnClick(object sender, RoutedEventArgs e)
     {
-        DevView.OpenHxD(Material.Hash);
+        DevView.OpenHxD(_material.Hash);
     }
 
-    private class ShaderDetail
+    public struct ShaderStageItem
     {
-        public string PixelShaderHash { get; set; }
-        public string PixelShader { get; set; }
-
-        public string VertexShaderHash { get; set; }
-        public string VertexShader { get; set; }
-
-        public string ComputeShaderHash { get; set; }
-        public string ComputeShader { get; set; }
+        public string HLSL { get; set; }
+        public string ShaderHash { get; set; }
+        public MaterialViewer_CBuffer CB0 { get; set; }
+        public MaterialViewer_CBuffer Constants { get; set; }
+        public List<MaterialViewer_TextureDetail> Textures { get; set; }
+        public List<MaterialViewer_SamplerDetail> Samplers { get; set; }
+        public List<TfxScope> UsedScopes { get; set; }
+        public List<TfxExtern> UsedExterns { get; set; }
+        public MaterialViewer_RenderStates States { get; set; }
+        public string PrintedOps { get; set; }
     }
 
-    private class TextureDetail
+    public class MaterialViewer_CBuffer
     {
-        public string Shader { get; set; }
-        public string Hash { get; set; }
-        public string Index { get; set; }
-        public string Type { get; set; }
-        public string Dimension { get; set; }
-        public string Format { get; set; }
-        public string Dimensions { get; set; }
-
-        public BitmapImage Texture { get; set; }
+        public string Name { get; set; }
+        public List<MaterialViewer_CBufferEntry> Data { get; set; } = new();
     }
 
-    private class CBufferDetail
-    {
-        public string Index { get; set; }
-        public string Count { get; set; }
-        public Shader Stage { get; set; }
-        public List<Vector4> Data { get; set; }
-
-        public enum Shader
-        {
-            Pixel,
-            Vertex
-        }
-    }
-
-    private class CBufferDataDetail
+    public class MaterialViewer_CBufferEntry
     {
         public int Index { get; set; }
         public string StringVector { get; set; }
@@ -390,12 +318,31 @@ public partial class MaterialView : UserControl
         public Color Color { get; set; } = Color.FromArgb(255, 0, 0, 0);
     }
 
-    private class SamplerDataDetail
+    public class MaterialViewer_TextureDetail
+    {
+        public string Hash { get; set; }
+        public string Index { get; set; }
+        public string Type { get; set; }
+        public string Dimension { get; set; }
+        public string Format { get; set; }
+        public string Dimensions { get; set; }
+
+        public ImageSource Texture { get; set; }
+    }
+
+    public class MaterialViewer_SamplerDetail
     {
         public int Slot { get; set; }
         public string Filter { get; set; }
         public string AddressU { get; set; }
         public string AddressV { get; set; }
+        public string ComparisonFunc { get; set; }
+    }
+
+    public class MaterialViewer_RenderStates
+    {
+        public string Blend { get; set; }
+        public string Rasterizer { get; set; }
+        public string DepthBias { get; set; }
     }
 }
-

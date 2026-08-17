@@ -26,7 +26,7 @@ public partial class TextureView : UserControl
         if (!textureHeader.IsVolume())
             CurrentSlice = 0;
 
-        BitmapImage bitmapImage = new BitmapImage();
+        BitmapImage bitmapImage = new();
         bitmapImage.BeginInit();
         bitmapImage.StreamSource = textureHeader.IsVolume() ? textureHeader.GetVolumeSlice(CurrentSlice) : textureHeader.GetTexture();
         bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
@@ -136,7 +136,7 @@ public static class TextureLoader
 
         try
         {
-            var image = CreateImage(texture, maxWidth, maxHeight);
+            BitmapImage image = CreateImage(texture, maxWidth, maxHeight);
             image.Freeze();
             return image;
         }
@@ -146,9 +146,9 @@ public static class TextureLoader
         }
     }
 
-    private static ImageSource CreateImage(Texture texture, int maxWidth, int maxHeight)
+    private static BitmapImage CreateImage(Texture texture, int maxWidth, int maxHeight)
     {
-        using var unmanagedStream = texture.IsCubemap()
+        using UnmanagedMemoryStream unmanagedStream = texture.IsCubemap()
             ? texture.GetCubemapFace(0)
             : texture.GetTexture();
 

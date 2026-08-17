@@ -1,0 +1,223 @@
+﻿<UserControl
+    x:Class="MIDA.TextureListView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MIDA"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wrap="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
+    d:DesignHeight="990"
+    d:DesignWidth="1920"
+    Loaded="OnControlLoaded"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="TextureTemplate">
+            <Button
+                Width="128"
+                Height="128"
+                Margin="0,0,0,0"
+                local:StyleHelper.BorderThickness="1"
+                Background="Transparent"
+                Click="Texture_OnClick"
+                Focusable="False"
+                Foreground="Transparent"
+                Style="{DynamicResource ButtonTransparent}">
+                <Image
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Loaded="TagImage_Loaded"
+                    Source="{Binding TagImageSource}"
+                    Unloaded="TagImage_Unloaded">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TagImageSource}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Button>
+        </DataTemplate>
+
+        <DataTemplate x:Key="PlaceholderTemplate">
+            <Border Margin="0" Background="#50505055" />
+        </DataTemplate>
+
+        <Style x:Name="TextureListViewItem" TargetType="ListViewItem">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <Border
+                            x:Name="ButtonBackground"
+                            Background="Transparent"
+                            BorderBrush="{StaticResource BackgroundColour30}"
+                            BorderThickness="0">
+                            <ContentPresenter Margin="0" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.Triggers>
+            <EventTrigger RoutedEvent="Grid.Loaded">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation
+                            Storyboard.TargetProperty="Opacity"
+                            From="0"
+                            To="1"
+                            Duration="0:0:0.25" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Grid.Triggers>
+
+        <Grid x:Name="MainContainer" Background="Transparent">
+            <Grid.RenderTransform>
+                <TranslateTransform />
+            </Grid.RenderTransform>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="25*" />
+            </Grid.ColumnDefinitions>
+
+            <local:PackageList x:Name="PackageList" Margin="10" />
+
+            <Grid
+                Grid.Column="1"
+                Margin="0,10,0,10"
+                Background="Transparent">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*" />
+                    <RowDefinition Height="95*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel
+                    x:Name="FilterOptions"
+                    Grid.Row="0"
+                    Margin="0,0,0,00"
+                    Orientation="Horizontal">
+                    <TextBox
+                        x:Name="TextureSearchBox"
+                        Grid.Row="0"
+                        Width="200"
+                        Margin="10,0,10,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        FontSize="30"
+                        TextChanged="TextureSearchBox_TextChanged"
+                        TextWrapping="Wrap" />
+
+                </StackPanel>
+
+                <ContentControl
+                    x:Name="TextureListLoading"
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Panel.ZIndex="10"
+                    Template="{StaticResource SpinningCircleTemplate}"
+                    Visibility="Collapsed" />
+
+                <ListView
+                    x:Name="TextureList"
+                    Grid.Row="1"
+                    Margin="0,10,0,5"
+                    Background="{StaticResource MarathonDarker}"
+                    BorderBrush="{StaticResource ForegroundColour70}"
+                    BorderThickness="0,0,1,0"
+                    ItemTemplate="{StaticResource TextureTemplate}"
+                    Style="{DynamicResource TextureListViewItem}"
+                    VirtualizingPanel.IsContainerVirtualizable="True"
+                    VirtualizingPanel.ScrollUnit="Pixel">
+
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <wrap:VirtualizingWrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
+            </Grid>
+
+            <Grid Grid.Column="2" Background="Transparent">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="95*" />
+                    <RowDefinition Height="10*" />
+                </Grid.RowDefinitions>
+
+                <local:TextureView
+                    x:Name="TextureControl"
+                    Grid.Row="0"
+                    Visibility="Hidden" />
+                <local:CubemapView
+                    x:Name="CubemapControl"
+                    Grid.Row="0"
+                    Visibility="Hidden" />
+
+                <StackPanel
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Orientation="Horizontal">
+                    <Border Margin="5" Background="{StaticResource BackgroundColour20}">
+                        <Button
+                            x:Name="ExportButton"
+                            Click="ExportButton_Click"
+                            IsEnabled="False"
+                            MouseEnter="ExportButtons_MouseEnter"
+                            MouseLeave="ExportButtons_MouseLeave"
+                            Style="{StaticResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="EXPORT" Description="Export the currently shown texture." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <TextBlock
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                FontSize="22"
+                                IsHitTestVisible="False"
+                                Text="EXPORT CURRENT"
+                                TextAlignment="Center" />
+                        </Button>
+                    </Border>
+
+
+                    <Border Margin="5" Background="{StaticResource BackgroundColour20}">
+                        <Button
+                            x:Name="BulkExportButton"
+                            Grid.Row="1"
+                            Click="BulkExportButton_Click"
+                            IsEnabled="False"
+                            MouseEnter="ExportButtons_MouseEnter"
+                            MouseLeave="ExportButtons_MouseLeave"
+                            Style="{StaticResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="EXPORT ALL" Description="Export all textures from this package, based on the current filters." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <TextBlock
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                FontSize="22"
+                                IsHitTestVisible="False"
+                                Text="EXPORT ALL"
+                                TextAlignment="Center" />
+                        </Button>
+                    </Border>
+                </StackPanel>
+
+            </Grid>
+        </Grid>
+
+    </Grid>
+</UserControl>

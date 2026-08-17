@@ -5,8 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MIDA"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="400"
     d:DesignWidth="1920"
+    KeyboardNavigation.ControlTabNavigation="None"
+    KeyboardNavigation.DirectionalNavigation="None"
+    KeyboardNavigation.TabNavigation="None"
     Loaded="UserControl_Loaded"
     mc:Ignorable="d">
 
@@ -67,23 +69,26 @@
     <Grid
         x:Name="MainGrid"
         Panel.ZIndex="100"
-        d:Background="#7F7F7F"
-        Background="Transparent">
+        Background="Transparent"
+        Focusable="False"
+        KeyboardNavigation.ControlTabNavigation="None"
+        KeyboardNavigation.DirectionalNavigation="None"
+        KeyboardNavigation.TabNavigation="None">
 
         <Border
             x:Name="ElementStack"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="100" ShadowDepth="0" />
-            </Border.Effect>
+            Margin="100"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Center"
+            Background="{StaticResource MarathonDark}">
 
             <StackPanel Orientation="Vertical">
                 <Grid
                     Name="Expanders"
                     d:Opacity="1"
                     Background="Transparent"
-                    Opacity="0">
+                    Opacity="0"
+                    Visibility="Visible">
                     <!--  Left Piece (Expands Left)  -->
                     <Rectangle
                         Name="LeftPiece"
@@ -94,7 +99,8 @@
                         Panel.ZIndex="15"
                         d:Fill="#88007490"
                         d:Width="1920"
-                        Fill="{Binding ExpanderColor}" />
+                        Fill="{Binding ExpanderColor}"
+                        Visibility="Collapsed" />
 
                     <!--  Right Piece (Expands Right)  -->
                     <Rectangle
@@ -106,210 +112,385 @@
                         Panel.ZIndex="15"
                         d:Fill="#88007490"
                         d:Width="1920"
-                        Fill="{Binding ExpanderColor}" />
+                        Fill="{Binding ExpanderColor}"
+                        Visibility="Collapsed" />
+
+                    <Border
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        d:Background="#4B007490"
+                        Background="{Binding BodyColor}">
+                        <TextBlock
+                            Margin="20"
+                            d:FontFamily="Haas Grot Text 55 Roman"
+                            d:Text="H E L L O"
+                            FontFamily="{DynamicResource Marathon Shapiro}"
+                            FontSize="36"
+                            FontWeight="Bold"
+                            Foreground="White">
+                            <Run Text="! " />
+                            <Run Text="{Binding Title, Converter={StaticResource SpacedTextConverter}}" />
+                        </TextBlock>
+                    </Border>
                 </Grid>
 
                 <Grid
                     Name="Info"
                     d:Opacity="1"
-                    Background="#80131313"
+                    Background="Transparent"
                     Opacity="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="35*" />
-                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="50*" />
+                        <ColumnDefinition Width="50*" />
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" Background="#4D000000">
+                    <Grid Grid.Column="1" Background="Transparent">
                         <TextBlock
+                            x:Name="TextIcon"
                             Margin="25"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            d:FontFamily="Destiny Keys"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            d:FontFamily="Haas Grot Text 55 Roman"
                             d:Foreground="#C90092B6"
-                            d:Text="&#xEE21;"
-                            FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                            FontSize="100"
+                            d:Text="✅"
+                            FontFamily="{DynamicResource KH Interference Regular Keys}"
+                            FontSize="300"
                             FontWeight="Bold"
                             Foreground="{Binding IconColor}"
                             Text="{Binding Icon}" />
-                    </Border>
-                    <Image
-                        Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Source="{Binding IconImage}"
-                        Visibility="Visible" />
 
-                    <StackPanel
-                        Grid.Column="1"
-                        Background="Transparent"
-                        Orientation="Vertical">
-                        <Border
-                            HorizontalAlignment="Stretch"
+                        <Grid
+                            x:Name="DefaultIconsGrid"
+                            HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            d:Background="#4B007490"
-                            Background="{Binding BodyColor}">
-                            <TextBlock
-                                Margin="20"
-                                d:FontFamily="Haas Grot Text 55 Roman"
-                                d:Text="H E L L O"
-                                FontFamily="{DynamicResource KH Interference Regular}"
-                                FontSize="36"
-                                FontWeight="Bold"
-                                Foreground="White"
-                                Text="{Binding Title, Converter={StaticResource SpacedTextConverter}}" />
-                        </Border>
-
-                        <Border Background="Transparent">
-                            <StackPanel Margin="20,20,300,20" Orientation="Vertical">
-                                <TextBlock
-                                    x:Name="SubtitleText"
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                    FontSize="26"
-                                    FontWeight="Bold"
-                                    Foreground="{StaticResource ForegroundColour90}"
-                                    TextWrapping="WrapWithOverflow">
-                                    <Run d:Text="Subtitle" Text="{Binding Subtitle}" />
-                                    <Run Text="&#x0a;" />
-                                </TextBlock>
-
-                                <TextBlock
-                                    x:Name="DescriptionText"
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    d:Text="Description"
-                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                    FontSize="24"
-                                    Text="{Binding Description}"
-                                    TextWrapping="WrapWithOverflow" />
-                            </StackPanel>
-
-                        </Border>
-
-                    </StackPanel>
-
-                </Grid>
-
-                <Grid
-                    Name="Input"
-                    Background="#E60D0D0D"
-                    Opacity="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="35*" />
-                        <ColumnDefinition Width="70*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Grid
-                        Grid.Column="1"
-                        Margin="20,5,20,5"
-                        Background="Transparent">
-                        <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                            RenderTransformOrigin="0.5,0.5"
+                            Visibility="Collapsed">
                             <Grid
-                                x:Name="MainUserInput"
-                                Margin="0,5,5,5"
-                                Background="Transparent">
-                                <TextBlock
+                                x:Name="InfoIcon"
+                                Grid.Column="0"
+                                Width="120"
+                                Height="120"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Visibility="Hidden">
+
+                                <Border
+                                    Name="InfoOuter"
+                                    Width="120"
+                                    Height="120"
+                                    BorderBrush="{Binding IconColor}"
+                                    BorderThickness="2"
+                                    CornerRadius="100"
+                                    Opacity="0.5"
+                                    RenderTransformOrigin="0.5,0.5" />
+
+                                <Border
+                                    Name="InfoInner"
+                                    Width="107"
+                                    Height="107"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                    FontSize="20"
-                                    Foreground="{StaticResource ForegroundColour80}"
-                                    Text=""
-                                    TextWrapping="WrapWithOverflow" />
-                                <TextBlock
+                                    BorderBrush="{Binding IconColor}"
+                                    BorderThickness="2"
+                                    CornerRadius="100"
+                                    Opacity="0.9"
+                                    RenderTransformOrigin="0.5,0.5" />
+
+                                <Border
+                                    Name="InfoInnerCircle"
+                                    Width="54"
+                                    Height="54"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                    FontSize="20"
-                                    Foreground="#3396DA"
-                                    Text=""
-                                    TextWrapping="WrapWithOverflow" />
+                                    Background="{Binding IconColor}"
+                                    BorderBrush="{Binding IconColor}"
+                                    CornerRadius="100"
+                                    Opacity="0.2"
+                                    RenderTransformOrigin="0.5,0.5" />
+
+                                <Border
+                                    Name="InfoExclamation1"
+                                    Width="18"
+                                    Height="44"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding IconColor}"
+                                    BorderBrush="{Binding IconColor}"
+                                    Opacity="1"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <TranslateTransform X="0" Y="15" />
+                                    </Border.RenderTransform>
+                                </Border>
+
+                                <Border
+                                    Name="InfoExclamation2"
+                                    Width="18"
+                                    Height="18"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding IconColor}"
+                                    BorderBrush="{Binding IconColor}"
+                                    CornerRadius="100"
+                                    Opacity="1"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <TranslateTransform X="0" Y="-25" />
+                                    </Border.RenderTransform>
+                                </Border>
                             </Grid>
 
-                            <TextBlock
-                                Margin="0,0,0,0"
-                                VerticalAlignment="Center"
-                                d:FontFamily="Haas Grot Text 55 Roman"
-                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                FontSize="20"
-                                Foreground="{StaticResource ForegroundColour80}"
-                                Text="{Binding UserInput}"
-                                TextWrapping="WrapWithOverflow" />
-
                             <Grid
-                                x:Name="SecondaryUserInput"
-                                Margin="15,5,5,5"
-                                Background="Transparent">
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                    FontSize="20"
-                                    Foreground="{StaticResource ForegroundColour80}"
-                                    Text=""
-                                    TextWrapping="WrapWithOverflow" />
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    d:FontFamily="Haas Grot Text 55 Roman"
-                                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                    FontSize="20"
-                                    Foreground="#3396DA"
-                                    Text=""
-                                    TextWrapping="WrapWithOverflow" />
-                            </Grid>
-
-                            <TextBlock
-                                Margin="0,0,0,0"
+                                x:Name="AlertIcon"
+                                Grid.Column="0"
+                                Width="120"
+                                Height="120"
+                                HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                d:FontFamily="Haas Grot Text 55 Roman"
-                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                                FontSize="20"
-                                Foreground="{StaticResource ForegroundColour80}"
-                                Text="{Binding UserInputSecondary}"
-                                TextWrapping="WrapWithOverflow" />
-                        </StackPanel>
+                                Visibility="Hidden">
+
+                                <Border
+                                    Name="AlertOuter"
+                                    Width="120"
+                                    Height="120"
+                                    BorderBrush="{Binding IconColor}"
+                                    BorderThickness="2"
+                                    Opacity="0.5"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="0.7071" ScaleY="0.7071" />
+                                            <RotateTransform Angle="45" />
+                                        </TransformGroup>
+                                    </Border.RenderTransform>
+                                </Border>
+
+                                <Border
+                                    Name="AlertInner"
+                                    Width="107"
+                                    Height="107"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{Binding IconColor}"
+                                    BorderThickness="2"
+                                    Opacity="0.9"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="0.7071" ScaleY="0.7071" />
+                                            <RotateTransform Angle="45" />
+                                        </TransformGroup>
+                                    </Border.RenderTransform>
+                                </Border>
+
+                                <Border
+                                    Name="AlertInnerCircle"
+                                    Width="54"
+                                    Height="54"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding IconColor}"
+                                    BorderBrush="{Binding IconColor}"
+                                    CornerRadius="100"
+                                    Opacity="0.2"
+                                    RenderTransformOrigin="0.5,0.5" />
+
+                                <Border
+                                    Name="AlertExclamation1"
+                                    Width="18"
+                                    Height="44"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding IconColor}"
+                                    BorderBrush="{Binding IconColor}"
+                                    Opacity="1"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <TranslateTransform X="0" Y="-15" />
+                                    </Border.RenderTransform>
+                                </Border>
+
+                                <Border
+                                    Name="AlertExclamation2"
+                                    Width="18"
+                                    Height="18"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding IconColor}"
+                                    BorderBrush="{Binding IconColor}"
+                                    CornerRadius="100"
+                                    Opacity="1"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <TranslateTransform X="0" Y="25" />
+                                    </Border.RenderTransform>
+                                </Border>
+                            </Grid>
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="1.75" ScaleY="1.75" />
+                            </Grid.RenderTransform>
+                        </Grid>
 
                     </Grid>
 
 
-                    <Border
+                    <Image
                         Grid.Column="1"
-                        Panel.ZIndex="-1"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
-                        BorderThickness="0">
-                        <ProgressBar
-                            x:Name="HoldProgress"
-                            Height="auto"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            BorderThickness="0"
-                            Foreground="#FF6D99FF"
-                            Maximum="100"
-                            Minimum="0"
-                            Value="0" />
+                        Margin="25"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Source="{Binding IconImage}"
+                        Stretch="Uniform"
+                        Visibility="Visible" />
 
-                        <Border.Triggers>
-                            <EventTrigger RoutedEvent="Loaded">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            AutoReverse="True"
-                                            RepeatBehavior="Forever"
-                                            Storyboard.TargetProperty="Opacity"
-                                            From="0.5"
-                                            To="1.0"
-                                            Duration="0:0:0.75">
-                                            <DoubleAnimation.EasingFunction>
-                                                <SineEase EasingMode="EaseInOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </Border.Triggers>
-                    </Border>
+                    <Grid Grid.Column="0" Margin="50,50,50,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Vertical">
+                            <TextBlock
+                                x:Name="SubtitleText"
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                FontFamily="{DynamicResource KH Interference Regular}"
+                                FontSize="26"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource MarathonYellow}"
+                                TextWrapping="WrapWithOverflow">
+                                <Run d:Text="Subtitle" Text="{Binding Subtitle}" />
+                                <Run Text="&#x0a;" />
+                            </TextBlock>
+
+                            <TextBlock
+                                x:Name="DescriptionText"
+                                d:FontFamily="Haas Grot Text 55 Roman"
+                                d:Text="Description"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                FontSize="22"
+                                Text="{Binding Description}"
+                                TextWrapping="WrapWithOverflow" />
+                        </StackPanel>
+
+                        <Grid
+                            Name="Input"
+                            Grid.Row="1"
+                            Margin="0,50,0,0"
+                            VerticalAlignment="Bottom"
+                            Background="Transparent">
+                            <Grid Background="Transparent">
+                                <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                                    <Grid
+                                        x:Name="MainUserInput"
+                                        Margin="0,5,5,0"
+                                        Background="Transparent">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            d:FontFamily="Haas Grot Text 55 Roman"
+                                            FontFamily="{DynamicResource Marathon PC Keys}"
+                                            FontSize="20"
+                                            Foreground="{StaticResource ForegroundColour90}"
+                                            Text=""
+                                            TextWrapping="WrapWithOverflow" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            d:FontFamily="Haas Grot Text 55 Roman"
+                                            FontFamily="{DynamicResource Marathon PC Keys}"
+                                            FontSize="20"
+                                            Foreground="#3396DA"
+                                            Text=""
+                                            TextWrapping="WrapWithOverflow" />
+                                    </Grid>
+
+                                    <TextBlock
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily="Haas Grot Text 55 Roman"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="20"
+                                        Foreground="{StaticResource ForegroundColour90}"
+                                        Text="{Binding UserInput}"
+                                        TextWrapping="WrapWithOverflow" />
+
+                                    <Grid
+                                        x:Name="SecondaryUserInput"
+                                        Margin="20,5,5,0"
+                                        Background="Transparent">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            d:FontFamily="Haas Grot Text 55 Roman"
+                                            FontFamily="{DynamicResource Marathon PC Keys}"
+                                            FontSize="20"
+                                            Foreground="{StaticResource ForegroundColour90}"
+                                            Text=""
+                                            TextWrapping="WrapWithOverflow" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            d:FontFamily="Haas Grot Text 55 Roman"
+                                            FontFamily="{DynamicResource Marathon PC Keys}"
+                                            FontSize="20"
+                                            Foreground="#3396DA"
+                                            Text=""
+                                            TextWrapping="WrapWithOverflow" />
+                                    </Grid>
+
+                                    <TextBlock
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily="Haas Grot Text 55 Roman"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="20"
+                                        Foreground="{StaticResource ForegroundColour90}"
+                                        Text="{Binding UserInputSecondary}"
+                                        TextWrapping="WrapWithOverflow" />
+                                </StackPanel>
+                            </Grid>
+
+
+                            <Border
+                                Grid.Column="1"
+                                Panel.ZIndex="-1"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="0">
+                                <ProgressBar
+                                    x:Name="HoldProgress"
+                                    Height="auto"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    Foreground="#FF6D99FF"
+                                    Maximum="100"
+                                    Minimum="0"
+                                    Value="0" />
+
+                                <Border.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation
+                                                    AutoReverse="True"
+                                                    RepeatBehavior="Forever"
+                                                    Storyboard.TargetProperty="Opacity"
+                                                    From="0.5"
+                                                    To="1.0"
+                                                    Duration="0:0:0.75">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <SineEase EasingMode="EaseInOut" />
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+
+
                 </Grid>
+
+
             </StackPanel>
         </Border>
 

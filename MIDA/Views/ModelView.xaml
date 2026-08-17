@@ -51,6 +51,7 @@
                 Style="{StaticResource MaterialDesignCheckBox}">
                 Render Details
             </CheckBox>
+
             <CheckBox
                 x:Name="TextureCheckBox"
                 Margin="10,0,10,0"
@@ -64,6 +65,17 @@
                     <TextBlock Foreground="Black" Text="Applies the first texture of each material. Not representative of the final look." />
                 </CheckBox.ToolTip>
                 Apply Texture
+            </CheckBox>
+
+            <CheckBox
+                x:Name="SkeletonCheckBox"
+                Margin="10,0,10,0"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                IsChecked="True"
+                Style="{StaticResource MaterialDesignCheckBox}"
+                Visibility="Collapsed">
+                Show Skeleton
             </CheckBox>
 
             <ComboBox

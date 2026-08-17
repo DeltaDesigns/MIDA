@@ -1,4 +1,5 @@
-﻿using Tiger.Exporters;
+﻿using Arithmic;
+using Tiger.Exporters;
 using Tiger.Schema.Entity;
 using Tiger.Schema.Shaders;
 
@@ -13,10 +14,12 @@ public class Lights : Tag<SMapLights>
 
     public void LoadIntoExporter()
     {
+        Log.Debug($"Loading Lights {Hash} into Exporter.");
+
         using TigerReader reader = GetReader();
         for (int i = 0; i < _tag.LightData.Count; i++)
         {
-            var data = _tag.LightData.ElementAt(reader, i);
+            SMapLightCollection data = _tag.LightData.ElementAt(reader, i);
 
             var bufferData = data.BufferData2 is null ? data.BufferData : data.BufferData2;
             if (bufferData is null)
@@ -70,10 +73,6 @@ public class Lights : Tag<SMapLights>
     public Vector4 GetColor(Tag<S80808691> data)
     {
         //Console.WriteLine($"{data.TagData.Buffer2[0].Vec} : {data.TagData.Buffer2[1].Vec} : {data.TagData.Buffer2.Count(x => x.Vec.Magnitude != 0)}");
-        //if ((Strategy.IsD1() || Strategy.IsPreBL()) && data.TagData.Buffer2.Count != 0 && !data.TagData.Buffer2[2].Vec.IsZero())
-        //{
-        //    return data.TagData.Buffer2[2].Vec; // Always color in D1?
-        //}
 
         if (data.TagData.Bytecode.Count != 0)
         {
@@ -96,14 +95,14 @@ public class Lights : Tag<SMapLights>
     {
         // 2x2x2 Cube
         Vector3[] cubePoints = new Vector3[] {
-            new Vector3(-1f, -1f, -1f),
-            new Vector3(-1f, -1f, 1f),
-            new Vector3(-1f, 1f, -1f),
-            new Vector3(-1f, 1f, 1f),
-            new Vector3(1f, -1f, -1f),
-            new Vector3(1f, -1f, 1f),
-            new Vector3(1f, 1f, -1f),
-            new Vector3(1f, 1f, 1f)
+            new(-1f, -1f, -1f),
+            new(-1f, -1f, 1f),
+            new(-1f, 1f, -1f),
+            new(-1f, 1f, 1f),
+            new(1f, -1f, -1f),
+            new(1f, -1f, 1f),
+            new(1f, 1f, -1f),
+            new(1f, 1f, 1f)
         };
 
         for (int i = 0; i < cubePoints.Length; i++)
@@ -120,7 +119,7 @@ public class Lights : Tag<SMapLights>
             r0 = matrix.Z_Axis * new Vector4(cubePoints[i].Z) + r0;
 
             //o0.xyzw = cb0[21].xyzw + r0.xyzw;
-            var b = (matrix.W_Axis + r0);
+            Vector4 b = (matrix.W_Axis + r0);
 
             cubePoints[i] = (b / new Vector4(b.W)).ToVec3();
         }
@@ -189,38 +188,38 @@ public class Lights : Tag<SMapLights>
 /// <summary>
 /// Map Light
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "35838080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON, "35838080", 0x18)]
 public struct SMapLightResource
 {
-    [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
+    [SchemaField(0x10, TigerStrategy.MARATHON), NoLoad]
     public Lights Lights;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080854B", 0x60)]
+[SchemaStruct(TigerStrategy.MARATHON, "8080854B", 0x60)]
 public struct SMapLights
 {
     [SchemaField(0x10)]
     public Vector4 Unk10;
     public Vector4 Unk20;
     public DynamicArrayUnloaded<SMapLightCollection> LightData;
-    public DynamicArrayUnloaded<S47BF8080> Transforms;
+    public DynamicArrayUnloaded<S8080BF47> Transforms;
 
-    [SchemaField(0x58, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x58, TigerStrategy.MARATHON)]
     public Tag<SOcclusionBounds> Bounds;
 }
 
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "56858080", 0x100)]
+[SchemaStruct(TigerStrategy.MARATHON, 0x80808556, 0x100)] // 56858080
 public struct SMapLightCollection
 {
-    [SchemaField(0x60, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x60, TigerStrategy.MARATHON)]
     public Matrix4x4 LightToWorld;
     // Techniques between
 
-    [SchemaField(0xC0, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0xC4, TigerStrategy.MARATHON)]
     public Material Shading;
 
-    [SchemaField(0xCC, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0xD0, TigerStrategy.MARATHON)]
     public Tag<S80808691> BufferData;
     public Tag<S80808691> BufferData2;
 }

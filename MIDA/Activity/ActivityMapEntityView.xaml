@@ -88,7 +88,7 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Click="EntityMapView_OnClick"
-                    Style="{StaticResource D2StyleButton}">
+                    Style="{StaticResource MarathonStyleButton}">
                     <TextBlock
                         VerticalAlignment="Center"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
@@ -142,7 +142,7 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Click="EntityView_OnClick"
-                        Style="{StaticResource D2StyleButton}">
+                        Style="{StaticResource MarathonStyleButton}">
                         <TextBlock
                             VerticalAlignment="Center"
                             FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
@@ -157,7 +157,7 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Click="EntityExport_OnClick"
-                        Style="{StaticResource D2StyleButton}">
+                        Style="{StaticResource MarathonStyleButton}">
                         <TextBlock
                             VerticalAlignment="Center"
                             FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"

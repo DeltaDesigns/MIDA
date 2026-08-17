@@ -38,53 +38,11 @@ public partial class MapView : UserControl
     {
         if (isEntities)
             GetEntityMapData(fileHash, detailLevel);
-        else
-            GetStaticMapData(fileHash, detailLevel);
     }
 
     private void GetEntityMapData(FileHash tagHash, ExportDetailLevel detailLevel)
     {
         SetEntityMapUI(tagHash, detailLevel);
-    }
-
-    private void GetStaticMapData(FileHash fileHash, ExportDetailLevel detailLevel)
-    {
-        Tag<SMapContainer> tag = FileResourcer.Get().GetSchemaTag<SMapContainer>(fileHash);
-        foreach (var tables in tag.TagData.MapDataTables)
-        {
-            foreach (var entry in tables.MapDataTable.TagData.DataEntries)
-            {
-                if (entry.DataResource.GetValue(tables.MapDataTable.GetReader()) is SMapDataResource resource)
-                {
-                    resource.StaticMapParent?.Load();
-                    if (resource.StaticMapParent is null || resource.StaticMapParent.TagData.StaticMap is null)
-                        continue;
-
-                    StaticMapData staticMapData = resource.StaticMapParent.TagData.StaticMap;
-                    SetMapUI(staticMapData, detailLevel);
-                }
-                if (entry.DataResource.GetValue(tables.MapDataTable.GetReader()) is SMapTerrainResource terrain)
-                {
-                    terrain.Terrain?.Load();
-                    if (terrain.Terrain is null)
-                        continue;
-
-                    SetTerrainMapUI(terrain.Terrain, detailLevel);
-                }
-            }
-        }
-    }
-
-    private void SetMapUI(StaticMapData staticMapData, ExportDetailLevel detailLevel)
-    {
-        var displayParts = MakeDisplayParts(staticMapData, detailLevel);
-        Dispatcher.Invoke(() =>
-        {
-            MainViewModel MVM = (MainViewModel)ModelView.UCModelView.Resources["MVM"];
-            MVM.SetChildren(displayParts);
-            MVM.SubTitle = $"{displayParts.Sum(p => p.BasePart.Indices.Count)} triangles";
-        });
-        displayParts.Clear();
     }
 
     private void SetEntityMapUI(FileHash dataentry, ExportDetailLevel detailLevel)
@@ -97,18 +55,6 @@ public partial class MapView : UserControl
         });
         displayParts.Clear();
     }
-
-    private void SetTerrainMapUI(Terrain terrain, ExportDetailLevel detailLevel)
-    {
-        var displayParts = MakeTerrainDisplayParts(terrain, detailLevel);
-        Dispatcher.Invoke(() =>
-        {
-            MainViewModel MVM = (MainViewModel)ModelView.UCModelView.Resources["MVM"];
-            MVM.SetChildren(displayParts);
-        });
-        displayParts.Clear();
-    }
-
     public bool LoadEntity(List<Entity> entities, FbxHandler fbxHandler)
     {
         fbxHandler.Clear();
@@ -154,11 +100,6 @@ public partial class MapView : UserControl
         Directory.CreateDirectory(savePath);
 
         ExtractDataTables(map, savePath);
-
-        if (_config.GetUnrealInteropEnabled())
-        {
-            AutomatedExporter.SaveInteropUnrealPythonFile(savePath, map.Hash.ToString(), AutomatedExporter.ImportType.Map, _config.GetOutputTextureFormat(), _config.GetSingleFolderMapAssetsEnabled());
-        }
     }
 
     private static void ExtractDataTables(Tag<SMapContainer> map, string savePath)

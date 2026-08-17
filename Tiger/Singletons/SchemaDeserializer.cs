@@ -129,9 +129,9 @@ public class SchemaDeserializer : Strategy.StrategistSingleton<SchemaDeserialize
                 Type schemaType = type.BaseType.GenericTypeArguments.First();
 
                 SchemaStructAttribute? schemaStructAttr = GetAttribute<SchemaStructAttribute>(schemaType);
-                if (schemaStructAttr != null && !string.IsNullOrEmpty(schemaStructAttr.ClassHash))
+                if (schemaStructAttr != null && schemaStructAttr.ClassID != TigerHash.InvalidHash32)
                 {
-                    _schemaTypeHashMap.TryAdd(type, new FileHash(schemaStructAttr.ClassHash).Hash32);
+                    _schemaTypeHashMap.TryAdd(type, schemaStructAttr.ClassID);
                 }
 
                 NonSchemaStructAttribute? nonSchemaStructAttr = GetAttribute<NonSchemaStructAttribute>(schemaType);
@@ -146,8 +146,8 @@ public class SchemaDeserializer : Strategy.StrategistSingleton<SchemaDeserialize
             if (schemaStructAttribute != null)
             {
                 _schemaSerializedSizeMap.TryAdd(type, schemaStructAttribute.SerializedSize);
-                _schemaHashTypeMap.TryAdd(new FileHash(schemaStructAttribute.ClassHash).Hash32, type);
-                _schemaTypeHashMap.TryAdd(type, new FileHash(schemaStructAttribute.ClassHash).Hash32);
+                _schemaHashTypeMap.TryAdd(schemaStructAttribute.ClassID, type);
+                _schemaTypeHashMap.TryAdd(type, schemaStructAttribute.ClassID);
                 _schemaTypeFieldsMap.TryAdd(type, GetStrategyFields(type.GetFields()));
                 return;
             }
@@ -194,7 +194,7 @@ public class SchemaDeserializer : Strategy.StrategistSingleton<SchemaDeserialize
                     // interfaceMap.TryAdd(strategy, interfaceType);
 
                     SchemaStructAttribute? intSchemaStructAttribute = GetAttribute<SchemaStructAttribute>(interfaceType.BaseType.GenericTypeArguments.First());
-                    _schemaTypeHashMap.TryAdd(type, new FileHash(intSchemaStructAttribute.ClassHash).Hash32);
+                    _schemaTypeHashMap.TryAdd(type, intSchemaStructAttribute.ClassID);
                     _interfaceImplementingTypeMap.TryAdd(type, interfaceType);
                 }
             }
@@ -297,8 +297,7 @@ public class SchemaDeserializer : Strategy.StrategistSingleton<SchemaDeserialize
         uint u32 = reader.ReadUInt32();
         int bIs32Bit = reader.ReadInt32();
         ulong u64 = reader.ReadUInt64();
-        //Console.WriteLine($"{u32:X} : {bIs32Bit:X} : {u64:X}");
-        if (bIs32Bit == 1 || bIs32Bit == 2) // TFS can have 2 instead of 1?
+        if (bIs32Bit == 1)
         {
             return new FileHash(u32);
         }

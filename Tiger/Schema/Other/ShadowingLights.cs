@@ -1,4 +1,5 @@
-﻿using Tiger.Exporters;
+﻿using Arithmic;
+using Tiger.Exporters;
 using Tiger.Schema.Shaders;
 
 namespace Tiger.Schema;
@@ -16,6 +17,8 @@ public class ShadowingLights : Tag<SMapShadowingLight>
         var data = _tag.BufferData2 is null ? _tag.BufferData : _tag.BufferData2;
         if (data is null)
             return;
+
+        Log.Debug($"Loading ShadowingLights {Hash} into Exporter.");
 
         List<Vec4> possibleColors = data.TagData.Buffer1.ToList();
         possibleColors.AddRange(data.TagData.Buffer2.ToList());
@@ -120,25 +123,25 @@ public class ShadowingLights : Tag<SMapShadowingLight>
 /// <summary>
 /// Map Shadowing Light (Casts shadows)
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "44858080", 0x20)]
+[SchemaStruct(TigerStrategy.MARATHON, "44858080", 0x20)]
 public struct SMapShadowingLightResource
 {
-    [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
+    [SchemaField(0x10, TigerStrategy.MARATHON), NoLoad]
     public ShadowingLights ShadowingLight;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808557", 0x120)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808557", 0x120)]
 public struct SMapShadowingLight
 {
-    [SchemaField(0x60, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x60, TigerStrategy.MARATHON)]
     public Matrix4x4 LightToWorld;
     public Vector4 Distance; // Unsure but only W is used?
 
-    [SchemaField(0xC0, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0xC0, TigerStrategy.MARATHON)]
     public float FarPlane;
     public float HalfFOV; // * 2, radians->degrees
 
-    [SchemaField(0xD0, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0xD4, TigerStrategy.MARATHON)]
     public FileHash Shading;
     //public Material Shading_Shadowing;
     //public Material Volumetric;
@@ -146,7 +149,7 @@ public struct SMapShadowingLight
     //public Material Lightprobe;
     //public Material Lightprobe_Shadowing;
 
-    [SchemaField(0xE8, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0xEC, TigerStrategy.MARATHON)]
     public Tag<S80808691> BufferData;
     public Tag<S80808691> BufferData2;
 }

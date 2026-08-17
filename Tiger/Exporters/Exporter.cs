@@ -112,9 +112,9 @@ public class GlobalExporterScene : ExporterScene
             _objects = new ConcurrentBag<dynamic>();
 
         // Check if an item of the same type already exists (if there should only be one)
-        var type = item.GetType();
+        dynamic type = item.GetType();
         if (isUnique && _objects.Any(existing => existing.GetType() == type))
-            throw new InvalidOperationException($"A unique item of type {type.Name} already exists in the Global Scene.");
+            throw new InvalidOperationException($"A unique item of type {type.Name} already exists in the Global Scene. This shouldn't happen.");
 
         _objects.Add(item);
     }
@@ -129,7 +129,7 @@ public class GlobalExporterScene : ExporterScene
     {
         item = default;
 
-        foreach (var existing in _objects)
+        foreach (dynamic existing in _objects)
         {
             if (existing is T)
             {
@@ -261,10 +261,10 @@ public class ExporterScene
         EntityPoints.Add(points);
     }
 
-    public void AddEntity(FileHash entityHash, List<DynamicMeshPart> parts, List<BoneNode> boneNodes, DestinyGenderDefinition gender = DestinyGenderDefinition.None)
+    public void AddEntity(Entity entity, List<DynamicMeshPart> parts, List<BoneNode> boneNodes)
     {
-        ExporterMesh mesh = new(entityHash);
-        string name = $"{entityHash}" + (gender == DestinyGenderDefinition.None ? "" : $"_{gender}");
+        ExporterMesh mesh = new(entity.Hash);
+        string name = $"{entity.Hash}" + (entity.Gender == DestinyGenderDefinition.None ? "" : $"_{entity.Gender}");
         for (int i = 0; i < parts.Count; i++)
         {
             DynamicMeshPart part = parts[i];
@@ -273,38 +273,64 @@ public class ExporterScene
 
             mesh.AddPart(name, part, i);
         }
-        Entities.Add(new ExporterEntity { Mesh = mesh, BoneNodes = boneNodes });
+        var exporterEntity = new ExporterEntity
+        {
+            Mesh = mesh,
+            BoneNodes = boneNodes,
+            SubType = entity.ItemType
+        };
+
+        if (entity.Model != null)
+        {
+            exporterEntity.TranslationOffset = entity.Model.TranslationOffset;
+            exporterEntity.RotationOffset = entity.Model.RotationOffset;
+            exporterEntity.AttachmentBoneIndex = entity.Model.AttachmentBoneIndex;
+        }
+
+        Entities.Add(exporterEntity);
     }
 
-    public void AddMapEntity(SMapDataEntry dynamicResource, Entity entity, Transform? transform = null)
+    public void AddMapEntity(SMapDataEntry entry, Transform? transform = null)
     {
-        if (_addedEntities.TryAdd(entity.Hash, true)) // Dont want duplicate entities being added
+        List<Entity> ents = new() { entry.Entity };
+        ents.AddRange(entry.Entity.GetEntityChildren());
+        foreach (var ent in ents)
         {
-            ExporterMesh mesh = new(dynamicResource.Entity.Hash);
-            var parts = entity.Model.Load(ExportDetailLevel.MostDetailed, entity.ModelParentResource);
-            for (int i = 0; i < parts.Count; i++)
+            if (_addedEntities.TryAdd(ent.Hash, true)) // Dont want duplicate entities being added
             {
-                DynamicMeshPart part = parts[i];
-                if (part.Material == null)
-                    continue;
+                ExporterMesh mesh = new(ent.Hash);
+                List<DynamicMeshPart> parts = ent.Load(ExportDetailLevel.MostDetailed);
 
-                mesh.AddPart(dynamicResource.Entity.Hash, part, i);
+                for (int i = 0; i < parts.Count; i++)
+                {
+                    DynamicMeshPart part = parts[i];
+                    if (part.Material == null)
+                        continue;
+
+                    mesh.AddPart(ent.Hash, part, i);
+                }
+                Entities.Add(new ExporterEntity
+                {
+                    Mesh = mesh,
+                    BoneNodes = ent.Skeleton?.GetBoneNodes(),
+                    TranslationOffset = ent.Model.TranslationOffset,
+                    RotationOffset = ent.Model.RotationOffset
+                });
             }
-            Entities.Add(new ExporterEntity { Mesh = mesh, BoneNodes = entity.Skeleton?.GetBoneNodes() });
-        }
 
-        EntityInstances.TryAdd(dynamicResource.Entity.Hash, new());
-        if (transform is null)
-        {
-            transform = new Transform
+            EntityInstances.TryAdd(ent.Hash, new());
+            if (transform is null)
             {
-                Position = dynamicResource.Transfrom.Translation.ToVec3(),
-                Rotation = Vector4.QuaternionToEulerAngles(dynamicResource.Transfrom.Rotation),
-                Quaternion = dynamicResource.Transfrom.Rotation,
-                Scale = new Vector3(dynamicResource.Transfrom.Translation.W, dynamicResource.Transfrom.Translation.W, dynamicResource.Transfrom.Translation.W)
-            };
+                transform = new Transform
+                {
+                    Position = entry.Transfrom.Translation.ToVec3(),
+                    Rotation = Vector4.QuaternionToEulerAngles(entry.Transfrom.Rotation),
+                    Quaternion = entry.Transfrom.Rotation,
+                    Scale = new Vector3(entry.Transfrom.Translation.W, entry.Transfrom.Translation.W, entry.Transfrom.Translation.W)
+                };
+            }
+            EntityInstances[ent.Hash].Add((Transform)transform);
         }
-        EntityInstances[dynamicResource.Entity.Hash].Add((Transform)transform);
     }
 
     public void AddMapModel(EntityModel model, Transform transform)
@@ -313,7 +339,7 @@ public class ExporterScene
 
         if (_addedEntities.TryAdd(model.Hash, true)) // Dont want duplicate entities being added
         {
-            var parts = model.Load(ExportDetailLevel.MostDetailed, null);
+            List<DynamicMeshPart> parts = model.Load(ExportDetailLevel.MostDetailed, null);
             for (int i = 0; i < parts.Count; i++)
             {
                 DynamicMeshPart part = parts[i];
@@ -326,10 +352,10 @@ public class ExporterScene
         EntityInstances[model.Hash].Add(transform);
     }
 
-    public void AddModel(EntityModel model, ExportDetailLevel detailLevel = ExportDetailLevel.MostDetailed)
+    public void AddModel(EntityModel model)
     {
         ExporterMesh mesh = new(model.Hash);
-        var parts = model.Load(detailLevel, null);
+        List<DynamicMeshPart> parts = model.Load(ExportDetailLevel.MostDetailed, null);
         for (int i = 0; i < parts.Count; i++)
         {
             DynamicMeshPart part = parts[i];
@@ -397,6 +423,12 @@ public class ExporterEntity
 {
     public ExporterMesh Mesh { get; set; }
     public List<BoneNode> BoneNodes { get; set; } = new();
+    public MarathonItemType SubType { get; set; } = MarathonItemType.Default;
+
+    // used by the importer addon to determine which bone to use to parent the entity to (for weapon attachments)
+    public int AttachmentBoneIndex { get; set; } = -1;
+    public Vector4 TranslationOffset = Vector4.Zero;
+    public Vector4 RotationOffset = Vector4.Quaternion;
 }
 
 public class ExporterMesh
@@ -469,15 +501,6 @@ public struct ExportMaterial
     }
 }
 
-public struct Transform
-{
-    public Vector3 Position { get; set; }
-    public Vector3 Rotation { get; set; }
-    public Vector4 Quaternion { get; set; }
-    public Vector3 Scale { get; set; }
-    public float Order { get; set; }
-}
-
 public struct MaterialTexture
 {
     public string Material;
@@ -502,9 +525,10 @@ public enum ExportType
     SkyObjects,
     RoadDecals,
     Decorators,
+    SpeedTrees,
     WaterDecals,
 
-    EntityPoints,
-    API,
-    D1API
+    // For gear
+    Weapon,
+    WeaponAttachment
 }

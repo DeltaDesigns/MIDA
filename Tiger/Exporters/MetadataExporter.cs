@@ -1,7 +1,14 @@
 ﻿using System.Collections.Concurrent;
 using Newtonsoft.Json;
+using Tiger.Schema;
 
 namespace Tiger.Exporters;
+
+public enum MetadataGame
+{
+    DESTINY = 0,
+    MARATHON = 1
+}
 
 // TODO: Clean this up
 public class MetadataExporter : AbstractExporter
@@ -25,23 +32,19 @@ class MetadataScene
 
     public MetadataScene(ExporterScene scene, Exporter.ExportEventArgs args)
     {
-        ConcurrentDictionary<string, Dictionary<string, string>> parts = new();
+        ConcurrentDictionary<string, JsonPart> parts = new();
         _config.TryAdd("Parts", parts);
         ConcurrentDictionary<string, ConcurrentBag<JsonInstance>> instances = new();
         _config.TryAdd("Instances", instances);
-        ConcurrentDictionary<string, ConcurrentBag<string>> terrainDyemaps = new ConcurrentDictionary<string, ConcurrentBag<string>>();
+        ConcurrentDictionary<string, ConcurrentBag<string>> terrainDyemaps = new();
         _config.TryAdd("TerrainDyemaps", terrainDyemaps);
-
-        if (ConfigSubsystem.Get().GetUnrealInteropEnabled())
-        {
-            SetUnrealInteropPath(ConfigSubsystem.Get().GetUnrealInteropPath());
-        }
 
         _exportType = scene.Type;
         _dataExportType = scene.DataType;
         SetType(_exportType, _dataExportType);
         SetMeshName(scene.Name);
 
+        _config.TryAdd("Game", MetadataGame.MARATHON);
         _config["UnifiedAssets"] = _charmConfig.GetSingleFolderMapAssetsEnabled();
         if (_charmConfig.GetSingleFolderMapAssetsEnabled() && scene.DataType == DataExportType.Map)
         {
@@ -55,54 +58,79 @@ class MetadataScene
                 _config["AssetsPath"] = (scene.DataType == DataExportType.Map ? args.OutputDirectory : Path.Join(args.OutputDirectory, scene.Name)).Replace("\\", "/");
         }
 
-        foreach (var mesh in scene.StaticMeshes)
+        foreach (ExporterMesh mesh in scene.StaticMeshes)
         {
-            foreach (var part in mesh.Parts)
+            foreach (ExporterPart part in mesh.Parts)
             {
                 AddPart(part, part.Name);
             }
         }
 
-        foreach (var mesh in scene.TerrainMeshes)
+        foreach (ExporterMesh mesh in scene.TerrainMeshes)
         {
-            foreach (var part in mesh.Parts)
+            foreach (ExporterPart part in mesh.Parts)
             {
                 AddPart(part, part.Name);
             }
         }
 
-        foreach (var meshInstanced in scene.StaticMeshInstances)
+        foreach (KeyValuePair<string, List<Transform>> meshInstanced in scene.StaticMeshInstances)
         {
             AddInstanced(meshInstanced.Key, meshInstanced.Value);
         }
-        foreach (var meshInstanced in scene.EntityInstances)
+        foreach (KeyValuePair<string, List<Transform>> meshInstanced in scene.EntityInstances)
         {
             AddInstanced(meshInstanced.Key, meshInstanced.Value);
         }
 
         foreach (ExporterEntity entityMesh in scene.Entities)
         {
-            foreach (var part in entityMesh.Mesh.Parts)
+            foreach (ExporterPart part in entityMesh.Mesh.Parts)
             {
-                AddPart(part, part.Name);
+                AddPart(part, part.Name, entityMesh);
             }
         }
 
-        foreach (var dyemaps in scene.TerrainDyemaps)
+        foreach (KeyValuePair<string, List<FileHash>> dyemaps in scene.TerrainDyemaps)
         {
-            foreach (var dyemap in dyemaps.Value)
+            foreach (FileHash dyemap in dyemaps.Value)
                 AddTerrainDyemap(dyemaps.Key, dyemap);
         }
     }
 
-    public void AddPart(ExporterPart part, string partName)
+    public void AddPart(ExporterPart part, string partName, ExporterEntity entityMesh = null)
     {
         if (!_config["Parts"].ContainsKey(part.SubName))
         {
-            _config["Parts"][part.SubName] = new Dictionary<string, string>();
+            var meshPart = part.MeshPart;
+            var jsonPart = new JsonPart
+            {
+                TranslationOffset = new float[] { 0, 0, 0 },
+                RotationOffset = new float[] { 0, 0, 0, 1 },
+                PartMaterials = new Dictionary<string, string>(),
+            };
+
+            if (meshPart is not null)
+                jsonPart.Misc = new()
+                {
+                    VertexScale = meshPart.VertexScale.ToFloatArray(),
+                    VertexOffset = meshPart.VertexOffset.ToFloatArray(),
+                };
+
+            if (entityMesh is not null)
+            {
+                var trans = entityMesh.TranslationOffset;
+                var rot = entityMesh.RotationOffset;
+                jsonPart.TranslationOffset = new float[] { trans.X, trans.Y, trans.Z };
+                jsonPart.RotationOffset = new float[] { rot.X, rot.Y, rot.Z, rot.W };
+                jsonPart.AttachmentBoneIndex = entityMesh.AttachmentBoneIndex;
+                jsonPart.SubType = entityMesh.SubType;
+            }
+
+            _config["Parts"][part.SubName] = jsonPart;
         }
 
-        _config["Parts"][part.SubName].TryAdd(partName, part.Material?.Hash ?? "");
+        _config["Parts"][part.SubName].PartMaterials[partName] = part.Material?.Hash ?? "";
     }
 
     public void SetType(ExportType type, DataExportType datatype)
@@ -158,8 +186,7 @@ class MetadataScene
         string path = args.OutputDirectory;
 
         if (_config["Instances"].Count == 0
-            && _config["Parts"].Count == 0
-            && _exportType is not ExportType.EntityPoints)
+            && _config["Parts"].Count == 0)
             return; //Dont export if theres nothing in the cfg (this is kind of a mess though)
 
         if (!args.AggregateOutput)
@@ -178,27 +205,21 @@ class MetadataScene
             //}
         }
 
-        // Are these needed anymore?
-        // If theres only 1 part, we need to rename it + the instance to the name of the mesh (unreal imports to fbx name if only 1 mesh inside)
-        //if (_config["Parts"].Count == 1)
-        //{
-        //    var part = _config["Parts"][_config["Parts"].Keys[0]];
-        //    //I'm not sure what to do if it's 0, so I guess I'll leave that to fix it in the future if something breakes.
-        //    if (_config["Instances"].Count != 0)
-        //    {
-        //        var instance = _config["Instances"][_config["Instances"].Keys[0]];
-        //        _config["Instances"] = new ConcurrentDictionary<string, ConcurrentBag<JsonInstance>>();
-        //        _config["Instances"][_config["MeshName"]] = instance;
-        //    }
-        //    _config["Parts"] = new ConcurrentDictionary<string, string>();
-        //    _config["Parts"][_config["MeshName"]] = part;
-        //}
-
         string s = JsonConvert.SerializeObject(_config, Formatting.Indented);
         if (_config.ContainsKey("MeshName"))
             File.WriteAllText($"{path}/{_config["MeshName"]}_info.cfg", s);
         else
             File.WriteAllText($"{path}/info.cfg", s);
+    }
+
+    public struct JsonPart
+    {
+        public MarathonItemType SubType;
+        public int AttachmentBoneIndex;
+        public float[] TranslationOffset;
+        public float[] RotationOffset;  // Quaternion
+        public JsonMisc Misc;
+        public Dictionary<string, string> PartMaterials;
     }
 
     public struct JsonInstance
@@ -209,30 +230,9 @@ class MetadataScene
         public float Order;
     }
 
-    private struct JsonDecal
+    public struct JsonMisc
     {
-        public string Material;
-        public float[] Origin;
-        public float Scale;
-        public float[] Corner1;
-        public float[] Corner2;
-    }
-
-    private struct JsonMaterial
-    {
-        public JsonMaterial()
-        {
-        }
-
-        public bool BackfaceCulling { get; set; } = true;
-        public List<string> UsedScopes;
-        public Dictionary<string, Dictionary<int, TexInfo>> Textures;
-    }
-
-    public struct TexInfo
-    {
-        public string Hash { get; set; }
-        public string Dimension { get; set; }
-        public bool SRGB { get; set; }
+        public float[] VertexScale;
+        public float[] VertexOffset;
     }
 }

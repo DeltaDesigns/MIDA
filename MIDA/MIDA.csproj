@@ -1,44 +1,59 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0-windows</TargetFramework>
-        <Nullable>enable</Nullable>
-        <UseWPF>true</UseWPF>
-		<UseWindowsForms>true</UseWindowsForms>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<Configurations>Release;Debug;</Configurations>
-		<Platforms>x64</Platforms>
-		<IsPackable>false</IsPackable>
-		<Authors />
-		<LangVersion>11</LangVersion>
-		<ApplicationIcon>MIDA.ico</ApplicationIcon>
-		<RunPostBuildEvent>Always</RunPostBuildEvent>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Configurations>Release;Debug;</Configurations>
+    <Platforms>x64</Platforms>
+    <IsPackable>false</IsPackable>
+    <Authors />
+    <ApplicationIcon>MIDA.ico</ApplicationIcon>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
 
-    <ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <None Remove="Changelog.json" />
+      <None Remove="HLSLSyntax.xshd" />
+      <None Remove="Shaders\pixelated_gradient.fx" />
       <None Remove="Shaders\procedural_spinner.ps.cso" />
       <None Remove="Shaders\procedural_spinner.ps.hlsl" />
       <None Remove="Shaders\procedural_spinner.vs.cso" />
       <None Remove="Shaders\procedural_spinner.vs.hlsl" />
+      <None Remove="ThirdParty\dxil\dxbc2dxil.exe" />
+      <None Remove="ThirdParty\dxil\dxcompiler.dll" />
+      <None Remove="ThirdParty\dxil\dxil-spirv-c-shared.dll" />
+      <None Remove="ThirdParty\dxil\dxil-spirv.exe" />
+      <None Remove="ThirdParty\dxil\dxilconv.dll" />
+      <None Remove="ThirdParty\dxil\HLSLDecompiler.exe" />
+      <None Remove="ThirdParty\dxil\spirv-cross.exe" />
+      <None Remove="ThirdParty\fonts\CodeLanguage.otf" />
       <None Remove="ThirdParty\fonts\GoliathBeta-Encrypted.otf" />
       <None Remove="ThirdParty\fonts\marathonshapiro_wide65.otf" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
       <PackageReference Include="ConcurrentHashSet" Version="1.3.0" />
-      <PackageReference Include="HelixToolkit" Version="2.24.0" />
-      <PackageReference Include="HelixToolkit.SharpDX.Assimp" Version="2.24.0" />
-      <PackageReference Include="HelixToolkit.SharpDX.Core" Version="2.24.0" />
-      <PackageReference Include="HelixToolkit.SharpDX.Core.Wpf" Version="2.24.0" />
+      <PackageReference Include="HelixToolkit.SharpDX.Assimp" Version="3.1.2" />
+      <PackageReference Include="HelixToolkit.Wpf" Version="3.1.2" />
+      <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="3.1.2" />
       <PackageReference Include="MaterialDesignThemes" Version="5.0.0-ci330" />
+      <PackageReference Include="MaterialDesignThemes" Version="5.3.1-ci1292" />
       <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
-      <PackageReference Include="NAudio" Version="2.1.0" />
+      <PackageReference Include="NAudio" Version="2.2.1" />
       <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
-      <PackageReference Include="SharpDX.Desktop" Version="4.2.0" />
+      <PackageReference Include="Restless.WaveForm" Version="1.1.0" />
       <PackageReference Include="VersionChecker" Version="1.1.0" />
-      <PackageReference Include="VirtualizingWrapPanel" Version="2.1.1" />
+      <PackageReference Include="VirtualizingWrapPanel" Version="2.5.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -46,9 +61,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Page Update="API\Collections View\CollectionItemControl.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
       <Page Update="Settings\ConfigSettingControl.xaml">
         <Generator>MSBuild:Compile</Generator>
         <DependentUpon>ConfigView.xaml</DependentUpon>
@@ -89,20 +101,10 @@
         <Generator>MSBuild:Compile</Generator>
         <DependentUpon>MusicView.xaml</DependentUpon>
       </Page>
-
-      <Page Update="API\APIItemControl.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
     </ItemGroup>
 
     <ItemGroup>
       <None Update="Shaders\Spinner.ps">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="ThirdParty\3dmigoto_shader_decomp.exe">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="ThirdParty\d3dcompiler_46.dll">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="ThirdParty\FbxWrapperNative.dll">
@@ -128,7 +130,13 @@
         <Link>Shaders\TFXFunctions.hlsl</Link>
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Include="HLSLSyntax.xshd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
       <Content Include="MIDA.ico" />
+      <Content Include="Shaders\pixelated_gradient.fx">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       <Content Include="Shaders\procedural_spinner.ps.cso">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
@@ -141,12 +149,40 @@
       <Content Include="Shaders\procedural_spinner.vs.hlsl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <Content Include="ThirdParty\vgmstream\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 
     <ItemGroup>
+      <Content Include="Changelog.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="ThirdParty\dxil\dxil-spirv-c-shared.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="ThirdParty\dxil\dxil-spirv.exe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="ThirdParty\dxil\dxilconv.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="ThirdParty\dxil\HLSLDecompiler.exe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="ThirdParty\dxil\spirv-cross.exe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="ThirdParty\fonts\CodeLanguage.otf" />
       <Resource Include="ThirdParty\fonts\GoliathBeta-Encrypted.otf" />
       <Resource Include="ThirdParty\fonts\marathonshapiro_wide65.otf" />
     </ItemGroup>
 
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="RD /S /Q &quot;$(TargetDir)cs\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)da\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)de\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)es\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)fa\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)fi\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)fr\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)it\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)ko\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)mk\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)nl\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)pl\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)pt\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)ru\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)sv\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)tr\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)zh-CN\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)ja\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)pt-BR\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)zh-Hans\&quot;&#xD;&#xA;RD /S /Q &quot;$(TargetDir)zh-Hant\&quot;" />
+    </Target>
 </Project>

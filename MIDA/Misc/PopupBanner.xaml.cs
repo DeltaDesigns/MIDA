@@ -45,8 +45,7 @@ public partial class PopupBanner : UserControl
 
     public void Show()
     {
-        var rootPanel = Application.Current.MainWindow?.Content as Panel;
-        rootPanel.Children.Add(this);
+        MainWindow.Current.ViewboxGrid.Children.Add(this);
     }
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -57,18 +56,18 @@ public partial class PopupBanner : UserControl
         switch (Style)
         {
             case PopupStyle.Warning:
-                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xBF, 0x96, 0x30, 0x30));
-                BodyColor = new SolidColorBrush(Color.FromArgb(0x7F, 0x96, 0x30, 0x30));
-                IconColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x96, 0x30, 0x30));
+                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 213, 16, 34));
+                BodyColor = new SolidColorBrush(Color.FromArgb(0xFF, 213, 16, 34));
+                IconColor = new SolidColorBrush(Color.FromArgb(0xFF, 213, 16, 34));
                 break;
             case PopupStyle.Information:
-                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xBF, 0x2F, 0x7F, 0x96));
-                BodyColor = new SolidColorBrush(Color.FromArgb(0x7F, 0x2F, 0x7F, 0x96));
-                IconColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x2F, 0x7F, 0x96));
+                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 39, 16, 253));
+                BodyColor = new SolidColorBrush(Color.FromArgb(0xFF, 39, 16, 253));
+                IconColor = new SolidColorBrush(Color.FromArgb(0xFF, 39, 16, 253));
                 break;
             case PopupStyle.Generic:
-                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xBF, 0x96, 0x96, 0x96));
-                BodyColor = new SolidColorBrush(Color.FromArgb(0x7F, 0x96, 0x96, 0x96));
+                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x96, 0x96, 0x96));
+                BodyColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x96, 0x96, 0x96));
                 IconColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x96, 0x96, 0x96));
                 break;
         }
@@ -86,12 +85,25 @@ public partial class PopupBanner : UserControl
             this.MouseLeftButtonDown += Remove;
         }
 
+        if (Icon is null || Icon == string.Empty)
+            TextIcon.Visibility = Visibility.Collapsed;
         if (Subtitle is null || Subtitle == string.Empty)
             SubtitleText.Visibility = Visibility.Collapsed;
         if (Description is null || Description == string.Empty)
             DescriptionText.Visibility = Visibility.Collapsed;
         if (UserInputSecondary is null || UserInputSecondary == string.Empty)
             SecondaryUserInput.Visibility = Visibility.Collapsed;
+
+
+        if (Icon is null && IconImage is null)
+        {
+            DefaultIconsGrid.Visibility = Visibility.Visible;
+            if (Style == PopupStyle.Warning)
+                AlertIcon.Visibility = Visibility.Visible;
+            else
+                InfoIcon.Visibility = Visibility.Visible;
+        }
+
 
         DataContext = this;
     }
@@ -126,8 +138,14 @@ public partial class PopupBanner : UserControl
     }
 
     // isnt actually removed here, just starts the animation that calls the actual function when it ends
-    public void Remove()
+    public void Remove(bool force = false)
     {
+        if (force && this.Parent is Panel parentPanel)
+        {
+            parentPanel.Children.Remove(this);
+            return;
+        }
+
         double currentHeight = ElementStack.ActualHeight;
         var heightAnimation = new DoubleAnimation
         {
@@ -152,6 +170,19 @@ public partial class PopupBanner : UserControl
         {
             parentPanel.Children.Remove(this);
         }
+    }
+
+    public static void ShowRedactedPopup()
+    {
+        PopupBanner warn = new()
+        {
+            Icon = "🔐",
+            Title = "REDACTED CONTENT",
+            Subtitle = "No decryption key found, can not display content.",
+            Description = "This item belongs to a redacted package and no valid decryption key was found, which means its content can not be shown.",
+            Style = PopupBanner.PopupStyle.Warning
+        };
+        warn.Show();
     }
 
     public enum PopupStyle

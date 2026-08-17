@@ -35,7 +35,7 @@ public class FbxExporter : AbstractExporter
                     break;
             }
 
-            if (scene.Type == ExportType.API || scene.Type == ExportType.D1API)
+            if (scene.Type is ExportType.Weapon)
             {
                 if (args.AggregateOutput)
                     outputDirectory = args.OutputDirectory;
@@ -61,21 +61,14 @@ public class FbxExporter : AbstractExporter
                 && scene.DataType == DataExportType.Individual
                 && args.AggregateOutput ? args.OutputDirectory : outputDirectory;
 
-                // Not point in overwritting map static fbx, saves a lot of time on re-exports
-                // maybe add this as a config option?
-                // nvm, somehow breaks things
-                //if (scene.DataType == DataExportType.Map && File.Exists(Path.Join(savePath, mesh.Hash) + ".fbx"))
-                //    return;
+                if (scene.Type == ExportType.Statics
+                    && scene.DataType == DataExportType.Map
+                    && File.Exists(Path.Join(savePath, mesh.Hash) + ".fbx"))
+                    continue;
 
                 FbxScene fbxIndivScene = FbxScene.Create(_manager, mesh.Hash);
                 AddMesh(fbxIndivScene, mesh);
                 ExportScene(fbxIndivScene, Path.Join(savePath, mesh.Hash));
-
-                if (_config.GetS2VMDLExportEnabled() && scene.Type != ExportType.Terrain)
-                {
-                    string fbxPath = scene.DataType == DataExportType.Map ? modelSubDirectory : "Models";
-                    Source2Handler.SaveStaticVMDL(savePath, fbxPath, mesh);
-                }
             }
 
             foreach (ExporterEntity entity in scene.Entities)
@@ -83,15 +76,14 @@ public class FbxExporter : AbstractExporter
                 if (entity.Mesh.Parts.Count == 0)
                     continue;
 
+                // this is dumb
+                string savePath = scene.Type == ExportType.Entities
+                && scene.DataType == DataExportType.Individual
+                && args.AggregateOutput ? args.OutputDirectory : outputDirectory;
+
                 FbxScene fbxIndivScene = FbxScene.Create(_manager, entity.Mesh.Hash);
                 AddEntity(fbxIndivScene, entity);
-                ExportScene(fbxIndivScene, Path.Join(outputDirectory, entity.Mesh.Hash));
-
-                if (_config.GetS2VMDLExportEnabled() && scene.Type != ExportType.Terrain)
-                {
-                    string fbxPath = scene.DataType == DataExportType.Map ? modelSubDirectory : "Models";
-                    Source2Handler.SaveEntityVMDL(outputDirectory, fbxPath, entity);
-                }
+                ExportScene(fbxIndivScene, Path.Join(savePath, entity.Mesh.Hash));
             }
 
             foreach (ExporterMesh mesh in scene.TerrainMeshes)
@@ -108,7 +100,7 @@ public class FbxExporter : AbstractExporter
             //{
             //    AddInstancedMesh(fbxScene, scene.StaticMeshes.First(s => s.Hash == meshInstance.Key).Parts, meshInstance.Value);
             //}
-            foreach (var p in scene.EntityPoints)
+            foreach (SMapDataEntry p in scene.EntityPoints)
             {
                 AddDynamicPoint(fbxScene, p);
             }
@@ -122,11 +114,11 @@ public class FbxExporter : AbstractExporter
         if (!Exporter.Get().GetOrCreateGlobalScene().TryGetItem<SStaticAOResource>(out SStaticAOResource mapAOHash))
             return;
 
-        var mapAO = FileResourcer.Get().GetSchemaTag<SStaticAmbientOcclusion>(mapAOHash.MapAO);
-        var offset = mapAO.TagData.AO_1.Value.Mappings.First(x => x.Identifier == identifier).Offset;
+        Tag<SStaticAmbientOcclusion> mapAO = FileResourcer.Get().GetSchemaTag<SStaticAmbientOcclusion>(mapAOHash.MapAO);
+        uint offset = mapAO.TagData.AO_1.Value.Mappings.First(x => x.Identifier == identifier).Offset;
         using TigerReader handle = mapAO.TagData.AO_1.Value.Buffer.GetReferenceReader();
 
-        foreach (var part in mesh.Parts.Select(x => x.MeshPart))
+        foreach (MeshPart? part in mesh.Parts.Select(x => x.MeshPart))
         {
             for (int i = 0; i < part.VertexIndices.Count; i++)
             {
@@ -215,7 +207,7 @@ public class FbxExporter : AbstractExporter
         FbxNode rootNode = null;
         List<FbxNode> skeletonNodes = new();
         List<BoneNode> nodes = new();
-        foreach (var boneNode in boneNodes)
+        foreach (BoneNode boneNode in boneNodes)
         {
             BoneNode newNode = boneNode;
             FbxSkeleton skeleton = FbxSkeleton.Create(_manager, boneNode.Hash.ToString());
@@ -231,7 +223,7 @@ public class FbxExporter : AbstractExporter
             nodes.Add(newNode);
         }
 
-        foreach (var node in nodes)
+        foreach (BoneNode node in nodes)
         {
             if (node.ParentNodeIndex != -1)
                 nodes[node.ParentNodeIndex].Node.AddChild(node.Node);
@@ -258,7 +250,7 @@ public class FbxExporter : AbstractExporter
         HashSet<int> seen = new();
 
         List<FbxCluster> weightClusters = new();
-        foreach (var node in skeletonNodes)
+        foreach (FbxNode node in skeletonNodes)
         {
             FbxCluster weightCluster = FbxCluster.Create(_manager, node.GetName());
             weightCluster.SetLink(node);
@@ -290,7 +282,7 @@ public class FbxExporter : AbstractExporter
             }
         }
 
-        foreach (var c in weightClusters)
+        foreach (FbxCluster c in weightClusters)
         {
             skin.AddCluster(c);
         }
@@ -356,10 +348,10 @@ public class FbxExporter : AbstractExporter
         foreach (uint vertexIndex in part.MeshPart.VertexIndices)
         {
             // todo utilise dictionary to make this control point thing better maybe?
-            var pos = part.MeshPart.VertexPositions[lookup[vertexIndex]];
+            Vector4 pos = part.MeshPart.VertexPositions[lookup[vertexIndex]];
             mesh.SetControlPointAt(new FbxVector4(pos.X, pos.Y, pos.Z, 1), lookup[vertexIndex]);
         }
-        foreach (var face in part.MeshPart.Indices)
+        foreach (UIntVector3 face in part.MeshPart.Indices)
         {
             mesh.BeginPolygon();
             mesh.AddPolygon(lookup[face.X]);
@@ -385,7 +377,7 @@ public static class FbxMeshExtensions
         FbxLayerElementUV uvLayer = FbxLayerElementUV.Create(fbxMesh, "uv0");
         uvLayer.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
         uvLayer.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
-        foreach (var tx in part.MeshPart.VertexTexcoords0)
+        foreach (Vector2 tx in part.MeshPart.VertexTexcoords0)
         {
             uvLayer.GetDirectArray().Add(new FbxVector2(tx.X, tx.Y));
         }
@@ -402,7 +394,7 @@ public static class FbxMeshExtensions
         FbxLayerElementUV uvLayer = FbxLayerElementUV.Create(fbxMesh, "uv1");
         uvLayer.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
         uvLayer.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
-        foreach (var tx in part.MeshPart.VertexTexcoords1)
+        foreach (Vector2 tx in part.MeshPart.VertexTexcoords1)
         {
             uvLayer.GetDirectArray().Add(new FbxVector2(tx.X, tx.Y));
         }
@@ -425,11 +417,12 @@ public static class FbxMeshExtensions
         FbxLayerElementNormal normalsLayer = FbxLayerElementNormal.Create(fbxMesh, "normalLayerName");
         normalsLayer.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
         normalsLayer.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
-        foreach (var normal in part.MeshPart.VertexNormals)
+        foreach (Vector4 normal in part.MeshPart.VertexNormals)
         {
             FbxVector4 vec4;
             Vector3 euler = part.MeshPart is DynamicMeshPart ? new Vector3(normal.X, normal.Y, normal.Z) : Vector4.ConsiderQuatToEulerConvert(normal);
             vec4 = new FbxVector4(euler.X, euler.Y, euler.Z);
+
             normalsLayer.GetDirectArray().Add(vec4);
         }
         fbxMesh.GetLayer(0).SetNormals(normalsLayer);
@@ -446,10 +439,9 @@ public static class FbxMeshExtensions
         tangentsLayer.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
         tangentsLayer.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
         // todo more efficient to do AddMultiple
-        foreach (var tangent in part.MeshPart.VertexTangents)
+        foreach (Vector4 tangent in part.MeshPart.VertexTangents)
         {
             FbxVector4 vec4;
-
             Vector3 euler = Vector4.QuaternionToEulerAngles(tangent);
             vec4 = new FbxVector4(euler.X, euler.Y, euler.Z);
 
@@ -468,7 +460,7 @@ public static class FbxMeshExtensions
         FbxLayerElementVertexColor colLayer = FbxLayerElementVertexColor.Create(fbxMesh, "colourLayerName");
         colLayer.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
         colLayer.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
-        foreach (var colour in part.MeshPart.VertexColours)
+        foreach (Vector4 colour in part.MeshPart.VertexColours)
         {
             colLayer.GetDirectArray().Add(new FbxColor(colour.X, colour.Y, colour.Z, colour.W));
         }
@@ -482,12 +474,12 @@ public static class FbxMeshExtensions
             return;
         }
 
-        foreach (var entry in part.MeshPart.VertexExtraData)
+        foreach (KeyValuePair<int, List<Vector4>> entry in part.MeshPart.VertexExtraData)
         {
             FbxLayerElementVertexColor dataLayer = FbxLayerElementVertexColor.Create(fbxMesh, $"data{entry.Key}");
             dataLayer.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
             dataLayer.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
-            foreach (var data in entry.Value)
+            foreach (Vector4 data in entry.Value)
             {
                 dataLayer.GetDirectArray().Add(new FbxColor(data.X, data.Y, data.Z, data.W));
             }
@@ -520,7 +512,7 @@ public static class FbxMeshExtensions
         }
         else
         {
-            foreach (var colour in meshPart.VertexColourSlots)
+            foreach (Vector4 colour in meshPart.VertexColourSlots)
             {
                 colLayer.GetDirectArray().Add(new FbxColor(colour.X, colour.Y, colour.Z, colour.W));
             }
@@ -542,7 +534,7 @@ public static class FbxMeshExtensions
         FbxLayerElementVertexColor colLayer = FbxLayerElementVertexColor.Create(fbxMesh, "VertexAO");
         colLayer.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
         colLayer.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
-        foreach (var colour in part.MeshPart.VertexAO)
+        foreach (Vector4 colour in part.MeshPart.VertexAO)
         {
             colLayer.GetDirectArray().Add(new FbxColor(colour.X, colour.Y, colour.Z, colour.W));
         }

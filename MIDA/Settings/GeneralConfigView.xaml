@@ -9,22 +9,41 @@
     d:DesignWidth="1914"
     Loaded="OnControlLoaded"
     mc:Ignorable="d">
-    <Grid Margin="100,50,100,50" Background="Transparent">
-        <StackPanel Margin="0" Orientation="Vertical">
+    <Grid Background="Transparent">
+        <ScrollViewer
+            Margin="50,75,50,75"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <ScrollViewer.Resources>
+                <Style BasedOn="{StaticResource VerticalScrollBarStyle}" TargetType="ScrollBar">
+                    <Setter Property="Width" Value="7" />
+                </Style>
+            </ScrollViewer.Resources>
 
-            <ContentControl Content="GENERAL" Template="{StaticResource MarathonCategoryLabel}" />
-            <StackPanel
-                x:Name="GeneralConfigPanel"
-                Margin="10,0,0,0"
-                Orientation="Vertical" />
+            <StackPanel Margin="50,0,50,0" Orientation="Vertical">
 
-            <Border Margin="20" />
+                <ContentControl Content="GENERAL" Template="{StaticResource MarathonCategoryLabelNoPlus}" />
+                <StackPanel
+                    x:Name="GeneralConfigPanel"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical" />
+                <Border Margin="20" />
 
-            <ContentControl Content="MISC" Template="{StaticResource MarathonCategoryLabel}" />
-            <StackPanel
-                x:Name="MiscConfigPanel"
-                Margin="10,0,0,0"
-                Orientation="Vertical" />
-        </StackPanel>
+                <ContentControl Content="MATERIALS" Template="{StaticResource MarathonCategoryLabelNoPlus}" />
+                <StackPanel
+                    x:Name="MaterialsConfigPanel"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical" />
+                <Border Margin="20" />
+
+                <ContentControl Content="MISC" Template="{StaticResource MarathonCategoryLabelNoPlus}" />
+                <StackPanel
+                    x:Name="MiscConfigPanel"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical" />
+                <Border Margin="20" />
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

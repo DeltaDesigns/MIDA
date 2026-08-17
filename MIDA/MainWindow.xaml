@@ -13,77 +13,137 @@
     PreviewKeyDown="MainWindow_PreviewKeyDown"
     WindowState="Maximized"
     mc:Ignorable="d">
-    <Grid x:Name="MainContainer" Style="{StaticResource GradientBackground}">
-        <Grid.Triggers>
-            <EventTrigger RoutedEvent="Grid.Loaded">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation
-                            Storyboard.TargetProperty="Opacity"
-                            From="0"
-                            To="1"
-                            Duration="0:0:0.25" />
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Grid.Triggers>
+    <Grid x:Name="MainGrid" Background="{StaticResource MarathonDarker}">
+
+        <!--  This probably sucks but it scales so...  -->
+        <Viewbox Panel.ZIndex="1">
+            <Grid
+                x:Name="ViewboxGrid"
+                Width="1920"
+                Height="1017"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <local:Tooltip2 x:Name="ToolTip" Panel.ZIndex="100" />
+
+                <!--  Shared overlay for floating UI  -->
+                <Canvas
+                    x:Name="OverlayRoot"
+                    Panel.ZIndex="90"
+                    IsHitTestVisible="False">
+                    <Canvas.RenderTransform>
+                        <TranslateTransform />
+                    </Canvas.RenderTransform>
+                </Canvas>
+
+                <StackPanel
+                    Margin="0,5,10,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Panel.ZIndex="1"
+                    Orientation="Horizontal">
+                    <Button
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Foreground="Transparent"
+                        Style="{x:Null}"
+                        Visibility="Collapsed">
+                        <local:GenericTooltipProperties.TooltipData>
+                            <local:GenericTooltip
+                                Name="BETA VERSION"
+                                Description="This is a beta version of MIDA.&#x0a;It is not feature complete and you may encounter bugs and/or crashes."
+                                Style="Category" />
+                        </local:GenericTooltipProperties.TooltipData>
+                        <TextBlock
+                            Margin="15,0,15,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            d:FontFamily="KH Interference Light"
+                            FontFamily="{DynamicResource KH Interference Light}"
+                            FontSize="14"
+                            Foreground="#FF3131"
+                            Text="BETA VERSION!"
+                            Visibility="Visible" />
+                    </Button>
+
+                    <Image
+                        x:Name="MIDAIcon"
+                        Width="20"
+                        Height="20"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center" />
+
+                    <TextBlock
+                        x:Name="CurrentStrategyText"
+                        VerticalAlignment="Center"
+                        FontFamily="{DynamicResource KH Interference Light}"
+                        FontSize="14"
+                        Text="NO GAME SELECTED" />
+
+                </StackPanel>
+
+                <TabControl
+                    x:Name="MainTabControl"
+                    Background="Transparent"
+                    FontFamily="{StaticResource MaterialDesignFont}"
+                    SelectionChanged="MainTabControl_SelectionChanged">
+                    <TabControl.Template>
+                        <ControlTemplate TargetType="TabControl">
+                            <Grid>
+                                <DockPanel>
+                                    <!--  Customized TabPanel  -->
+                                    <TabPanel
+                                        x:Name="HeaderPanel"
+                                        Margin="0,0,0,0"
+                                        Panel.ZIndex="1"
+                                        Background="#141416"
+                                        DockPanel.Dock="Top"
+                                        IsItemsHost="True" />
+
+                                    <!--  Content Presenter  -->
+                                    <ContentPresenter
+                                        x:Name="PART_SelectedContentHost"
+                                        Margin="0"
+                                        ContentSource="SelectedContent" />
+                                </DockPanel>
+                            </Grid>
+                        </ControlTemplate>
+                    </TabControl.Template>
+
+                    <TabItem
+                        x:Name="SettingsTab"
+                        HorizontalAlignment="Left"
+                        Header="SETTINGS">
+                        <local:ConfigView />
+                    </TabItem>
+                    <TabItem
+                        x:Name="Log"
+                        HorizontalAlignment="Left"
+                        Header="LOG"
+                        Visibility="Collapsed">
+                        <local:LogView />
+                    </TabItem>
+                    <TabItem
+                        x:Name="MainMenuTab"
+                        HorizontalAlignment="Left"
+                        Header="MAIN MENU"
+                        IsSelected="True">
+                        <local:MainMenuView />
+                    </TabItem>
+                </TabControl>
+
+                <local:ProgressView
+                    x:Name="ProgressView"
+                    Grid.Row="0"
+                    Grid.RowSpan="2" />
+            </Grid>
+        </Viewbox>
 
         <Grid
             x:Name="SpinnerContainer"
             Grid.RowSpan="2"
             Panel.ZIndex="0"
-            Background="#131316"
+            Background="Transparent"
             Opacity="1"
             Visibility="Visible" />
-
-        <StackPanel
-            Margin="0,5,10,0"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            Panel.ZIndex="1"
-            Orientation="Horizontal">
-            <Image
-                x:Name="MIDAIcon"
-                Width="20"
-                Height="20"
-                Margin="0,0,5,0"
-                VerticalAlignment="Center" />
-            <TextBlock
-                x:Name="CurrentStrategyText"
-                VerticalAlignment="Center"
-                FontFamily="{StaticResource MaterialDesignFont}"
-                FontSize="16"
-                Text="NO GAME SELECTED" />
-        </StackPanel>
-
-        <TabControl
-            x:Name="MainTabControl"
-            Background="Transparent"
-            FontFamily="{StaticResource MaterialDesignFont}">
-            <TabItem
-                x:Name="SettingsTab"
-                HorizontalAlignment="Left"
-                Header="SETTINGS">
-                <local:ConfigView />
-            </TabItem>
-            <TabItem
-                x:Name="Log"
-                HorizontalAlignment="Left"
-                Header="LOG">
-                <local:LogView />
-            </TabItem>
-            <TabItem
-                x:Name="MainMenuTab"
-                HorizontalAlignment="Left"
-                Header="MAIN MENU"
-                IsSelected="True">
-                <local:MainMenuView />
-            </TabItem>
-        </TabControl>
-
-        <local:ProgressView
-            x:Name="ProgressView"
-            Grid.Row="0"
-            Grid.RowSpan="2" />
     </Grid>
 </Window>

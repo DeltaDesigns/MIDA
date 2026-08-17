@@ -1,8 +1,26 @@
 ﻿using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Tiger.Schema;
+
+public struct VertexWeight
+{
+    public IntVector4 WeightValues;
+    public IntVector4 WeightIndices;
+}
+
+public struct Transform
+{
+    public Transform() { }
+
+    public Vector3 Position { get; set; } = Vector3.Zero;
+    public Vector3 Rotation { get; set; }
+    public Vector4 Quaternion { get; set; } = Vector4.Quaternion;
+    public Vector3 Scale { get; set; } = Vector3.One;
+    public float Order { get; set; }
+}
 
 /// <summary>
 /// A Map Transfrom
@@ -167,7 +185,7 @@ public struct Vector3
     {
         get
         {
-            Vector3 vec3 = new Vector3();
+            Vector3 vec3 = new();
             vec3.X = 0;
             vec3.Y = 0;
             vec3.Z = 0;
@@ -179,7 +197,7 @@ public struct Vector3
     {
         get
         {
-            Vector3 vec3 = new Vector3();
+            Vector3 vec3 = new();
             vec3.X = 1;
             vec3.Y = 1;
             vec3.Z = 1;
@@ -187,9 +205,19 @@ public struct Vector3
         }
     }
 
+    public static Vector3 operator +(Vector3 x, Vector3 y)
+    {
+        return new Vector3(x.X + y.X, x.Y + y.Y, x.Z + y.Z);
+    }
+
     public static Vector3 operator -(Vector3 x, Vector3 y)
     {
         return new Vector3(x.X - y.X, x.Y - y.Y, x.Z - y.Z);
+    }
+
+    public static Vector3 operator *(Vector3 x, Vector3 y)
+    {
+        return new Vector3(x.X * y.X, x.Y * y.Y, x.Z * y.Z);
     }
 
     public static Vector3 operator *(Vector3 x, float y)
@@ -209,6 +237,11 @@ public struct Vector3
         return x.X != y.X &&
         x.Y != y.Y &&
         x.Z != y.Z;
+    }
+
+    public static Vector3 Transform(Vector4 value, Vector4 rotation)
+    {
+        return Transform(value.ToVec3(), rotation);
     }
 
     public static Vector3 Transform(Vector3 value, Vector4 rotation)
@@ -242,12 +275,27 @@ public struct Vector3
         if (float.IsInfinity(value) || float.IsNaN(value))
             return value.ToString(); // This will return "Infinity", "-Infinity", or "NaN"
 
-        return Decimal.Parse(value.ToString(), NumberStyles.Float).ToString();
+        return Decimal.Parse(value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture).ToString();
     }
 
     public System.Numerics.Vector3 ToSys()
     {
         return new System.Numerics.Vector3(X, Y, Z);
+    }
+
+    public float[] ToFloatArray()
+    {
+        return new float[3] { X, Y, Z };
+    }
+
+    public static implicit operator System.Numerics.Vector3(Vector3 m)
+    {
+        return Unsafe.As<Vector3, System.Numerics.Vector3>(ref m);
+    }
+
+    public static implicit operator Vector3(System.Numerics.Vector3 m)
+    {
+        return Unsafe.As<System.Numerics.Vector3, Vector3>(ref m);
     }
 }
 
@@ -327,6 +375,7 @@ public struct Vector4
         W = 0;
     }
 
+
     public Vector4(int x, int y, int z, int w, bool bIsVector3 = false)
     {
         if (bIsVector3)
@@ -392,11 +441,43 @@ public struct Vector4
         }
     }
 
+    public Vector4(Vector3 vec3)
+    {
+        X = vec3.X;
+        Y = vec3.Y;
+        Z = vec3.Z;
+        W = 1;
+    }
+
+    public Vector4(Vector3 vec3, float w)
+    {
+        X = vec3.X;
+        Y = vec3.Y;
+        Z = vec3.Z;
+        W = w;
+    }
+
+    public Vector4(Quaternion quat)
+    {
+        X = quat.X;
+        Y = quat.Y;
+        Z = quat.Z;
+        W = quat.W;
+    }
+
+    public Vector4(Vector2 xy, Vector2 zw)
+    {
+        X = xy.X;
+        Y = xy.Y;
+        Z = zw.X;
+        W = zw.Y;
+    }
+
     public static Vector4 Zero
     {
         get
         {
-            Vector4 vec4 = new Vector4();
+            Vector4 vec4 = new();
             vec4.X = 0;
             vec4.Y = 0;
             vec4.Z = 0;
@@ -409,7 +490,7 @@ public struct Vector4
     {
         get
         {
-            Vector4 vec4 = new Vector4();
+            Vector4 vec4 = new();
             vec4.X = 1.0f;
             vec4.Y = 1.0f;
             vec4.Z = 1.0f;
@@ -432,7 +513,7 @@ public struct Vector4
     {
         get
         {
-            Vector4 vec4 = new Vector4();
+            Vector4 vec4 = new();
             vec4.X = 0;
             vec4.Y = 0;
             vec4.Z = 0;
@@ -454,28 +535,43 @@ public struct Vector4
         return new Vector3(X, Y, Z);
     }
 
+    public float[] ToFloatArray()
+    {
+        return new float[4] { X, Y, Z, W };
+    }
+
     public System.Numerics.Vector4 ToSys()
     {
         return new System.Numerics.Vector4(X, Y, Z, W);
+    }
+
+    public static implicit operator System.Numerics.Vector4(Vector4 m)
+    {
+        return Unsafe.As<Vector4, System.Numerics.Vector4>(ref m);
+    }
+
+    public static implicit operator Vector4(System.Numerics.Vector4 m)
+    {
+        return Unsafe.As<System.Numerics.Vector4, Vector4>(ref m);
+    }
+
+    public System.Numerics.Quaternion ToQuat()
+    {
+        return new System.Numerics.Quaternion(X, Y, Z, W);
     }
 
     public float this[int index]
     {
         get
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return X;
-                case 1:
-                    return Y;
-                case 2:
-                    return Z;
-                case 3:
-                    return W;
-            }
-
-            throw new IndexOutOfRangeException();
+                0 => X,
+                1 => Y,
+                2 => Z,
+                3 => W,
+                _ => throw new IndexOutOfRangeException(),
+            };
         }
         set
         {
@@ -581,6 +677,18 @@ public struct Vector4
         );
     }
 
+    public static Vector4 QuaternionMultiply(Vector4 q1, Vector4 q2)
+    {
+        Vector4 ret = new()
+        {
+            X = q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y + q1.W * q2.X,
+            Y = -q1.X * q2.Z + q1.Y * q2.W + q1.Z * q2.X + q1.W * q2.Y,
+            Z = q1.X * q2.Y - q1.Y * q2.X + q1.Z * q2.W + q1.W * q2.Z,
+            W = -q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z + q1.W * q2.W
+        };
+        return ret;
+    }
+
     /// euler degrees
     /// From https://github.com/OwlGamingCommunity/V/blob/492d0cb3e89a97112ac39bf88de39da57a3a1fbf/Source/owl_core/Server/MapLoader.cs
     public static Vector3 QuaternionToEulerAngles(Vector4 q)
@@ -625,7 +733,7 @@ public struct Vector4
     /// euler in radians
     public static Vector3 ConsiderQuatToEulerConvert(Vector4 v4N)
     {
-        Vector3 res = new Vector3();
+        Vector3 res = new();
         if (Math.Abs(v4N.Magnitude - 1) < 0.01)  // Quaternion
         {
             var quat = new SharpDX.Quaternion(v4N.X, v4N.Y, v4N.Z, v4N.W);
@@ -644,18 +752,6 @@ public struct Vector4
         return res;
     }
 
-    public static Vector4 QuaternionMultiply(Vector4 q1, Vector4 q2)
-    {
-        Vector4 ret = new()
-        {
-            X = q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y + q1.W * q2.X,
-            Y = -q1.X * q2.Z + q1.Y * q2.W + q1.Z * q2.X + q1.W * q2.Y,
-            Z = q1.X * q2.Y - q1.Y * q2.X + q1.Z * q2.W + q1.W * q2.Z,
-            W = -q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z + q1.W * q2.W
-        };
-        return ret;
-    }
-
     public override string ToString() =>
     $"({FormatFloat(X)}, {FormatFloat(Y)}, {FormatFloat(Z)}, {FormatFloat(W)})";
 
@@ -670,6 +766,11 @@ public struct Vector4
     public bool IsZero()
     {
         return X == 0 && Y == 0 && Z == 0 && W == 0;
+    }
+
+    public float Length()
+    {
+        return MathF.Sqrt(X * X + Y * Y + Z * Z + W * W);
     }
 }
 
@@ -692,19 +793,14 @@ public struct IntVector4
     {
         get
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return X;
-                case 1:
-                    return Y;
-                case 2:
-                    return Z;
-                case 3:
-                    return W;
-            }
-
-            throw new IndexOutOfRangeException();
+                0 => X,
+                1 => Y,
+                2 => Z,
+                3 => W,
+                _ => throw new IndexOutOfRangeException(),
+            };
         }
         set
         {

@@ -26,8 +26,7 @@ public partial class NotificationBanner : UserControl
 
     public void Show()
     {
-        var rootPanel = Application.Current.MainWindow?.Content as Panel;
-        rootPanel.Children.Add(this);
+        MainWindow.Current.ViewboxGrid.Children.Add(this);
     }
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -35,10 +34,10 @@ public partial class NotificationBanner : UserControl
         switch (Style)
         {
             case PopupStyle.Warning:
-                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x96, 0x30, 0x30));
+                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 213, 16, 34));
                 break;
             case PopupStyle.Information:
-                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x2F, 0x7F, 0x96));
+                ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 39, 16, 253));
                 break;
             case PopupStyle.Generic:
                 ExpanderColor = new SolidColorBrush(Color.FromArgb(0xFF, 0x96, 0x96, 0x96));

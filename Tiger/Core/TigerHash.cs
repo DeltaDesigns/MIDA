@@ -17,6 +17,11 @@ public class StringHash : TigerHash
 {
     public const uint InvalidHash32 = 0x811c9dc5;
 
+    public StringHash(TigerHash hash) : base(hash.Hash32)
+    {
+        Hash32 = hash.Hash32;
+    }
+
     public StringHash(uint hash32) : base(hash32)
     {
         Hash32 = hash32;
@@ -35,6 +40,11 @@ public class StringHash : TigerHash
     public override bool IsValid()
     {
         return Hash32 != InvalidHash32 && Hash32 != 0;
+    }
+
+    public string GetString()
+    {
+        return GlobalStrings.Get().GetString(new(Hash32));
     }
 }
 
@@ -63,13 +73,8 @@ public class TigerHash : IHash, ITigerDeserialize, IComparable<TigerHash>, IEqua
     public TigerHash(string hash, bool bBigEndianString = true)
     {
         bool parsed = uint.TryParse(hash, NumberStyles.HexNumber, null, out Hash32);
-        if (parsed)
-        {
-            if (hash.EndsWith("80") || hash.EndsWith("81") || bBigEndianString)
-            {
-                Hash32 = Endian.SwapU32(Hash32);
-            }
-        }
+        if (!parsed)
+            throw new ArgumentException($"Invalid Hash String: {hash}");
     }
 
     public int CompareTo(TigerHash? other)
@@ -102,9 +107,23 @@ public class TigerHash : IHash, ITigerDeserialize, IComparable<TigerHash>, IEqua
         return !IsValid();
     }
 
+    /// <summary>
+    /// Returns the hash as a hexadecimal string.
+    /// </summary>
     public override string ToString()
     {
-        return Endian.U32ToString(Hash32);
+        return Hash32.ToString("X2");
+        //return Endian.U32ToString(Hash32);
+    }
+
+    /// <summary>
+    /// Returns the hash as a reversed hexadecimal string.
+    /// Example: ABCD12380
+    /// </summary>
+    public string Reverse()
+    {
+        return Endian.SwapU32(Hash32).ToString("X8");
+        //return Endian.U32ToString(Hash32);
     }
 
     public static implicit operator string(TigerHash hash) => hash.ToString();
@@ -233,6 +252,11 @@ public static class FileHashExtensions
     public static byte[] GetFileData(this FileHash fileHash)
     {
         return PackageResourcer.Get().GetFileData(fileHash);
+    }
+
+    public static bool CheckRedacted(this FileHash fileHash)
+    {
+        return PackageResourcer.Get().CheckRedacted(fileHash);
     }
 
     public static bool ContainsHash(this FileHash fileHash, uint searchValue)

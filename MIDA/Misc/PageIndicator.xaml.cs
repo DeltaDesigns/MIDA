@@ -1,0 +1,163 @@
+﻿using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+
+namespace MIDA;
+
+public partial class PageIndicator : UserControl, INotifyPropertyChanged
+{
+    private ObservableCollection<PageIndicatorDot> _indicators = new();
+    public ObservableCollection<PageIndicatorDot> Indicators
+    {
+        get => _indicators;
+        set
+        {
+            _indicators = value;
+            OnPropertyChanged(nameof(Indicators));
+        }
+    }
+
+    private bool _shrinkInactive = true;
+    public bool ShrinkInactive
+    {
+        get => _shrinkInactive;
+        set
+        {
+            if (_shrinkInactive != value)
+            {
+                _shrinkInactive = value;
+                OnPropertyChanged(nameof(ShrinkInactive));
+            }
+        }
+    }
+
+    public int CurrentPage
+    {
+        get => (int)GetValue(CurrentPageProperty);
+        set
+        {
+            SetValue(CurrentPageProperty, value);
+            UpdateIndicators();
+        }
+    }
+
+    public static readonly DependencyProperty CurrentPageProperty =
+        DependencyProperty.Register(nameof(CurrentPage), typeof(int), typeof(PageIndicator), new PropertyMetadata(0, OnCurrentPageChanged));
+
+    private static void OnCurrentPageChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var control = (PageIndicator)d;
+        control.UpdateIndicators();
+    }
+
+    public int TotalPages
+    {
+        get => (int)GetValue(TotalPagesProperty);
+        set
+        {
+            SetValue(TotalPagesProperty, value);
+            UpdateIndicators();
+        }
+    }
+
+    public static readonly DependencyProperty TotalPagesProperty =
+        DependencyProperty.Register(nameof(TotalPages), typeof(int), typeof(PageIndicator), new PropertyMetadata(1, OnTotalPagesChanged));
+
+    private static void OnTotalPagesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var control = (PageIndicator)d;
+        control.UpdateIndicators();
+    }
+
+    public double HostWidth
+    {
+        get => (double)GetValue(HostWidthProperty);
+        set => SetValue(HostWidthProperty, value);
+    }
+
+    public static readonly DependencyProperty HostWidthProperty =
+        DependencyProperty.Register(nameof(HostWidth), typeof(double), typeof(PageIndicator));
+
+    private bool _displayAsNumbers = false;
+    public bool DisplayAsNumbers
+    {
+        get => _displayAsNumbers;
+        set
+        {
+            if (_displayAsNumbers != value)
+            {
+                _displayAsNumbers = value;
+                OnPropertyChanged(nameof(DisplayAsNumbers));
+            }
+        }
+    }
+
+    private bool _isVertical = false;
+    public bool IsVertical
+    {
+        get => _isVertical;
+        set
+        {
+            if (!DisplayAsNumbers)
+                _isVertical = false;
+
+            if (_isVertical != value)
+            {
+                _isVertical = value;
+                OnPropertyChanged(nameof(IsVertical));
+            }
+        }
+    }
+
+    public PageIndicator()
+    {
+        InitializeComponent();
+        UpdateIndicators();
+    }
+
+    private void UpdateIndicators()
+    {
+        ShrinkInactive = TotalPages > 7;
+
+        Indicators.Clear();
+        for (int i = 0; i < TotalPages; i++)
+        {
+            Indicators.Add(new PageIndicatorDot { IsCurrent = i == CurrentPage });
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    private void OnPropertyChanged(string name)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+    private void StackPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        DisplayAsNumbers = ActualWidth >= HostWidth;
+    }
+}
+
+public class PageIndicatorDot
+{
+    public bool IsCurrent { get; set; }
+}
+
+public class BoolToColorConverter : IValueConverter
+{
+    public Color ActiveColor { get; set; } = Colors.White;
+    public Color InactiveColor { get; set; } = Colors.Gray;
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return (bool)value ? ActiveColor : InactiveColor;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}

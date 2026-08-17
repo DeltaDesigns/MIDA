@@ -16,7 +16,7 @@
         </Grid.ColumnDefinitions>
         <Border
             Grid.ColumnSpan="3"
-            Background="#B140454F"
+            Background="#B12F3239"
             CornerRadius="10" />
         <StackPanel
             Grid.Column="0"
@@ -27,7 +27,7 @@
                 Margin="0,3,0,3"
                 VerticalAlignment="Center"
                 FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                FontSize="24"
+                FontSize="22"
                 Foreground="{StaticResource ForegroundColour90}"
                 Text="{Binding SettingName}"
                 TextWrapping="Wrap" />
@@ -36,7 +36,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                FontSize="18"
+                FontSize="16"
                 Foreground="{StaticResource ForegroundColour50}"
                 Text="{Binding SettingLabel}"
                 TextWrapping="Wrap">
@@ -56,8 +56,8 @@
         <Button
             Grid.Column="2"
             Margin="0"
-            local:StyleHelper.ButtonCornerRadius="0,10,10,0"
-            Style="{DynamicResource D2StyleButton}">
+            local:StyleHelper.CornerRadius="0,10,10,0"
+            Style="{DynamicResource MarathonStyleButton}">
             <ComboBox
                 x:Name="SettingsCombobox"
                 BorderBrush="Transparent"
@@ -71,7 +71,7 @@
             x:Name="ChangeButton"
             Grid.Column="2"
             Margin="0"
-            Style="{DynamicResource D2StyleButton}">
+            Style="{DynamicResource MarathonStyleButton}">
             <TextBlock
                 d:FontFamily="Haas Grot Text 55 Roman"
                 FontFamily="{DynamicResource PP Fraktion Mono Medium}"

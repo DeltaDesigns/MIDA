@@ -1,4 +1,5 @@
-﻿using Tiger.Exporters;
+﻿using Arithmic;
+using Tiger.Exporters;
 using Tiger.Schema.Model;
 using Tiger.Schema.Shaders;
 
@@ -13,6 +14,7 @@ public class Decals : Tag<SMapDecals>
 
     public void LoadIntoExporter(ExporterScene scene)
     {
+        Log.Debug($"Loading Decals {Hash} into Exporter.");
         Exporter.Get().GetGlobalScene().AddToGlobalScene(this);
 
         foreach (var instance in _tag.DecalResources.Enumerate(GetReader()))
@@ -130,24 +132,24 @@ public class Decals : Tag<SMapDecals>
 /// </summary>
 /// Map Decals Resource
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "1E828080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON, "1E828080", 0x18)]
 public struct SMapDecalsResource
 {
-    [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
+    [SchemaField(0x10, TigerStrategy.MARATHON), NoLoad]
     public Decals MapDecals;
 }
 
 /// <summary>
 /// Map Decals
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808224", 0x78)]
+[SchemaStruct(TigerStrategy.MARATHON, 0x80808224, 0x78)]
 public struct SMapDecals
 {
     public ulong FileSize;
-    public DynamicArrayUnloaded<S2C828080> DecalResources;
+    public DynamicArrayUnloaded<S8080822C> DecalResources;
 
     [SchemaField(0x18)]
-    public DynamicArrayUnloaded<S2D828080> UnkLocations;
+    public DynamicArrayUnloaded<S8080822D> UnkLocations;
 
     [SchemaField(0x28)]
     public VertexBuffer Transforms;
@@ -165,19 +167,20 @@ public struct SMapDecals
 /// <summary>
 /// Decal resources
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "2C828080", 0x8)]
-public struct S2C828080
+[SchemaStruct(TigerStrategy.MARATHON, 0x8080822C, 0xC)] // 2C828080
+public struct S8080822C
 {
     public Material Material;
     public short StartIndex;
-    public short Count; //Number of entries to read
+    public short Count; // Number of entries to read
+    public int Unk08;
 }
 
 /// <summary>
 /// Decal Location
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "2D828080", 0x10)]
-public struct S2D828080
+[SchemaStruct(TigerStrategy.MARATHON, 0x8080822D, 0x10)] // 2D828080
+public struct S8080822D
 {
     public Vector4 Location;
 }

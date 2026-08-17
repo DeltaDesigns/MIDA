@@ -16,7 +16,7 @@ public class PackageResourcer : Strategy.StrategistSingleton<PackageResourcer>
     private PackagePathsCache? _packagePathsCache;
     private Dictionary<uint, string> _activityNames = new();
     private Dictionary<FileHash, TagClassHash> _d1NamedTags = new();
-    private Dictionary<ulong, Dictionary<byte[], byte[]>> _keys = new();
+    private Dictionary<ulong, (byte[] AES, byte[] Nonce)> _keys = new();
 
     public PackagePathsCache PackagePathsCache
     {
@@ -30,7 +30,7 @@ public class PackageResourcer : Strategy.StrategistSingleton<PackageResourcer>
         }
     }
 
-    public Dictionary<ulong, Dictionary<byte[], byte[]>> Keys
+    public Dictionary<ulong, (byte[] AES, byte[] Nonce)> Keys
     {
         get
         {
@@ -73,30 +73,30 @@ public class PackageResourcer : Strategy.StrategistSingleton<PackageResourcer>
             return;
 
         string[] txt = File.ReadAllLines("./keys.txt");
-        foreach (var entry in txt)
+
+        foreach (string entry in txt)
         {
             try
             {
-                // Split the entry by ':' and trim any whitespace
-                var parts = entry.Split(':');
+                // Splits into parts
+                string[] parts = entry.Split(':');
                 if (parts.Length < 3)
                 {
                     Log.Error($"Invalid key entry format: {entry}");
                     continue;
                 }
 
-                var pkgGroup = ulong.Parse(parts[0].Trim(), NumberStyles.HexNumber);
-                var key = Helpers.HexStringToByteArray(parts[1].Trim());
-                var nonce = Helpers.HexStringToByteArray(parts[2].Split("//")[0].Trim());
+                ulong pkgGroup = ulong.Parse(parts[0].Trim(), NumberStyles.HexNumber);
+                byte[] key = Helpers.HexStringToByteArray(parts[1].Trim());
+                byte[] nonce = Helpers.HexStringToByteArray(parts[2].Split("//")[0].Trim());
 
-                if (!_keys.ContainsKey(pkgGroup))
-                    _keys[pkgGroup] = new Dictionary<byte[], byte[]>();
-
-                var keyDict = _keys[pkgGroup];
-                if (!keyDict.ContainsKey(key))
-                    keyDict[key] = nonce;
-                else
+                if (_keys.ContainsKey(pkgGroup))
+                {
                     Log.Error($"Duplicate key for package group {pkgGroup:X}: {entry}");
+                    continue;
+                }
+
+                _keys[pkgGroup] = (key, nonce);
             }
             catch (Exception ex)
             {
@@ -175,6 +175,7 @@ public class PackageResourcer : Strategy.StrategistSingleton<PackageResourcer>
     }
 
     public byte[] GetFileData(FileHash fileHash) { return GetPackage(fileHash).GetFileBytes(fileHash); }
+    public bool CheckRedacted(FileHash fileHash) { return GetPackage(fileHash).CheckRedacted(fileHash); }
 
     private void LoadAllPackages()
     {
@@ -317,11 +318,6 @@ public class PackageResourcer : Strategy.StrategistSingleton<PackageResourcer>
         throw new NullReferenceException($"Can not find Named Tag '{name}'");
     }
 
-    public Dictionary<FileHash, TagClassHash> GetD1Activities()
-    {
-        return _d1NamedTags;
-    }
-
     private void CacheAllActivityNames()
     {
         ConcurrentHashSet<PackageActivityEntry> activityEntries = new();
@@ -347,24 +343,6 @@ public class PackageResourcer : Strategy.StrategistSingleton<PackageResourcer>
             {
                 _activityNames.Add(entry.TagHash.Hash32, entry.Name);
             }
-        }
-    }
-
-    private async void CacheAllD1NamedTags()
-    {
-        ConcurrentHashSet<PackageActivityEntry> activityEntries = new();
-
-        ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = 5, CancellationToken = CancellationToken.None };
-        await Parallel.ForEachAsync(_packagesCache.Values, parallelOptions, async (package, ct) =>
-        {
-            activityEntries.UnionWith(package.GetAllActivities());
-        });
-
-        _d1NamedTags = new();
-
-        foreach (PackageActivityEntry entry in activityEntries)
-        {
-            _d1NamedTags.TryAdd(entry.TagHash, entry.TagClassHash);
         }
     }
 }

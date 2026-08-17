@@ -8,7 +8,7 @@ public static class TigerInstance
 {
     private static Dictionary<string, Subsystem> _subsystems = new();
 
-    public static InstanceArgs Args { get; set; } = new InstanceArgs();
+    public static TigerArgs Args { get; set; } = new TigerArgs();
 
     public static bool HasSubsystem<T>() where T : Subsystem
     {

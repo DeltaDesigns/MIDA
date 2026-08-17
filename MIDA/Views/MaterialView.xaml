@@ -5,25 +5,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MIDA"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="1000"
-    d:DesignWidth="1900"
-    Loaded="OnControlLoaded"
+    d:DesignHeight="992"
+    d:DesignWidth="1920"
+    Loaded="UserControl_Loaded"
     mc:Ignorable="d">
+
     <UserControl.Resources>
-        <ControlTemplate x:Key="MaterialViewTemplate">
+        <ControlTemplate x:Key="TextureViewTemplate">
             <Grid Margin="5,0,0,10" Background="{StaticResource BackgroundColour14a}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30*" />
-                    <RowDefinition Height="30*" />
-                    <RowDefinition Height="30*" />
-                    <RowDefinition Height="30*" />
-                    <RowDefinition Height="30*" />
-                    <RowDefinition Height="30*" />
-                </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="18*" />
-                    <ColumnDefinition Width="80*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <Border
@@ -37,108 +30,77 @@
                     Grid.RowSpan="6"
                     Margin="0,0,0,0"
                     Panel.ZIndex="1"
-                    Click="Texture_OnClick">
-                    <Border BorderBrush="White" BorderThickness="2">
-                        <Image Source="{Binding Texture}" />
-                    </Border>
+                    Click="Texture_OnClick"
+                    Style="{StaticResource ButtonTransparent}">
+                    <Image
+                        Width="128"
+                        Height="128"
+                        Source="{Binding Texture}" />
                 </Button>
 
-                <TextBlock
-                    Grid.Row="0"
+                <StackPanel
                     Grid.Column="1"
-                    Margin="0,5,5,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5"
+                        HorizontalAlignment="Left"
+                        FontFamily="{DynamicResource Haas Grot Text 65 Medium Keys}"
+                        FontSize="26"
+                        Foreground="White"
+                        Text="{Binding Hash}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Left"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                        FontSize="16"
+                        Foreground="{StaticResource ForegroundColour90}"
+                        Text="{Binding Index}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Left"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                        FontSize="16"
+                        Foreground="{StaticResource ForegroundColour90}"
+                        Text="{Binding Type}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Left"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                        FontSize="16"
+                        Foreground="{StaticResource ForegroundColour90}"
+                        Text="{Binding Dimension}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Left"
+                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                        FontSize="16"
+                        Foreground="{StaticResource ForegroundColour90}"
+                        Text="{Binding Format}" />
+                </StackPanel>
+
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="5"
                     HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
                     FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                    FontSize="15"
-                    Text="{Binding Shader}" />
-                <TextBlock
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Margin="5,0,0,0"
-                    HorizontalAlignment="Left"
-                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                    FontSize="26"
-                    Text="{Binding Hash}" />
-                <TextBlock
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Margin="5,0,0,0"
-                    HorizontalAlignment="Left"
-                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                    FontSize="17"
-                    Foreground="{StaticResource ForegroundColour75}"
-                    Text="{Binding Index}" />
-                <TextBlock
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Margin="5,0,0,0"
-                    HorizontalAlignment="Left"
-                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                    FontSize="17"
-                    Foreground="{StaticResource ForegroundColour75}"
-                    Text="{Binding Type}" />
-                <TextBlock
-                    Grid.Row="4"
-                    Grid.Column="1"
-                    Margin="5,0,0,0"
-                    HorizontalAlignment="Left"
-                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                    FontSize="17"
-                    Foreground="{StaticResource ForegroundColour75}"
-                    Text="{Binding Dimension}" />
-                <TextBlock
-                    Grid.Row="5"
-                    Grid.Column="1"
-                    Margin="5,0,0,0"
-                    HorizontalAlignment="Left"
-                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                    FontSize="17"
-                    Foreground="{StaticResource ForegroundColour75}"
-                    Text="{Binding Format}" />
-                <TextBlock
-                    Grid.Row="5"
-                    Grid.Column="1"
-                    Margin="0,0,5,0"
-                    HorizontalAlignment="Right"
-                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                    FontSize="17"
+                    FontSize="14"
                     Foreground="{StaticResource ForegroundColour75}"
                     Text="{Binding Dimensions}" />
+
+
             </Grid>
         </ControlTemplate>
 
-        <ControlTemplate x:Key="CBufferViewTemplate">
-            <Button Click="LoadCBufferData">
-                <Grid Margin="0,0,0,0" Background="Transparent">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80*" />
-                        <ColumnDefinition Width="auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="10,0,0,0"
-                        HorizontalAlignment="Left"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="24"
-                        Text="{Binding Index}"
-                        TextWrapping="WrapWithOverflow" />
-
-                    <TextBlock
-                        Grid.Column="1"
-                        Margin="0,0,10,0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="18"
-                        Text="{Binding Count}" />
-
-                </Grid>
-            </Button>
-        </ControlTemplate>
-
         <ControlTemplate x:Key="CBufferDataViewTemplate">
-            <Grid Margin="0,0,0,0" Background="Transparent">
+            <Grid Margin="0,1,0,1" Background="#1D1D23">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="5*" />
                     <ColumnDefinition Width="50*" />
@@ -151,25 +113,30 @@
                     BorderBrush="{StaticResource BackgroundColour30}"
                     BorderThickness="1" />
 
+
+                <TextBlock
+                    Grid.Column="0"
+                    Margin="0,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                    FontSize="20"
+                    Foreground="{StaticResource ForegroundColour65}"
+                    Text="{Binding Index}" />
+
                 <Border
+                    Grid.Column="0"
                     Panel.ZIndex="1"
                     BorderBrush="{StaticResource BackgroundColour30}"
-                    BorderThickness="1">
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="0,0,0,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="20"
-                        Text="{Binding Index}" />
-                </Border>
+                    BorderThickness="0,0,1,0" />
 
                 <TextBox
                     Grid.Column="1"
-                    Margin="5,0,0,0"
+                    Margin="5,0,5,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
                     FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                     FontSize="18"
                     IsReadOnly="True"
@@ -177,9 +144,8 @@
 
                 <Button
                     Grid.Column="3"
-                    Width="25"
-                    Height="25"
-                    Click="CBufferColor_OnClick">
+                    Click="CBufferColor_OnClick"
+                    Cursor="Hand">
                     <Rectangle>
                         <Rectangle.Fill>
                             <SolidColorBrush Color="{Binding Color}" />
@@ -194,20 +160,20 @@
                 Grid.Row="1"
                 HorizontalAlignment="Stretch"
                 Background="Transparent"
-                Columns="4"
+                Columns="5"
                 Rows="0">
                 <Border
                     Margin="0,0,0,0"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     BorderBrush="{StaticResource BackgroundColour30}"
-                    BorderThickness="1,1,0,1">
+                    BorderThickness="1">
                     <TextBlock
                         Grid.Column="0"
-                        Margin="2,0,0,0"
+                        Margin="2"
                         HorizontalAlignment="Center"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="16"
+                        FontSize="18"
                         Text="{Binding Slot}" />
                 </Border>
 
@@ -215,12 +181,13 @@
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
                     BorderBrush="{StaticResource BackgroundColour30}"
-                    BorderThickness="1,1,0,1">
+                    BorderThickness="1">
                     <TextBlock
                         Grid.Column="0"
-                        Margin="2,0,0,0"
+                        Margin="2"
+                        HorizontalAlignment="Center"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="16"
+                        FontSize="18"
                         Text="{Binding Filter}" />
                 </Border>
 
@@ -228,12 +195,13 @@
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
                     BorderBrush="{StaticResource BackgroundColour30}"
-                    BorderThickness="1,1,0,1">
+                    BorderThickness="1">
                     <TextBlock
                         Grid.Column="0"
-                        Margin="2,0,0,0"
+                        Margin="2"
+                        HorizontalAlignment="Center"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="16"
+                        FontSize="18"
                         Text="{Binding AddressU}" />
                 </Border>
 
@@ -241,39 +209,35 @@
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
                     BorderBrush="{StaticResource BackgroundColour30}"
-                    BorderThickness="1,1,1,1">
+                    BorderThickness="1">
                     <TextBlock
                         Grid.Column="0"
-                        Margin="2,0,0,0"
+                        Margin="2"
+                        HorizontalAlignment="Center"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="16"
+                        FontSize="18"
                         Text="{Binding AddressV}" />
                 </Border>
 
-            </UniformGrid>
-        </ControlTemplate>
-
-        <ControlTemplate x:Key="ScopeViewTemplate">
-            <Grid Margin="0,0,0,0" Background="Transparent">
                 <Border
-                    Panel.ZIndex="1"
+                    Margin="0,0,0,0"
+                    VerticalAlignment="Center"
                     BorderBrush="{StaticResource BackgroundColour30}"
                     BorderThickness="1">
                     <TextBlock
                         Grid.Column="0"
-                        Margin="5,0,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
+                        Margin="2"
+                        HorizontalAlignment="Center"
                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="20"
-                        Text="{Binding}" />
+                        FontSize="18"
+                        Text="{Binding ComparisonFunc}" />
                 </Border>
-            </Grid>
-        </ControlTemplate>
 
+            </UniformGrid>
+        </ControlTemplate>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource GridDarken}">
+    <Grid>
         <Grid.Triggers>
             <EventTrigger RoutedEvent="Grid.Loaded">
                 <BeginStoryboard>
@@ -288,459 +252,702 @@
             </EventTrigger>
         </Grid.Triggers>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="145*" />
-            <ColumnDefinition Width="100*" />
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="95*" />
+        </Grid.RowDefinitions>
 
+        <StackPanel
+            Grid.Row="0"
+            Grid.RowSpan="1"
+            Grid.ColumnSpan="3"
+            Margin="50,0,50,0"
+            Orientation="Horizontal">
 
-        <Grid Grid.Column="1" Background="Transparent">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="21*" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
+            <ItemsControl x:Name="ShaderStagesList" ItemsSource="{Binding ShaderStages}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <RadioButton
+                            Margin="5"
+                            Checked="ShaderStack_OnClick"
+                            GroupName="ShaderStage"
+                            Style="{StaticResource D2StyleRadioButton}">
+                            <TextBlock
+                                Margin="5,0,5,0"
+                                d:FontFamily="PP Fraktion Mono Medium"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
+                                FontSize="16"
+                                Text="{Binding Key}" />
+                        </RadioButton>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
             <Border
-                Grid.RowSpan="2"
-                Panel.ZIndex="0"
-                BorderBrush="{StaticResource BackgroundColour30}"
-                BorderThickness="1" />
+                Margin="15,5,15,5"
+                BorderBrush="{StaticResource ForegroundColour80}"
+                BorderThickness="1,0,1,0" />
 
-            <TextBlock
-                Grid.Row="0"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                FontSize="25"
-                Text="Textures"
-                TextWrapping="Wrap" />
+            <Button
+                Margin="5"
+                Click="ExportMaterial_OnClick"
+                Style="{StaticResource MarathonStyleButton}">
+                <TextBlock
+                    Margin="5,0,5,0"
+                    d:FontFamily="PP Fraktion Mono Medium"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
+                    FontSize="16"
+                    Text="Export Material" />
+            </Button>
 
-            <ListView
-                x:Name="TextureListView"
-                Grid.Row="1"
-                Background="Transparent">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="OverridesDefaultStyle" Value="True" />
-                        <Setter Property="Template" Value="{StaticResource MaterialViewTemplate}" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
-            </ListView>
-
-            <StackPanel
-                Grid.Row="2"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Orientation="Horizontal">
-                <Button
-                    Margin="10,0,10,0"
-                    Click="ExportMaterial_OnClick"
-                    Content="Export Material" />
-                <Button
-                    Margin="10,0,10,0"
-                    Click="OpenMaterial_OnClick"
-                    Content="Open In HxD" />
-            </StackPanel>
+            <Button
+                Margin="5"
+                Click="OpenMaterial_OnClick"
+                Style="{StaticResource MarathonStyleButton}">
+                <TextBlock
+                    Margin="5,0,5,0"
+                    d:FontFamily="PP Fraktion Mono Medium"
+                    FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
+                    FontSize="16"
+                    Text="Open In HxD" />
+            </Button>
+        </StackPanel>
 
 
 
-        </Grid>
+        <Grid Grid.Row="1" Margin="50,0,50,50">
 
-        <Grid Grid.Column="0" Background="Transparent">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="80*" />
-                <RowDefinition Height="100*" />
-            </Grid.RowDefinitions>
+            <TabControl Background="Transparent" FontFamily="{DynamicResource PP Fraktion Mono Medium}">
+                <TabControl.Template>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <DockPanel>
+                                <TabPanel
+                                    x:Name="HeaderPanel"
+                                    Margin="3,0,0,0"
+                                    Panel.ZIndex="1"
+                                    Background="Transparent"
+                                    DockPanel.Dock="Top"
+                                    IsItemsHost="True" />
 
-            <Grid Grid.Column="0" Background="Transparent">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100*" />
-                    <ColumnDefinition Width="100*" />
-                </Grid.ColumnDefinitions>
-
-                <Grid Grid.Column="0" Background="Transparent">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="10*" />
-                        <RowDefinition Height="100*" />
-                    </Grid.RowDefinitions>
-
-                    <Border
-                        Grid.RowSpan="2"
-                        Panel.ZIndex="0"
-                        BorderBrush="{StaticResource BackgroundColour30}"
-                        BorderThickness="1" />
-
-                    <TextBlock
-                        Grid.Row="0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="25"
-                        TextWrapping="Wrap">
-                        <Run Text="Pixel Shader" />
-                        <Run Text="{Binding PixelShaderHash}" />
-                    </TextBlock>
-
-                    <ScrollViewer
-                        Grid.Row="1"
-                        Margin="5,0,5,0"
-                        VerticalContentAlignment="Center"
-                        HorizontalScrollBarVisibility="Auto">
-                        <TextBox
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                            FontSize="16"
-                            IsReadOnly="True"
-                            Text="{Binding PixelShader}"
-                            TextWrapping="Wrap" />
-                    </ScrollViewer>
-                </Grid>
-
-                <Grid Grid.Column="1" Background="Transparent">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="10*" />
-                        <RowDefinition Height="100*" />
-                    </Grid.RowDefinitions>
-
-                    <Border
-                        Grid.RowSpan="2"
-                        Panel.ZIndex="0"
-                        BorderBrush="{StaticResource BackgroundColour30}"
-                        BorderThickness="1" />
-
-                    <TextBlock
-                        Grid.Row="0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="25"
-                        TextWrapping="Wrap">
-                        <Run Text="Vertex Shader" />
-                        <Run Text="{Binding VertexShaderHash}" />
-                    </TextBlock>
-
-                    <ScrollViewer
-                        Grid.Row="1"
-                        Margin="5,0,5,0"
-                        VerticalContentAlignment="Center"
-                        HorizontalScrollBarVisibility="Auto">
-                        <TextBox
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                            FontSize="16"
-                            IsReadOnly="True"
-                            Text="{Binding VertexShader}"
-                            TextWrapping="Wrap" />
-                    </ScrollViewer>
-                </Grid>
-
-
-            </Grid>
-
-            <Grid
-                Grid.Row="1"
-                Grid.Column="0"
-                Background="Transparent">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40*" />
-                    <ColumnDefinition Width="20*" />
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40*" />
-                    <RowDefinition Height="20*" />
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Column="0" Background="Transparent">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="25*" />
-                        <ColumnDefinition Width="55*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Grid Grid.Column="0" Background="Transparent">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="10*" />
-                            <RowDefinition Height="10*" />
-                        </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="0" Background="Transparent">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="10*" />
-                                <RowDefinition Height="90*" />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock
-                                Grid.Row="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                                FontSize="16"
-                                Text="Pixel Shader CBuffers"
-                                TextWrapping="Wrap" />
-
-                            <ListView
-                                x:Name="PS_CBufferList"
-                                Grid.Row="1"
-                                Background="Transparent">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="OverridesDefaultStyle" Value="True" />
-                                        <Setter Property="Template" Value="{StaticResource CBufferViewTemplate}" />
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-
-                                <ListView.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical" />
-                                    </ItemsPanelTemplate>
-                                </ListView.ItemsPanel>
-                            </ListView>
+                                <ContentPresenter
+                                    x:Name="PART_SelectedContentHost"
+                                    Margin="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    ContentSource="SelectedContent" />
+                            </DockPanel>
                         </Grid>
+                    </ControlTemplate>
+                </TabControl.Template>
 
-                        <Grid Grid.Row="1" Background="Transparent">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="10*" />
-                                <RowDefinition Height="90*" />
-                            </Grid.RowDefinitions>
+                <TabItem Header="Main" IsSelected="True">
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="33*" />
+                        </Grid.ColumnDefinitions>
 
-                            <TextBlock
-                                Grid.Row="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                                FontSize="16"
-                                Text="Vertex Shader CBuffers"
-                                TextWrapping="Wrap" />
-
-                            <ListView
-                                x:Name="VS_CBufferList"
-                                Grid.Row="1"
-                                Background="Transparent">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="OverridesDefaultStyle" Value="True" />
-                                        <Setter Property="Template" Value="{StaticResource CBufferViewTemplate}" />
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-
-                                <ListView.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical" />
-                                    </ItemsPanelTemplate>
-                                </ListView.ItemsPanel>
-                            </ListView>
-                        </Grid>
-
-                    </Grid>
-
-                    <Grid Grid.Column="1" Background="Transparent">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition Height="19*" />
-                        </Grid.RowDefinitions>
-
-                        <Border
-                            Grid.RowSpan="2"
-                            Panel.ZIndex="0"
-                            BorderBrush="{StaticResource BackgroundColour30}"
-                            BorderThickness="0" />
-
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                            FontSize="16"
-                            Text="CBuffer Values" />
-
-                        <ListView
-                            x:Name="CBufferDataList"
+                        <Grid
                             Grid.Row="1"
-                            Background="Transparent">
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem">
-                                    <Setter Property="OverridesDefaultStyle" Value="True" />
-                                    <Setter Property="Template" Value="{StaticResource CBufferDataViewTemplate}" />
-                                </Style>
-                            </ListView.ItemContainerStyle>
+                            Grid.Column="0"
+                            Margin="0,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                            <ListView.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical" />
-                                </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
-                    </Grid>
-                </Grid>
+                            <StackPanel
+                                Grid.Row="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
 
-                <Grid Grid.Column="1" Background="Transparent">
-                    <Border
-                        Grid.RowSpan="2"
-                        Panel.ZIndex="0"
-                        BorderBrush="{StaticResource BackgroundColour30}"
-                        BorderThickness="0" />
+                                <TextBlock
+                                    d:FontFamily=" PP Fraktion Mono Medium"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                    FontSize="18"
+                                    Foreground="{StaticResource ForegroundColour90}"
+                                    Text="HLSL"
+                                    TextWrapping="Wrap" />
 
-                    <Grid Grid.Row="1" Background="Transparent">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition Height="19*" />
-                        </Grid.RowDefinitions>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    d:FontFamily=" PP Fraktion Mono Medium"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                    FontSize="18"
+                                    Foreground="{StaticResource ForegroundColour90}"
+                                    TextWrapping="Wrap">
+                                    <Run Text=" - " />
+                                    <Run Text="{Binding CurrentStage.ShaderHash}" />
+                                </TextBlock>
+                            </StackPanel>
 
-                        <TextBlock
-                            Margin="5,0,0,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                            FontSize="16"
-                            Text="Used Scopes" />
 
-                        <Grid Grid.Row="1" Background="Transparent">
-                            <Grid Grid.Column="0" Background="Transparent">
+                            <avalonEdit:TextEditor
+                                xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                                x:Name="HLSLText"
+                                Grid.Row="1"
+                                HorizontalAlignment="Stretch"
+                                Background="#1D1D23"
+                                FontFamily="Consolas"
+                                FontSize="16"
+                                Foreground="White"
+                                HorizontalScrollBarVisibility="Auto"
+                                IsReadOnly="True"
+                                LineNumbersForeground="Gray"
+                                ShowLineNumbers="True"
+                                SyntaxHighlighting="HLSL"
+                                VerticalScrollBarVisibility="Auto"
+                                WordWrap="False" />
+
+                        </Grid>
+
+                        <Grid Grid.Column="1" Margin="15,0,15,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50*" />
+                                <RowDefinition Height="50*" />
+                            </Grid.RowDefinitions>
+
+                            <TabControl Background="Transparent" FontFamily="{DynamicResource PP Fraktion Mono Medium}">
+                                <TabControl.Template>
+                                    <ControlTemplate TargetType="TabControl">
+                                        <Grid>
+                                            <DockPanel>
+                                                <TabPanel
+                                                    Margin="0,0,0,0"
+                                                    Panel.ZIndex="1"
+                                                    Background="Transparent"
+                                                    DockPanel.Dock="Top"
+                                                    IsItemsHost="True" />
+
+                                                <ContentPresenter
+                                                    Margin="0"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch"
+                                                    ContentSource="SelectedContent" />
+                                            </DockPanel>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </TabControl.Template>
+
+                                <TabItem Header="CBuffer" IsSelected="True">
+                                    <ListView
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderBrush="{StaticResource BackgroundColour50}"
+                                        BorderThickness="0,0,0,2"
+                                        ItemsSource="{Binding CurrentStage.CB0.Data}">
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem">
+                                                <Setter Property="OverridesDefaultStyle" Value="True" />
+                                                <Setter Property="Template" Value="{StaticResource CBufferDataViewTemplate}" />
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                    </ListView>
+                                </TabItem>
+
+                                <TabItem Header="Bytecode Constants">
+                                    <ListView
+                                        VerticalAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderBrush="{StaticResource BackgroundColour50}"
+                                        BorderThickness="0,0,0,0"
+                                        ItemsSource="{Binding CurrentStage.Constants.Data}">
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem">
+                                                <Setter Property="OverridesDefaultStyle" Value="True" />
+                                                <Setter Property="Template" Value="{StaticResource CBufferDataViewTemplate}" />
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                    </ListView>
+                                </TabItem>
+
+                            </TabControl>
+
+                            <Grid
+                                Name="BytecodeOps"
+                                Grid.Row="1"
+                                Margin="0,0,0,0"
+                                Background="Transparent">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="36*" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
-                                <ListView
-                                    x:Name="UsedScopesList"
-                                    Grid.Row="1"
-                                    d:ItemsSource="{d:SampleData ItemCount=5}"
-                                    Background="Transparent">
-                                    <ListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem">
-                                            <Setter Property="OverridesDefaultStyle" Value="True" />
-                                            <Setter Property="Template" Value="{StaticResource ScopeViewTemplate}" />
-                                        </Style>
-                                    </ListView.ItemContainerStyle>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Margin="0,10,0,10"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    d:FontFamily=" PP Fraktion Mono Medium"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                    FontSize="18"
+                                    Foreground="{StaticResource ForegroundColour90}"
+                                    Text="TFX Bytecode Operations"
+                                    TextWrapping="Wrap" />
 
-                                    <ListView.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Vertical" />
-                                        </ItemsPanelTemplate>
-                                    </ListView.ItemsPanel>
-                                </ListView>
+
+                                <ScrollViewer
+                                    Grid.Row="1"
+                                    Margin="5,0,5,0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalScrollBarVisibility="Auto">
+                                    <TextBox
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        FontFamily="Consolas"
+                                        FontSize="18"
+                                        IsReadOnly="True"
+                                        Text="{Binding CurrentStage.PrintedOps}"
+                                        TextWrapping="Wrap" />
+                                </ScrollViewer>
                             </Grid>
+
+                        </Grid>
+
+                        <Grid Grid.Row="1" Grid.Column="3">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Grid.Row="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                d:FontFamily=" PP Fraktion Mono Medium"
+                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                FontSize="18"
+                                Foreground="{StaticResource ForegroundColour90}"
+                                Text="Textures"
+                                TextWrapping="Wrap" />
+
+                            <ListView
+                                Grid.Row="1"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                ItemsSource="{Binding CurrentStage.Textures}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="OverridesDefaultStyle" Value="True" />
+                                        <Setter Property="Template" Value="{StaticResource TextureViewTemplate}" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical" />
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                            </ListView>
                         </Grid>
                     </Grid>
-                </Grid>
+                </TabItem>
 
-                <Grid
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Margin="5,0,0,0"
-                    Background="Transparent">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="19*" />
-                    </Grid.RowDefinitions>
+                <TabItem Header="Misc">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="75*" />
+                            <RowDefinition Height="25*" />
+                        </Grid.RowDefinitions>
 
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                        FontSize="16"
-                        Text="Texture Samplers" />
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="25*" />
+                                <ColumnDefinition Width="25*" />
+                                <ColumnDefinition Width="25*" />
+                            </Grid.ColumnDefinitions>
 
-                    <UniformGrid
-                        Grid.Row="1"
-                        Margin="0,0,0,0"
-                        HorizontalAlignment="Stretch"
-                        Background="Transparent"
-                        Columns="4"
-                        Rows="0">
-                        <Border
-                            Margin="0,0,0,0"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
-                            BorderBrush="{StaticResource BackgroundColour30}"
-                            BorderThickness="1,1,0,1">
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="50*" />
+                                    <RowDefinition Height="50*" />
+                                </Grid.RowDefinitions>
+
+                                <Grid
+                                    Name="UsedScopes"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="0,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour90}"
+                                        Text="Used Scopes"
+                                        TextWrapping="Wrap" />
+
+                                    <ListView
+                                        Grid.Row="1"
+                                        VerticalAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderBrush="{StaticResource BackgroundColour50}"
+                                        BorderThickness="0,0,0,2"
+                                        ItemsSource="{Binding CurrentStage.UsedScopes}">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Margin="5,0,0,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                                    FontSize="24"
+                                                    Text="{Binding}" />
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+
+                                <Grid
+                                    Name="UsedExterns"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,15,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour90}"
+                                        Text="Used Externs"
+                                        TextWrapping="Wrap" />
+
+                                    <ListView
+                                        Grid.Row="1"
+                                        VerticalAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderBrush="{StaticResource BackgroundColour50}"
+                                        BorderThickness="0,0,0,0"
+                                        ItemsSource="{Binding CurrentStage.UsedExterns}">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Margin="5,0,0,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                                    FontSize="24"
+                                                    Text="{Binding}" />
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+                            </Grid>
+
+                            <Grid
+                                Name="States"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Margin="15,0,15,0"
+                                Background="Transparent">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    d:FontFamily=" PP Fraktion Mono Medium"
+                                    FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                    FontSize="18"
+                                    Foreground="{StaticResource ForegroundColour90}"
+                                    Text="Render States"
+                                    TextWrapping="Wrap" />
+
+                                <Grid
+                                    Name="BlendState"
+                                    Grid.Row="1"
+                                    Visibility="{Binding CurrentStage.States.Blend, Converter={StaticResource StringNullOrEmptyVisibilityConverter}}">
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,0,0,5"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour90}"
+                                        Text="Blend State:"
+                                        TextWrapping="Wrap" />
+
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        Background="#4B000000"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour80}"
+                                        Text="{Binding CurrentStage.States.Blend}"
+                                        TextWrapping="Wrap" />
+
+                                    <Border
+                                        Grid.Row="3"
+                                        Margin="0,15,0,15"
+                                        BorderBrush="{StaticResource ForegroundColour50}"
+                                        BorderThickness="0,0,0,1" />
+                                </Grid>
+
+
+                                <Grid
+                                    Name="RasterizeState"
+                                    Grid.Row="2"
+                                    Visibility="{Binding CurrentStage.States.Rasterizer, Converter={StaticResource StringNullOrEmptyVisibilityConverter}}">
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,0,0,5"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour90}"
+                                        Text="Rasterizer State:"
+                                        TextWrapping="Wrap" />
+
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        Background="#4B000000"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour70}"
+                                        Text="{Binding CurrentStage.States.Rasterizer}"
+                                        TextWrapping="Wrap" />
+
+                                    <Border
+                                        Grid.Row="3"
+                                        Margin="0,15,0,15"
+                                        BorderBrush="{StaticResource ForegroundColour50}"
+                                        BorderThickness="0,0,0,1" />
+                                </Grid>
+
+                                <Grid
+                                    Name="DepthState"
+                                    Grid.Row="3"
+                                    Visibility="{Binding CurrentStage.States.DepthBias, Converter={StaticResource StringNullOrEmptyVisibilityConverter}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,0,0,5"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour90}"
+                                        Text="Depth State:"
+                                        TextWrapping="Wrap" />
+
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        d:FontFamily=" PP Fraktion Mono Medium"
+                                        Background="#4B000000"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Foreground="{StaticResource ForegroundColour70}"
+                                        Text="{Binding CurrentStage.States.DepthBias}"
+                                        TextWrapping="Wrap" />
+
+                                    <Border
+                                        Grid.Row="3"
+                                        Margin="0,15,0,15"
+                                        BorderBrush="{StaticResource ForegroundColour50}"
+                                        BorderThickness="0,0,0,1" />
+                                </Grid>
+                            </Grid>
+
+
+
+                        </Grid>
+
+                        <Grid
+                            Name="Samplers"
+                            Grid.Row="1"
+                            Background="Transparent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
                             <TextBlock
-                                Grid.Column="0"
-                                Margin="2,0,0,0"
+                                Grid.Row="0"
                                 HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                d:FontFamily=" PP Fraktion Mono Medium"
                                 FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                                FontSize="16"
-                                Text="Sampler Slot" />
-                        </Border>
+                                FontSize="18"
+                                Foreground="{StaticResource ForegroundColour90}"
+                                Text="Texture Samplers"
+                                TextWrapping="Wrap" />
 
-                        <Border
-                            Margin="0,0,0,0"
-                            VerticalAlignment="Center"
-                            BorderBrush="{StaticResource BackgroundColour30}"
-                            BorderThickness="1,1,0,1">
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="2,0,0,0"
-                                HorizontalAlignment="Center"
-                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                                FontSize="16"
-                                Text="Filter" />
-                        </Border>
+                            <UniformGrid
+                                Grid.Row="1"
+                                Margin="1"
+                                HorizontalAlignment="Stretch"
+                                Background="Transparent"
+                                Columns="5"
+                                Rows="0">
+                                <Border
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource BackgroundColour30}"
+                                    BorderThickness="1">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Margin="2"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Text="Sampler Slot" />
+                                </Border>
 
-                        <Border
-                            Margin="0,0,0,0"
-                            VerticalAlignment="Center"
-                            BorderBrush="{StaticResource BackgroundColour30}"
-                            BorderThickness="1,1,0,1">
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="2,0,0,0"
-                                HorizontalAlignment="Center"
-                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                                FontSize="16"
-                                Text="AddressU" />
-                        </Border>
+                                <Border
+                                    Margin="0,0,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource BackgroundColour30}"
+                                    BorderThickness="1">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Margin="2"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Text="Filter" />
+                                </Border>
 
-                        <Border
-                            Margin="0,0,0,0"
-                            VerticalAlignment="Center"
-                            BorderBrush="{StaticResource BackgroundColour30}"
-                            BorderThickness="1,1,1,1">
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="2,0,0,0"
-                                HorizontalAlignment="Center"
-                                FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                                FontSize="16"
-                                Text="AddressV" />
-                        </Border>
 
-                    </UniformGrid>
+                                <Border
+                                    Margin="0,0,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource BackgroundColour30}"
+                                    BorderThickness="1">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Margin="2"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Text="AddressU" />
+                                </Border>
 
-                    <ListView
-                        x:Name="SamplerDataList"
-                        Grid.Row="2"
-                        d:ItemsSource="{d:SampleData ItemCount=3}"
-                        Background="Transparent">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="OverridesDefaultStyle" Value="True" />
-                                <Setter Property="Template" Value="{StaticResource SamplerDataViewTemplate}" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
+                                <Border
+                                    Margin="0,0,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource BackgroundColour30}"
+                                    BorderThickness="1">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Margin="2"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Text="AddressV" />
+                                </Border>
 
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Vertical" />
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
-                    </ListView>
-                </Grid>
+                                <Border
+                                    Margin="0,0,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderBrush="{StaticResource BackgroundColour30}"
+                                    BorderThickness="1">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Margin="2"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                                        FontSize="18"
+                                        Text="Comparison Function" />
+                                </Border>
 
-            </Grid>
+                            </UniformGrid>
+
+                            <ListView
+                                Grid.Row="2"
+                                Margin="0"
+                                d:ItemsSource="{d:SampleData ItemCount=3}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                ItemsSource="{Binding CurrentStage.Samplers}">
+
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="OverridesDefaultStyle" Value="True" />
+                                        <Setter Property="Template" Value="{StaticResource SamplerDataViewTemplate}" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical" />
+                                    </ItemsPanelTemplate>
+
+                                </ListView.ItemsPanel>
+                            </ListView>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
 
         </Grid>
 
     </Grid>
-
 </UserControl>

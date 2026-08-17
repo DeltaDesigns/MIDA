@@ -1,5 +1,6 @@
 ﻿using DirectXTexNet;
 using SharpDX.Direct3D11;
+using Tiger.Schema.Strings;
 
 namespace Tiger.Schema;
 
@@ -7,36 +8,29 @@ namespace Tiger.Schema;
 public class Globals : Strategy.StrategistSingleton<Globals>
 {
     private List<TigerInputLayout> _inputLayouts = new();
+    public List<TigerInputLayout> InputLayouts => _inputLayouts;
+
+    public Dictionary<TigerHash, Vector4> GlobalChannelDefaults = new();
     public Tag<SRenderGlobals> RenderGlobals;
 
     public Globals(TigerStrategy strategy, StrategyConfiguration strategyConfiguration) : base(strategy)
     {
     }
 
-    public class TigerInputLayout
-    {
-        public List<TigerInputLayoutElement> Elements { get; set; }
-    }
-
-    public class TigerInputLayoutElement
-    {
-        public string HlslType { get; set; }
-        public DXGI_FORMAT Format { get; set; }
-        public uint Stride { get; set; }
-        public string SemanticName { get; set; }
-        public uint SemanticIndex { get; set; }
-        public uint BufferIndex { get; set; }
-        public bool IsInstanceData { get; set; }
-    }
-
     protected override void Initialise()
     {
+        FileHash hash = PackageResourcer.Get().GetNamedTag("render_globals");
+        var pkg = FileResourcer.Get().GetSchemaTag<SClientBootstrap>(hash);
+        RenderGlobals = pkg.TagData.RenderGlobals;
+
         FillVertexInputLayouts();
+        FillGlobalChannelDefaults();
     }
 
     protected override void Reset()
     {
         _inputLayouts.Clear();
+        GlobalChannelDefaults.Clear();
     }
 
     public List<TigerInputLayout> GetInputLayouts()
@@ -48,16 +42,11 @@ public class Globals : Strategy.StrategistSingleton<Globals>
     {
         _inputLayouts.AddRange(BaseInputLayouts);
 
-
-        FileHash hash = PackageResourcer.Get().GetNamedTag("render_globals");
-        var pkg = FileResourcer.Get().GetSchemaTag<SClientBootstrap>(hash);
-        RenderGlobals = pkg.TagData.RenderGlobals;
-
-        var ElementSet = RenderGlobals.TagData.InputLayouts.TagData.Elements2.TagData.Sets;
-        var Mappings = RenderGlobals.TagData.InputLayouts.TagData.ElementMappings.TagData.Layouts;
-        foreach (var layout in Mappings)
+        DynamicArray<SVertexInputElementSet> ElementSet = RenderGlobals.TagData.InputLayouts.TagData.Elements2.TagData.Sets;
+        DynamicArray<SVertexLayout> Mappings = RenderGlobals.TagData.InputLayouts.TagData.ElementMappings.TagData.Layouts;
+        foreach (SVertexLayout layout in Mappings)
         {
-            List<TigerInputLayoutElement> layoutElements = new List<TigerInputLayoutElement>();
+            List<TigerInputLayoutElement> layoutElements = new();
             var buffers = new (int elementIndex, bool isInstanceData)[]
             {
                 (layout.Buffer0, layout.Buffer0Instanced),
@@ -68,15 +57,15 @@ public class Globals : Strategy.StrategistSingleton<Globals>
 
             for (int bufferIndex = 0; bufferIndex < buffers.Length; bufferIndex++)
             {
-                var (elementIndex, isInstanceData) = buffers[bufferIndex];
+                (int elementIndex, bool isInstanceData) = buffers[bufferIndex];
 
                 if (elementIndex == -1)
                     continue;
 
-                foreach (var e in ElementSet[elementIndex].Elements)
+                foreach (SVertexInputElement e in ElementSet[elementIndex].Elements)
                 {
-                    var semantic = InputSemantics[e.Semantic];
-                    var format = GetInputFormats()[e.Format];
+                    string semantic = InputSemantics[e.Semantic];
+                    TigerInputLayoutElement format = GetInputFormats()[e.Format];
                     layoutElements.Add(new TigerInputLayoutElement
                     {
                         HlslType = format.HlslType,
@@ -115,6 +104,18 @@ public class Globals : Strategy.StrategistSingleton<Globals>
         //}
     }
 
+    public void FillGlobalChannelDefaults()
+    {
+        var hashes = RenderGlobals.TagData.GlobalChannelDefaults.TagData.ChannelHashes;
+        var values = RenderGlobals.TagData.GlobalChannelDefaults.TagData.ChannelDefaults;
+        for (int i = 0; i < hashes.Count; i++)
+        {
+            var vec = values[i].Vec;
+            GlobalChannelDefaults.TryAdd(hashes[i].StringHash, vec);
+            //Console.WriteLine($"[{vec.X}, {vec.Y}, {vec.Z}, {vec.W}],");
+        }
+    }
+
     private List<TfxRenderStage> ExportRenderStages = new List<TfxRenderStage>
     {
         TfxRenderStage.GenerateGbuffer,
@@ -128,10 +129,6 @@ public class Globals : Strategy.StrategistSingleton<Globals>
 
     public List<TfxRenderStage> GetExportStages()
     {
-        if (ConfigSubsystem.Get().GetS2ShaderExportEnabled())
-        {
-            return ExportRenderStages.Append(TfxRenderStage.WaterReflection).ToList();
-        }
         return ExportRenderStages;
     }
 
@@ -377,6 +374,22 @@ public class Globals : Strategy.StrategistSingleton<Globals>
             }
         }
     };
+
+    public class TigerInputLayout
+    {
+        public List<TigerInputLayoutElement> Elements { get; set; }
+    }
+
+    public class TigerInputLayoutElement
+    {
+        public string HlslType { get; set; }
+        public DXGI_FORMAT Format { get; set; }
+        public uint Stride { get; set; }
+        public string SemanticName { get; set; }
+        public uint SemanticIndex { get; set; }
+        public uint BufferIndex { get; set; }
+        public bool IsInstanceData { get; set; }
+    }
 }
 
 public static class RenderStates
@@ -3300,26 +3313,52 @@ public static class RenderStates
     }).ToArray();
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080B61C", 0x5C)]
+[SchemaStruct(TigerStrategy.MARATHON, "8080B61C", 0x5C)]
 public struct SClientBootstrap
 {
-    [SchemaField(0x48, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x48, TigerStrategy.MARATHON)]
     public Tag<SRenderGlobals> RenderGlobals;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808070", 0x48)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808070", 0x48)]
 public struct SRenderGlobals
 {
     public long FileSize;
     public Tag<SVertexInputLayouts> InputLayouts;
-    //[SchemaField(0x10, TigerStrategy.DESTINY2_BEYONDLIGHT_3402)]
-    //public DynamicArrayUnloaded<SRenderGlobalScopes> Scopes;
-    //public DynamicArrayUnloaded<SRenderGlobalPipelines> Pipelines;
+    [SchemaField(0x10)]
+    public DynamicArrayUnloaded<SRenderGlobalScope> Scopes;
+    [SchemaField(0x20)]
+    public DynamicArrayUnloaded<SRenderGlobalPipelines> Pipelines;
     [SchemaField(0x30)]
     public Tag<SGlobalTextures> Textures;
+    public Tag<SGlobalChannelDefaults> GlobalChannelDefaults;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80807F6A", 0x20)]
+[SchemaStruct(TigerStrategy.MARATHON, "75808080", 0x10)]
+public struct SRenderGlobalScope
+{
+    public StringPointer Name;
+    [SchemaField(0xC)]
+    public FileHash Scope;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON, "74808080", 0x10)]
+public struct SRenderGlobalPipelines
+{
+    public StringPointer Name;
+    [SchemaField(0xC)]
+    public FileHash Technique;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON, "8080822D", 0x38)]
+public struct SGlobalChannelDefaults
+{
+    [SchemaField(0x8)]
+    public DynamicArray<SStringHash> ChannelHashes;
+    public DynamicArray<Vec4> ChannelDefaults;
+}
+
+[SchemaStruct(TigerStrategy.MARATHON, "80807F6A", 0x20)]
 public struct SGlobalTextures
 {
     public long FileSize;
@@ -3329,7 +3368,7 @@ public struct SGlobalTextures
     public Texture IridescenceLookup;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808661", 0x38)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808661", 0x38)]
 public struct SVertexInputLayouts
 {
     public long FileSize;
@@ -3341,24 +3380,24 @@ public struct SVertexInputLayouts
     //[SchemaField(0x2C, TigerStrategy.DESTINY2_BEYONDLIGHT_3402)]
     //public Tag<SVertexInputElementSets> ElementsLast;
 
-    [SchemaField(0x34, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x34, TigerStrategy.MARATHON)]
     public Tag<SVertexInputLayoutMapping> ElementMappings;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808668", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808668", 0x18)]
 public struct SVertexInputElementSets
 {
     public long FileSize;
     public DynamicArray<SVertexInputElementSet> Sets;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "6A868080", 0x10)]
+[SchemaStruct(TigerStrategy.MARATHON, "6A868080", 0x10)]
 public struct SVertexInputElementSet
 {
     public DynamicArray<SVertexInputElement> Elements;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "6D868080", 0x03)]
+[SchemaStruct(TigerStrategy.MARATHON, "6D868080", 0x03)]
 public struct SVertexInputElement
 {
     public byte Semantic;
@@ -3366,14 +3405,14 @@ public struct SVertexInputElement
     public byte Format;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808664", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808664", 0x18)]
 public struct SVertexInputLayoutMapping
 {
     public long FileSize;
     public DynamicArray<SVertexLayout> Layouts;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "67868080", 0x1C)]
+[SchemaStruct(TigerStrategy.MARATHON, "67868080", 0x1C)]
 public struct SVertexLayout
 {
     public short Index;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -34,11 +35,14 @@ public partial class GeneralConfigView : UserControl
 
     private void PopulateConfigPanel()
     {
+        bool bVal;
+
+        #region General
         // ---- General settings panel ----
         GeneralConfigPanel.Children.Clear();
 
         // Strategy
-        ConfigSettingComboControl cs = new ConfigSettingComboControl();
+        ConfigSettingComboControl cs = new();
         cs.SettingName = "Game Version";
         TigerStrategy csval = _config.GetCurrentStrategy();
         cs.SettingsCombobox.ItemsSource = MakeEnumComboBoxItems<TigerStrategy>(); //MakeEnumComboBoxItems((TigerStrategy val) => Strategy.HasConfiguration(val));
@@ -47,8 +51,8 @@ public partial class GeneralConfigView : UserControl
         {
             cs.SettingsCombobox.SelectedIndex = 0;
         }
-        cs.SettingsCombobox.SelectionChanged += PackagePathStrategyComboBox_OnSelectionChanged;
         cs.SettingsCombobox.SelectionChanged += CurrentStrategy_OnSelectionChanged;
+
         cs.ChangeButton.Visibility = Visibility.Hidden;
         GeneralConfigPanel.Children.Add(cs);
 
@@ -58,7 +62,7 @@ public partial class GeneralConfigView : UserControl
             _packagePathStrategy = _config.GetCurrentStrategy();
         }
 
-        ConfigSettingControl cpp = new ConfigSettingControl();
+        ConfigSettingControl cpp = new();
         // cpp.Settings.Children.Add(_packagePathStrategyComboBox);
         cpp.SettingName = "Packages Path";
         if (_packagePathStrategy == TigerStrategy.NONE)
@@ -68,7 +72,7 @@ public partial class GeneralConfigView : UserControl
         }
         else
         {
-            var packagesPath = _config.GetPackagesPath(_packagePathStrategy);
+            string packagesPath = _config.GetPackagesPath(_packagePathStrategy);
             cpp.SettingValue = packagesPath == "" ? "Not Set (Required)" : packagesPath;
             cpp.ChangeButton.Click += PackagesPath_OnClick;
         }
@@ -76,7 +80,7 @@ public partial class GeneralConfigView : UserControl
 
 
         // Save path
-        ConfigSettingControl csp = new ConfigSettingControl();
+        ConfigSettingControl csp = new();
         csp.SettingName = "Export Save Path";
         string exportSavePath = _config.GetExportSavePath();
         csp.SettingValue = exportSavePath == "" ? "Not Set (Required)" : exportSavePath;
@@ -84,7 +88,7 @@ public partial class GeneralConfigView : UserControl
         GeneralConfigPanel.Children.Add(csp);
 
         // Output texture format
-        ConfigSettingComboControl ctf = new ConfigSettingComboControl();
+        ConfigSettingComboControl ctf = new();
         ctf.SettingName = "Output Texture Format";
         ctf.SettingLabel = "(Use PNG or TGA in Blender)";
         TextureExportFormat etfval = _config.GetOutputTextureFormat();
@@ -93,38 +97,63 @@ public partial class GeneralConfigView : UserControl
         ctf.SettingsCombobox.SelectionChanged += OutputTextureFormat_OnSelectionChanged;
         ctf.ChangeButton.Visibility = Visibility.Hidden;
         GeneralConfigPanel.Children.Add(ctf);
+        #endregion
 
+        #region Materials
+        // ---- Material settings panel ----
+        MaterialsConfigPanel.Children.Clear();
+
+        // Whether to export shader hlsl files
+        ConfigSettingToggleControl hlsl = new();
+        hlsl.SettingName = "Export Shader HLSL (Experimental due to DX12)";
+        hlsl.SettingLabel = "Save shader hlsl code, can slow down larger exports such as maps.";
+        bVal = _config.GetSaveShaderHLSL();
+        hlsl.SettingValue = bVal.ToString();
+        hlsl.ChangeButton.Click += SaveShaderHLSL_OnClick;
+        MaterialsConfigPanel.Children.Add(hlsl);
+
+        // Whether to export cubemaps as equirectangular projected
+        ConfigSettingToggleControl equirectCubemaps = new();
+        equirectCubemaps.SettingName = "Export Equirectangular Cubemaps";
+        equirectCubemaps.SettingLabel = "Export cubemaps as spherical (equirectangular), alongside the default cross layout.";
+        bVal = _config.GetExportEquirectCubemaps();
+        equirectCubemaps.SettingValue = bVal.ToString();
+        equirectCubemaps.ChangeButton.Click += ExportEquirectCubemaps_OnClick;
+        MaterialsConfigPanel.Children.Add(equirectCubemaps);
+        #endregion
+
+        #region Misc
         // ---- Misc settings panel ----
         MiscConfigPanel.Children.Clear();
 
         // Store all exported map assets in a single "Maps/Assets/" folder  
         // instead of "ExportPath/(MapName)/".
-        ConfigSettingToggleControl cfe = new ConfigSettingToggleControl();
+        ConfigSettingToggleControl cfe = new();
         cfe.SettingName = "Unified Map Asset Exports";
-        cfe.SettingLabel = "Export all map assets to a single \"Maps/Assets/\" folder";
-        var eval = _config.GetSingleFolderMapAssetsEnabled();
-        cfe.SettingValue = eval.ToString();
+        cfe.SettingLabel = "Export all map assets to a single \"Maps/Assets/\" folder.";
+        bVal = _config.GetSingleFolderMapAssetsEnabled();
+        cfe.SettingValue = bVal.ToString();
         cfe.ChangeButton.Click += SingleFolderMapAssetsEnabled_OnClick;
         MiscConfigPanel.Children.Add(cfe);
 
 
-        ConfigSettingToggleControl disBg = new ConfigSettingToggleControl();
+        ConfigSettingToggleControl disBg = new();
         disBg.SettingName = "Animated Background";
-        disBg.SettingLabel = "(Requires Restart)";
-        var bval = _config.GetAnimatedBackground();
-        disBg.SettingValue = bval.ToString();
+        disBg.SettingLabel = "Requires a restart to take effect.";
+        bVal = _config.GetAnimatedBackground();
+        disBg.SettingValue = bVal.ToString();
         disBg.ChangeButton.Click += AnimatedBackground_OnClick;
         MiscConfigPanel.Children.Add(disBg);
-    }
 
-    private void PackagePathStrategyComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        TigerStrategy strategy = (TigerStrategy)(((sender as ComboBox).DataContext as ConfigSettingComboControl).SettingsCombobox.SelectedItem as ComboBoxItem).Tag;
-        if (_packagePathStrategy != strategy)
-        {
-            _packagePathStrategy = strategy;
-            PopulateConfigPanel();
-        }
+        //ConfigSettingToggleControl disME = new();
+        //disME.SettingName = "Motion Effects";
+        //disME.SettingLabel = "Enables a fake parallax effect when moving the mouse in menus.";
+        //bVal = _config.GetMotionEffects();
+        //disME.SettingValue = bVal.ToString();
+        //disME.ChangeButton.Click += MotionEffects_OnClick;
+        //MiscConfigPanel.Children.Add(disME);
+
+        #endregion
     }
 
     private List<ComboBoxItem> MakeEnumComboBoxItems<T>() where T : Enum
@@ -134,7 +163,7 @@ public partial class GeneralConfigView : UserControl
 
     private List<ComboBoxItem> MakeEnumComboBoxItems<T>(Func<T, bool> filterAction) where T : Enum
     {
-        List<ComboBoxItem> items = new List<ComboBoxItem>();
+        List<ComboBoxItem> items = new();
         foreach (T val in Enum.GetValues(typeof(T)))
         {
             if (filterAction(val))
@@ -245,58 +274,82 @@ public partial class GeneralConfigView : UserControl
         }
     }
 
-    private void BlenderInteropEnabled_OnClick(object sender, RoutedEventArgs e)
-    {
-        if (!_config.GetBlenderInteropEnabled())
-        {
-            MessageBox.Show("Blender will NOT import shaders. Please have moderate Blender shader knowledge.");
-        }
-        _config.SetBlenderInteropEnabled(!_config.GetBlenderInteropEnabled());
-        PopulateConfigPanel();
-    }
-
     private void SingleFolderMapAssetsEnabled_OnClick(object sender, RoutedEventArgs e)
     {
         _config.SetSingleFolderMapAssetsEnabled(!_config.GetSingleFolderMapAssetsEnabled());
         PopulateConfigPanel();
     }
 
-    //private void IndvidualStaticsEnabled_OnClick(object sender, RoutedEventArgs e)
-    //{
-    //    _config.SetIndvidualStaticsEnabled(!_config.GetIndvidualStaticsEnabled());
-    //    PopulateConfigPanel();
-    //}
-
     private void OutputTextureFormat_OnSelectionChanged(object sender, RoutedEventArgs e)
     {
-        var index = ((sender as ComboBox).DataContext as ConfigSettingComboControl).SettingsCombobox.SelectedIndex;
+        int index = ((sender as ComboBox).DataContext as ConfigSettingComboControl).SettingsCombobox.SelectedIndex;
         _config.SetOutputTextureFormat((TextureExportFormat)index);
         TextureExtractor.SetTextureFormat(_config.GetOutputTextureFormat());
         PopulateConfigPanel();
     }
 
-    private void CurrentStrategy_OnSelectionChanged(object sender, RoutedEventArgs e)
+    // This is a mess
+    private async void CurrentStrategy_OnSelectionChanged(object sender, RoutedEventArgs e)
     {
-        TigerStrategy strategy = (TigerStrategy)(((sender as ComboBox).DataContext as ConfigSettingComboControl).SettingsCombobox.SelectedItem as ComboBoxItem).Tag;
-        if (!Strategy.HasConfiguration(strategy))
+        var prevStrat = Strategy.CurrentStrategy;
+        TigerStrategy targetStrategy = (TigerStrategy)(((sender as ComboBox).DataContext as ConfigSettingComboControl).SettingsCombobox.SelectedItem as ComboBoxItem).Tag;
+
+        MainWindow.Progress.SetProgressStage(
+            $"Changing from {prevStrat.GetEnumDescription()} to {targetStrategy.GetEnumDescription()}");
+
+        // dumb but allows with progress view to show up without wrapping shit in a task.run, which causes more headaches
+        await Task.Delay(100);
+
+        bool hasConfig = Strategy.HasConfiguration(targetStrategy);
+        if (!hasConfig)
         {
-            Log.Warning($"Strategy {strategy} has no configuration set.");
-            if (!OpenPackagesPathDialog(strategy))
+            Log.Warning($"Strategy {targetStrategy} has no configuration set.");
+            Strategy.SetStrategy(TigerStrategy.NONE);
+
+            bool result = OpenPackagesPathDialog(targetStrategy);
+            if (!result)
             {
-                Strategy.SetStrategy(TigerStrategy.NONE);
-                PopulateConfigPanel();
+                MainWindow.Progress.CompleteStage();
+                SetStrategy(prevStrat);
                 return;
             }
         }
-        _config.SetCurrentStrategy(strategy);
-        Strategy.SetStrategy(_config.GetCurrentStrategy());
-        PopulateConfigPanel();
+
+        MainWindow.Progress.CompleteStage();
+        SetStrategy(targetStrategy);
         ConsiderShowingMainMenu();
+    }
+
+    private void SetStrategy(TigerStrategy targetStrategy)
+    {
+        _packagePathStrategy = targetStrategy;
+        _config.SetCurrentStrategy(targetStrategy);
+        Strategy.SetStrategy(targetStrategy);
+
+        PopulateConfigPanel();
     }
 
     private void AnimatedBackground_OnClick(object sender, RoutedEventArgs e)
     {
         _config.SetAnimatedBackground(!_config.GetAnimatedBackground());
+        PopulateConfigPanel();
+    }
+
+    private void MotionEffects_OnClick(object sender, RoutedEventArgs e)
+    {
+        _config.SetMotionEffects(!_config.GetMotionEffects());
+        PopulateConfigPanel();
+    }
+
+    private void SaveShaderHLSL_OnClick(object sender, RoutedEventArgs e)
+    {
+        _config.SetSaveShaderHLSL(!_config.GetSaveShaderHLSL());
+        PopulateConfigPanel();
+    }
+
+    private void ExportEquirectCubemaps_OnClick(object sender, RoutedEventArgs e)
+    {
+        _config.SetExportEquirectCubemaps(!_config.GetExportEquirectCubemaps());
         PopulateConfigPanel();
     }
 }

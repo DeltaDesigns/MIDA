@@ -1,4 +1,5 @@
-﻿using Tiger.Exporters;
+﻿using System.Diagnostics;
+using Tiger.Exporters;
 
 namespace Tiger.Schema.Entity;
 
@@ -7,99 +8,107 @@ public class Entity : Tag<SEntity>
     public TfxFeatureRenderer FeatureType = TfxFeatureRenderer.DynamicObjects;
     // Entity features, todo clean this up
     public EntitySkeleton? Skeleton { get; set; }
-    public EntityModel? Model { get; private set; }
-    public EntityResource? ModelParentResource { get; private set; }
-    public EntityModel? PhysicsModel { get; private set; }
-    public EntityPhysicsModelParent? PhysicsModelParentResource { get; private set; }
-    public EntityResource? PatternAudio { get; private set; }
-    public EntityResource? PatternAudioUnnamed { get; private set; }
     public EntityControlRig? ControlRig { get; private set; }
-    public EntityResource? EntityChildren { get; private set; }
-    public string? EntityName { get; set; } // Usually just the generic name (Ogre, Vandal, etc)
-    public DestinyGenderDefinition Gender { get; set; } = DestinyGenderDefinition.None; // Only used for player armor
+    public EntityModelParent? ModelParent { get; private set; }
+    public EntityPhysicsModelParent? PhysicsModelParent { get; private set; }
+    public EntityComponent? PatternAudio { get; private set; }
+    public EntityComponent? PatternAudioUnnamed { get; private set; }
+    public EntityAttachmentInfo? AttachmentInfo { get; private set; }
+    public EntityComponent? EntityChildren { get; private set; }
+    public EntityComponent? ObjectChannels { get; private set; }
+    public List<EntitySequencer>? Sequences { get; private set; } // The Sequencer (tm)
 
-    public List<EntityResource>? EntityChildren2 { get; private set; } // Some weird collection of entities thats only in Pre-BL?
+    public EntityModel? Model => ModelParent?.GetModel();
+    public EntityModel? PhysicsModel => PhysicsModelParent?.GetModel();
+
+    public string? EntityName { get; set; }
+    public DestinyGenderDefinition Gender { get; set; } = DestinyGenderDefinition.None; // obsolete
+
+    public MarathonItemType ItemType = MarathonItemType.Default; // Currently used for investment purposes
+    public MarathonAttachmentType? AttachmentType;
+    public TigerHash AttachmentID = null;
+
+    public IEnumerable<FileHash> Components => _tag.EntityComponents.Select(GetReader(), r => r.Component);
 
     private bool _loaded = false;
-
-    public Entity(FileHash hash) : base(hash)
-    {
-        Load();
-    }
-
     public Entity(FileHash hash, bool shouldParse = true) : base(hash, shouldParse)
     {
         if (shouldParse)
             Load();
     }
 
-    // TODO: Figure out a way to make Dynamics view not take 10gb of ram and almost a minute to load.
-    // Tried setting most things to NoLoad but it made little difference. I'm not entirely sure what's being the
-    // resource hog. Thought it was EntityModel but I guess not.
     public void Load()
     {
         Deserialize();
         _loaded = true;
-        foreach (var resourceHash in _tag.EntityResources.Select(GetReader(), r => r.Resource))
+        foreach (var resourceHash in Components)
         {
-            EntityResource resource = FileResourcer.Get().GetFile<EntityResource>(resourceHash);
+            EntityComponent resource = FileResourcer.Get().GetFile<EntityComponent>(resourceHash);
             switch (resource.TagData.Unk10.GetValue(resource.GetReader()))
             {
-                case S73868080: // Entity model
-                    Model = ((S78868080)resource.TagData.Unk18.GetValue(resource.GetReader())).Model;
-                    ModelParentResource = resource;
+                case S80808673: // Entity model
+                    ModelParent = FileResourcer.Get().GetFile<EntityModelParent>(resource.Hash);
                     break;
 
-                case S44868080: // Entity physics model
-                    PhysicsModel = ((S55868080)resource.TagData.Unk18.GetValue(resource.GetReader())).PhysicsModel;
-                    PhysicsModelParentResource = FileResourcer.Get().GetFile<EntityPhysicsModelParent>(resource.Hash);
+                case S80808644: // Entity physics model
+                    PhysicsModelParent = FileResourcer.Get().GetFile<EntityPhysicsModelParent>(resource.Hash);
                     break;
 
-                case SAE9F8080: // Some weird skeleton
-                case SB69F8080: // Entity skeleton FK
+                case S80809FAE: // Some weird skeleton
+                case S80809FB6: // Entity skeleton FK
                     Skeleton = FileResourcer.Get().GetFile<EntitySkeleton>(resource.Hash);
+                    break;
+
+                //case S85AD8080:
+                case S80809F75:
+                    AttachmentInfo = FileResourcer.Get().GetFile<EntityAttachmentInfo>(resource.Hash);
+                    break;
+
+                case S808032C2:
+                    var unk18 = (S808032C4)resource.GetUnk18();
+                    var attachmentType = (MarathonAttachmentType)unk18.AttachmentType.Hash32;
+
+                    if (Enum.IsDefined(attachmentType))
+                        AttachmentType = attachmentType;
+                    else if (unk18.AttachmentType != StringHash.InvalidHash32)
+                        Debug.Assert(false, $"Unknown attachment type {attachmentType} : Resource {resourceHash}");
+
+                    if (unk18.Unk120.GetValue(resource.Reader) is S808032C9 unk)
+                        AttachmentID = unk.Unk00;
                     break;
 
                 //case S668B8080:  // Entity skeleton IK
                 //    ControlRig = FileResourcer.Get().GetFile<EntityControlRig>(resource.Hash);
                 //    break;
 
-                //case S97318080: // todo
-                //    PatternAudio = resource;
-                //    break;
+                case S80804603:
+                    PatternAudio = resource;
+                    break;
 
-                //case SF62C8080: // todo
-                //    PatternAudioUnnamed = resource;
-                //    break;
+                case S808040D6:
+                    PatternAudioUnnamed = resource;
+                    break;
 
-                //case S357C8080: // Generic name
-                //    // we care more about the specific name so if the entity name is already assigned, dont assign this one
-                //    if (EntityName == null)
-                //    {
-                //        var genericName = ((S18808080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk3C0.TagData.EntityName;
-                //        if (GlobalStrings.Get().GetString(genericName) != genericName)
-                //            EntityName = GlobalStrings.Get().GetString(genericName);
-                //    }
-                //    break;
+                case S8080B69A: // sequencer
+                    if (Sequences is null)
+                        Sequences = new();
 
-                //case SDA5E8080: // Specific name
-                //    var specificName = ((SDB5E8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Unk108.TagData.EntityName;
+                    Sequences.Add(new(resource.Hash));
+                    break;
 
-                //    // Don't assign a name if the name hash doesnt return an actual string (returns the name hash instead)
-                //    if (GlobalStrings.Get().GetString(specificName) != specificName)
-                //        EntityName = GlobalStrings.Get().GetString(specificName);
-                //    break;
+                case S8080A317:
+                    EntityChildren = resource;
+                    break;
 
-                //case S9AB68080 when Strategy.IsPreBL(): // No idea if this is SK only
-                //    if (EntityChildren2 is null)
-                //        EntityChildren2 = new();
+                case S8080AF8E:
+                    ObjectChannels = resource;
+                    break;
 
-                //    EntityChildren2.Add(resource);
-                //    break;
-
-                //case S12848080:
-                //    EntityChildren = resource;
-                //    break;
+                case S808035B4: // Loot container name
+                    var S808035B7 = (S808035B7)resource.GetUnk18();
+                    if (S808035B7.Container is not null && S808035B7.Name.IsValid())
+                        EntityName = S808035B7.Container.GetStringFromHash(S808035B7.Name);
+                    break;
 
                 default:
                     //Console.WriteLine($"Unk10 {resource.TagData.Unk18.GetValue(resource.GetReader())}");
@@ -110,21 +119,24 @@ public class Entity : Tag<SEntity>
         }
     }
 
+    /// <summary>
+    /// Loads both the normal model and physics model into dynamic mesh parts
+    /// </summary>
+    /// <param name="detailLevel"></param>
+    /// <param name="loadLevel"></param>
+    /// <returns></returns>
     public List<DynamicMeshPart> Load(ExportDetailLevel detailLevel)
     {
         if (!_loaded)
-        {
             Load();
-        }
+
         var dynamicParts = new List<DynamicMeshPart>();
         if (Model != null)
-        {
-            dynamicParts = dynamicParts.Concat(Model.Load(detailLevel, ModelParentResource, hasSkeleton: Skeleton != null)).ToList();
-        }
+            dynamicParts = dynamicParts.Concat(Model.Load(detailLevel, ModelParent, hasSkeleton: Skeleton != null)).ToList();
+
         if (PhysicsModel != null)
-        {
-            dynamicParts = dynamicParts.Concat(PhysicsModel.Load(detailLevel, PhysicsModelParentResource, hasSkeleton: Skeleton != null)).ToList();
-        }
+            dynamicParts = dynamicParts.Concat(PhysicsModel.Load(detailLevel, PhysicsModelParent, hasSkeleton: Skeleton != null)).ToList();
+
         return dynamicParts;
     }
 
@@ -161,20 +173,10 @@ public class Entity : Tag<SEntity>
         lock (_lock)
         {
             if (!_loaded)
-            {
                 Load();
-            }
         }
-        return Model != null;
 
-        //// saves about 10 seconds when loading dynamics list, but its not really worth it since
-        //// the entity will need to be fully loaded after anyways, which adds time
-        //foreach (var resourceHash in _tag.EntityResources.Select(GetReader(), r => r.Resource))
-        //{
-        //    if (resourceHash.ContainsHash(0x80806D8A)) // 8A6D8080
-        //        return true;
-        //}
-        //return false;
+        return ModelParent != null;
     }
 
     public List<Entity> GetEntityChildren()
@@ -188,15 +190,13 @@ public class Entity : Tag<SEntity>
         }
 
         List<Entity> entities = new List<Entity>();
-        //if (Strategy.IsPreBL() && EntityChildren2 is not null)
-        //    entities.AddRange(GetEntityChildren2());
 
         if (EntityChildren is null)
             return entities;
 
-        if (EntityChildren.TagData.Unk18.GetValue(EntityChildren.GetReader()) is S0E848080)
+        if (EntityChildren.TagData.Unk18.GetValue(EntityChildren.GetReader()) is S8080A313 a)
         {
-            foreach (var entry in ((S0E848080)EntityChildren.TagData.Unk18.GetValue(EntityChildren.GetReader())).Unk88)
+            foreach (var entry in a.Unk88)
             {
                 foreach (var entry2 in entry.Unk08)
                 {
@@ -216,40 +216,6 @@ public class Entity : Tag<SEntity>
         }
 
 
-        return entities;
-    }
-
-    public List<Entity> GetEntityChildren2() // THIS SUCKS WHYYY BUNGIEEE
-    {
-        List<Entity> entities = new List<Entity>();
-        if (EntityChildren2 is null)
-            return entities;
-
-        foreach (var resource in EntityChildren2)
-        {
-            if (resource.TagData.Unk18.GetValue(resource.GetReader()) is S519F8080)
-            {
-                foreach (var entry in ((S519F8080)resource.TagData.Unk18.GetValue(resource.GetReader())).Array2)
-                {
-                    if (entry.Unk10.GetValue(resource.GetReader()) is S81888080 entry2)
-                    {
-                        if (entry2.Entity is null)
-                            continue;
-#if DEBUG
-                        Console.WriteLine($"GetEntityChildren2: {resource.Hash} : {entry2.Entity.Hash}");
-#endif
-                        Entity entity = FileResourcer.Get().GetFile<Entity>(entry2.Entity.Hash);
-                        if (!entities.Contains(entity) && entity.HasGeometry())
-                        {
-                            entities.Add(entity);
-                            //Just in case
-                            foreach (var child in entity.GetEntityChildren())
-                                entities.Add(child);
-                        }
-                    }
-                }
-            }
-        }
         return entities;
     }
 }

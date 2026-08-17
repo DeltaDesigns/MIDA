@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using Arithmic;
 
 namespace Tiger.Schema;
@@ -17,17 +18,19 @@ public class ShaderBytecode : TigerReferenceFile<SShaderBytecode>
     {
         get
         {
+            return new();
+
             if (_inputSignatures != null)
             {
                 return _inputSignatures;
             }
 
             _inputSignatures = GetInputSignatures();
-            Log.Debug($"Input signatures for shader {Hash} ({_inputSignatures.Count}):");
-            foreach (DXBCIOSignature inputSignature in _inputSignatures)
-            {
-                Log.Debug(inputSignature.DebugString());
-            }
+            //Log.Debug($"Input signatures for shader {Hash} ({_inputSignatures.Count}):");
+            //foreach (DXBCIOSignature inputSignature in _inputSignatures)
+            //{
+            //    Log.Debug(inputSignature.DebugString());
+            //}
             return _inputSignatures;
         }
     }
@@ -37,17 +40,19 @@ public class ShaderBytecode : TigerReferenceFile<SShaderBytecode>
     {
         get
         {
+            return new();
+
             if (_outputSignatures != null)
             {
                 return _outputSignatures;
             }
 
             _outputSignatures = GetOutputSignatures();
-            Log.Debug($"Output signatures for shader {Hash} ({_outputSignatures.Count}):");
-            foreach (DXBCIOSignature outputSignature in _outputSignatures)
-            {
-                Log.Debug(outputSignature.DebugString());
-            }
+            //Log.Debug($"Output signatures for shader {Hash} ({_outputSignatures.Count}):");
+            //foreach (DXBCIOSignature outputSignature in _outputSignatures)
+            //{
+            //    Log.Debug(outputSignature.DebugString());
+            //}
             return _outputSignatures;
         }
     }
@@ -57,17 +62,19 @@ public class ShaderBytecode : TigerReferenceFile<SShaderBytecode>
     {
         get
         {
+            return new();
+
             if (_resources != null)
             {
                 return _resources;
             }
 
             _resources = GetShaderResources();
-            Log.Debug($"Shader Resources for shader {Hash} ({_resources.Count}):");
-            foreach (DXBCShaderResource resource in _resources)
-            {
-                Log.Debug(resource.DebugString());
-            }
+            //Log.Debug($"Shader Resources for shader {Hash} ({_resources.Count}):");
+            //foreach (DXBCShaderResource resource in _resources)
+            //{
+            //    Log.Debug(resource.DebugString());
+            //}
             return _resources;
         }
     }
@@ -78,20 +85,29 @@ public class ShaderBytecode : TigerReferenceFile<SShaderBytecode>
         return reader.ReadBytes((int)_tag.BytecodeSize);
     }
 
+    // Experimental DXIL -> SPIR-V -> HLSL decompilation.
+    // It's really bad and ugly, but it works for the most part. 
     private static object _lock = new object();
     public string Decompile(string name, string savePath = "hlsl_temp")
     {
         if (_decompiled is not null)
             return _decompiled;
 
-        var shaderBytecode = GetBytecode();
-        string binPath = $"{savePath}/{name}.bin";
+        string binPath = $"{Directory.GetCurrentDirectory()}/{savePath}/{name}.bin";
         string hlslPath = $"{savePath}/{name}.hlsl";
 
-        if (!Directory.Exists(savePath))
+        lock (_lock)
         {
-            Directory.CreateDirectory($"{savePath}/");
+            if (File.Exists(hlslPath))
+            {
+                _decompiled = File.ReadAllText(hlslPath);
+                return _decompiled;
+            }
         }
+
+        var shaderBytecode = GetBytecode();
+        if (!Directory.Exists(savePath))
+            Directory.CreateDirectory($"{savePath}/");
 
         lock (_lock)
         {
@@ -106,9 +122,9 @@ public class ShaderBytecode : TigerReferenceFile<SShaderBytecode>
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = false;
             startInfo.UseShellExecute = false;
-            startInfo.FileName = "ThirdParty/3dmigoto_shader_decomp.exe";
+            startInfo.FileName = "ThirdParty/dxil/HLSLDecompiler.exe";
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            startInfo.Arguments = $"-D \"{binPath}\"";
+            startInfo.Arguments = $"\"{binPath}\" -dxil";
 
             using (Process exeProcess = Process.Start(startInfo))
             {
@@ -117,28 +133,59 @@ public class ShaderBytecode : TigerReferenceFile<SShaderBytecode>
 
             if (!File.Exists(hlslPath))
             {
-                throw new FileNotFoundException($"Decompilation failed for {name}");
+                Log.Error($"Decompilation failed for Shader {Hash}");
+                return $"Decompilation failed for Shader {Hash}";
             }
         }
 
-        string hlsl = "";
-        lock (_lock)
+        string hlsl = string.Empty;
+        StringBuilder add = new();
+        add.AppendLine("// Decompiled from DXIL to SPIR-V to HLSL.");
+        add.AppendLine("// Yes I know, it's ugly. Blame Bungie for switching to DX12.\n");
+
+        const int maxRetries = 50;
+        const int retryDelay = 100;
+        int retryCount = 0;
+
+        while (string.IsNullOrEmpty(hlsl) && retryCount < maxRetries)
         {
-            while (hlsl == "")
+            try
             {
-                try  // needed for slow machines
+                lock (_lock)
                 {
-                    hlsl = File.ReadAllText(hlslPath);
-                    _decompiled = hlsl;
-                }
-                catch (IOException)
-                {
-                    Thread.Sleep(100);
+                    if (File.Exists(hlslPath))
+                    {
+                        hlsl = File.ReadAllText(hlslPath);
+                        add.AppendLine(hlsl);
+                        hlsl = add.ToString();
+                        File.WriteAllText(hlslPath, hlsl);
+                        _decompiled = hlsl;
+                    }
+                    else
+                    {
+                        Log.Error($"HLSL file not found: {hlslPath}");
+                    }
                 }
             }
+            catch (IOException ex)
+            {
+                retryCount++;
+                if (retryCount >= maxRetries)
+                {
+                    Log.Error($"Failed to read HLSL file after {maxRetries} attempts.");
+                }
+
+                Thread.Sleep(retryDelay);
+            }
+        }
+
+        if (string.IsNullOrEmpty(hlsl))
+        {
+            Log.Error("Failed to load HLSL file.");
         }
         return hlsl;
     }
+
 
     //These are kinda messy and can probably be simplified
     public List<DXBCIOSignature> GetInputSignatures()

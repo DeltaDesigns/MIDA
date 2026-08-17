@@ -62,45 +62,72 @@ public class NoLoadAttribute : Attribute
 [AttributeUsage(AttributeTargets.Struct, AllowMultiple = true)]
 public class SchemaStructAttribute : StrategyAttribute
 {
-    public string ClassHash { get; }
     public int SerializedSize { get; }
 
+    private uint _classID;
+    public uint ClassID
+    {
+        get => _classID;
+        set { _classID = value; }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the SchemaStructAttribute class with the specified size.
+    /// </summary>
+    /// <param name="serializedSize">The size, in bytes, of the serialized structure.</param>
     public SchemaStructAttribute(int serializedSize)
     {
-        ClassHash = "";
+        ClassID = TigerHash.InvalidHash32;
         SerializedSize = serializedSize;
     }
 
-    public SchemaStructAttribute(string classHash, int serializedSize)
+    /// <summary>
+    /// Initializes a new instance of the SchemaStructAttribute class with the specified class ID and size.
+    /// This version should only be used for primitive types such as Vectors
+    /// </summary>
+    /// <param name="classID">The ID, as a uint, identifying the class.</param>
+    /// <param name="serializedSize">The size, in bytes, of the serialized structure.</param>
+    public SchemaStructAttribute(uint classID, int serializedSize)
     {
-        if (classHash.StartsWith("8080") && !classHash.EndsWith("8080"))
-        {
-            byte[] bytes = Helpers.HexStringToByteArray(classHash);
+        ClassID = classID;
+        SerializedSize = serializedSize;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the SchemaStructAttribute class with the specified strategy, class ID, and size.
+    /// serialized size.
+    /// </summary>
+    /// <param name="strategy">The strategy to use.</param>
+    /// <param name="classID">The ID, as a uint, identifying the class.</param>
+    /// <param name="serializedSize">The size, in bytes, of the serialized structure.</param>
+    public SchemaStructAttribute(TigerStrategy strategy, uint classID, int serializedSize) : base(strategy)
+    {
+        ClassID = classID;
+        SerializedSize = serializedSize;
+    }
+
+
+    [Obsolete("Class IDs should now be defined as a uint (Ex: 0x8080ABCD")]
+    public SchemaStructAttribute(string classID, int serializedSize)
+    {
+        ClassID = LegacyStringIDToUInt(classID);
+        SerializedSize = serializedSize;
+    }
+
+    [Obsolete("Class IDs should now be defined as a uint (Ex: 0x8080ABCD)")]
+    public SchemaStructAttribute(TigerStrategy strategy, string classID, int serializedSize) : base(strategy)
+    {
+        ClassID = LegacyStringIDToUInt(classID);
+        SerializedSize = serializedSize;
+    }
+
+    private uint LegacyStringIDToUInt(string classID)
+    {
+        byte[] bytes = Helpers.HexStringToByteArray(classID);
+        if (classID.StartsWith("8080") && !classID.EndsWith("8080"))
             Array.Reverse(bytes);
-            classHash = Endian.U32ToString(BitConverter.ToUInt32(bytes));
-        }
 
-        ClassHash = classHash;
-        SerializedSize = serializedSize;
-    }
-
-    public SchemaStructAttribute(TigerStrategy strategy, int serializedSize) : base(strategy)
-    {
-        ClassHash = "FFFFFFFF";
-        SerializedSize = serializedSize;
-    }
-
-    public SchemaStructAttribute(TigerStrategy strategy, string classHash, int serializedSize) : base(strategy)
-    {
-        if (classHash.StartsWith("8080") && !classHash.EndsWith("8080"))
-        {
-            byte[] bytes = Helpers.HexStringToByteArray(classHash);
-            Array.Reverse(bytes);
-            classHash = Endian.U32ToString(BitConverter.ToUInt32(bytes));
-        }
-
-        ClassHash = classHash;
-        SerializedSize = serializedSize;
+        return BitConverter.ToUInt32(bytes);
     }
 }
 
@@ -249,5 +276,28 @@ public class SchemaTestAttribute : Attribute
     public SchemaTestAttribute(string displayName = null)
     {
         DisplayName = displayName;
+    }
+}
+
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+public class MarathonItemAttribute : Attribute
+{
+    public string Name { get; }
+    public string Glyph { get; } = "";
+    public MarathonItemType ItemType { get; }
+
+    public MarathonItemAttribute(string name, MarathonItemType itemType = MarathonItemType.Default)
+    {
+        Name = name;
+        ItemType = itemType;
+        if (itemType == MarathonItemType.WeaponAttachment)
+            Glyph = "";
+    }
+
+    public MarathonItemAttribute(string name, string glyph, MarathonItemType itemType)
+    {
+        Name = name;
+        ItemType = itemType;
+        Glyph = glyph;
     }
 }

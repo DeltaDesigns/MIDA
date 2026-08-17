@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using Arithmic;
 using Tiger;
 using Tiger.Schema;
 using Tiger.Schema.Activity;
-using static MIDA.APIItemView;
 
 namespace MIDA;
 
@@ -23,8 +21,6 @@ public partial class ActivityMapView : UserControl
     private DisplayBubble _currentBubble;
     private string _destinationName;
 
-    private APITooltip ToolTip;
-
     public ActivityMapView()
     {
         InitializeComponent();
@@ -32,33 +28,7 @@ public partial class ActivityMapView : UserControl
 
     private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
     {
-        if (ToolTip is null)
-        {
-            ToolTip = new();
-            Panel.SetZIndex(ToolTip, 50);
-            MainContainer.Children.Add(ToolTip);
-        }
-    }
 
-    private void ExportButton_MouseEnter(object sender, MouseEventArgs e)
-    {
-        ToolTip.ActiveItem = (sender as FrameworkElement);
-        string[] text = (sender as FrameworkElement).Tag.ToString().Split(":");
-
-        PlugItem plugItem = new()
-        {
-            Name = $"{text[0]}",
-            Description = $"{text[1]}",
-            PlugRarityColor = MarathonTierType.Standard.GetColor()
-        };
-
-        ToolTip.MakeTooltip(plugItem);
-    }
-
-    public void ExportButton_MouseLeave(object sender, MouseEventArgs e)
-    {
-        ToolTip.ClearTooltip();
-        ToolTip.ActiveItem = null;
     }
 
     public void LoadUI(IActivity activity)
@@ -154,11 +124,50 @@ public partial class ActivityMapView : UserControl
     private async void QuickControl_OnClick(object sender, RoutedEventArgs e)
     {
         int exportType = Int32.Parse(((sender as Button).DataContext as string));
+        MapControl.Visibility = Visibility.Hidden;
+
         switch (exportType)
         {
             case 0: // All Map
-                await Task.Run(() => ExportStaticMap());
-                goto case 2;
+                {
+                    var tcs = new TaskCompletionSource<bool>();
+                    PopupBanner warn = new()
+                    {
+                        DarkenBackground = true,
+                        Title = "HEADS UP",
+                        Subtitle = "You're about to export an ENTIRE map!",
+                        Description = "Marathon maps are EXTREMELY model and instance heavy. Exporting an entire map WILL TAKE A LONG TIME!" +
+                        "\nThousands (maybe even 10K+) of models will be exported!" +
+                        "\n\nYou are about to export this maps statics, entities and activity entities." +
+                        "\nAre you sure you want to continue?",
+                        Style = PopupBanner.PopupStyle.Warning,
+                        UserInput = "Yep.",
+                        UserInputSecondary = "Nevermind..."
+                    };
+                    warn.MouseLeftButtonDown += (s, e) =>
+                    {
+                        tcs.TrySetResult(true);
+                    };
+
+                    warn.MouseRightButtonDown += (s, e) =>
+                    {
+                        tcs.TrySetResult(false);
+                    };
+                    warn.Show();
+
+                    bool confirmed = await tcs.Task;
+                    warn.Remove();
+                    if (!confirmed)
+                    {
+                        MapControl.Visibility = Visibility.Visible;
+                        return;
+                    }
+
+                    await Task.Run(() => ExportStaticMap());
+                    await Task.Run(() => ExportResources());
+                    await Task.Run(() => ExportActivityEntities());
+                }
+                break;
 
             case 1: // Static Map
                 await Task.Run(() => ExportStaticMap());
@@ -169,37 +178,9 @@ public partial class ActivityMapView : UserControl
                 break;
 
             case 3: // Activity Entities
-                var maps = new ConcurrentDictionary<FileHash, List<FileHash>>();
-                var entries = _currentActivity.EnumerateActivityEntities().Where(x => x.BubbleName == _currentBubble.Name).ToList();
-
-                var tag = (_currentActivity as Tiger.Schema.Activity.MARATHON_ALPHA.Activity).TagData.AmbientActivity;
-                if (tag is not null)
-                {
-                    var ambient = FileResourcer.Get().GetFileInterface<IActivity>(tag.Hash);
-                    entries.AddRange(ambient.EnumerateActivityEntities().Where(x => x.BubbleName == _currentBubble.Name).ToList());
-                }
-
-
-                foreach (var entry in entries)
-                {
-                    if (entry.DataTables.Count > 0)
-                    {
-                        var containerHash = entry.Hash;
-                        if (!maps.ContainsKey(containerHash))
-                            maps.TryAdd(containerHash, new());
-
-                        foreach (var hash in entry.DataTables)
-                        {
-                            if (!maps[containerHash].Contains(hash))
-                                maps[containerHash].Add(hash);
-                        }
-                    }
-                }
-                await Task.Run(() => ExportResources(maps));
+                await Task.Run(() => ExportActivityEntities());
                 break;
         }
-
-        //MessageBox.Show("Export Complete.");
 
         Dispatcher.Invoke(() => MapControl.Visibility = Visibility.Hidden);
         NotificationBanner notify = new()
@@ -211,6 +192,41 @@ public partial class ActivityMapView : UserControl
         };
         notify.OnProgressComplete += () => Dispatcher.Invoke(() => MapControl.Visibility = Visibility.Visible);
         notify.Show();
+    }
+
+    public async void ExportActivityEntities()
+    {
+        MainWindow.Progress.SetProgressStages(new() { $"Gathering Activity Entities for {_currentBubble.Name}..." });
+
+        var maps = new ConcurrentDictionary<FileHash, List<FileHash>>();
+        var entries = _currentActivity.EnumerateActivityEntities().Where(x => x.BubbleName == _currentBubble.Name).ToList();
+
+        var tag = (_currentActivity as Tiger.Schema.Activity.MARATHON.Activity).TagData.AmbientActivity;
+        if (tag is not null)
+        {
+            var ambient = FileResourcer.Get().GetFileInterface<IActivity>(tag.Hash);
+            entries.AddRange(ambient.EnumerateActivityEntities().Where(x => x.BubbleName == _currentBubble.Name).ToList());
+        }
+
+
+        foreach (var entry in entries)
+        {
+            if (entry.DataTables.Count > 0)
+            {
+                var containerHash = entry.Hash;
+                if (!maps.ContainsKey(containerHash))
+                    maps.TryAdd(containerHash, new());
+
+                foreach (var hash in entry.DataTables)
+                {
+                    if (!maps[containerHash].Contains(hash))
+                        maps[containerHash].Add(hash);
+                }
+            }
+        }
+        MainWindow.Progress.CompleteStage();
+
+        ExportResources(maps);
     }
 
     public async void ExportStaticMap()
@@ -230,8 +246,8 @@ public partial class ActivityMapView : UserControl
                 maps.Add(containerHash);
         });
 
-        List<string> mapStages = maps.Select((x, i) => $"Preparing {x} ({i + 1}/{maps.Count()})").ToList();
-        mapStages.Add("Exporting Static Map...This may take some time");
+        List<string> mapStages = maps.Select((x, i) => $"Preparing {x} ({i + 1}/{maps.Count()})\nThis may take some time.").ToList();
+        mapStages.Add("Exporting Static Map...\nThis will take a while.");
         MainWindow.Progress.SetProgressStages(mapStages);
 
         Tiger.Exporters.Exporter.Get().GetOrCreateGlobalScene();
@@ -281,8 +297,8 @@ public partial class ActivityMapView : UserControl
         }
 
         Log.Info($"Exporting {type}: {_currentBubble.Name}, {_currentBubble.Hash}");
-        List<string> mapStages = maps.Select((x, i) => $"Preparing {_currentBubble.Name} ({i + 1}/{maps.Count()})").ToList();
-        mapStages.Add($"Exporting {type}");
+        List<string> mapStages = maps.Select((x, i) => $"Preparing {_currentBubble.Name} ({i + 1}/{maps.Count()})\nThis may take some time.").ToList();
+        mapStages.Add($"Exporting {type}...\nThis will take a while.");
 
         MainWindow.Progress.SetProgressStages(mapStages);
 
@@ -355,8 +371,8 @@ public partial class ActivityMapView : UserControl
             return;
         }
 
-        List<string> mapStages = maps.Select((x, i) => $"Preparing {i + 1}/{maps.Count}").ToList();
-        mapStages.Add("Exporting...This may take some time");
+        List<string> mapStages = maps.Select((x, i) => $"Preparing {i + 1}/{maps.Count}\nThis may take some time.").ToList();
+        mapStages.Add("Exporting...\nThis will take a while.");
         MainWindow.Progress.SetProgressStages(mapStages);
 
         Tiger.Exporters.Exporter.Get().GetOrCreateGlobalScene();
@@ -392,67 +408,6 @@ public partial class ActivityMapView : UserControl
             notify.Show();
         });
 
-    }
-
-    private async void StaticMap_OnClick(object sender, RoutedEventArgs e)
-    {
-        var s = sender as Button;
-        var dc = s.DataContext as DisplayStaticMap;
-
-        MapControl.Clear();
-        MapControl.Visibility = Visibility.Hidden;
-        Log.Info($"Loading UI for static map hash: {dc.Name}");
-
-        var lod = MapControl.ModelView.GetSelectedLod();
-        if (dc.Name == "Select all")
-        {
-            var items = StaticList.Items.Cast<DisplayStaticMap>().Where(x => x.Name != "Select all");
-            List<string> mapStages = items.Select(x => $"Loading to UI: {x.Hash}").ToList();
-            if (mapStages.Count == 0)
-            {
-                Log.Error("No maps available for viewing.");
-                //MessageBox.Show("No maps available for viewing.");
-
-                Dispatcher.Invoke(() =>
-                {
-                    MapControl.Visibility = Visibility.Hidden;
-                    NotificationBanner warn = new()
-                    {
-                        Icon = "⚠️",
-                        Title = "WARNING",
-                        Description = $"No maps available for viewing!",
-                        Style = NotificationBanner.PopupStyle.Warning
-                    };
-                    warn.OnProgressComplete += () => Dispatcher.Invoke(() => MapControl.Visibility = Visibility.Visible);
-                    warn.Show();
-                });
-
-                return;
-            }
-            MainWindow.Progress.SetProgressStages(mapStages);
-            await Task.Run(() =>
-            {
-                Tag<SBubbleDefinition> bubbleMaps = FileResourcer.Get().GetSchemaTag<SBubbleDefinition>(_currentBubble.Hash);
-                bubbleMaps.TagData.MapResources.ForEach(m =>
-                {
-                    MapControl.LoadMap(m.MapContainer.Hash, lod);
-                    MainWindow.Progress.CompleteStage();
-                });
-            });
-        }
-        else
-        {
-            var fileHash = new FileHash(dc.Hash);
-            MainWindow.Progress.SetProgressStages(new List<string> { fileHash });
-            // cant do this rn bc of lod problems with dupes
-            // MapControl.ModelView.SetModelFunction(() => MapControl.LoadMap(fileHash, MapControl.ModelView.GetSelectedLod()));
-            await Task.Run(() =>
-            {
-                MapControl.LoadMap(fileHash, lod);
-                MainWindow.Progress.CompleteStage();
-            });
-        }
-        MapControl.Visibility = Visibility.Visible;
     }
 
     public void Dispose()

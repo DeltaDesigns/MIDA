@@ -7,7 +7,7 @@ public class FindBytesInPackagesCommandlet : ICommandlet
     private string bytesStr;
     private byte[] bytes;
 
-    public void Run(InstanceArgs args)
+    public void Run(TigerArgs args)
     {
         // var config = Strategy.GetStrategyConfiguration(TigerStrategy.DESTINY2_WITCHQUEEN_6307);
         // config.PackagesDirectory = "I:/v6307/packages/";

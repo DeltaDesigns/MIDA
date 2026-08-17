@@ -7,7 +7,7 @@ using ConcurrentCollections;
 
 namespace Tiger;
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "C29E8080", 0x10)]
+[SchemaStruct(TigerStrategy.MARATHON, "C29E8080", 0x10)]
 [StructLayout(LayoutKind.Sequential, Size = 0x10)]
 public struct SHash64Definition
 {
@@ -23,10 +23,10 @@ public interface IPackageHeader
     public uint GetTimestamp();
     public ushort GetPatchId();
     public uint GetFileCount();
+    public TigerLanguage GetLanguage();
     public List<FileEntry> GetFileEntries(TigerReader reader);
     public List<BlockEntry> GetBlockEntries(TigerReader reader);
     public List<SHash64Definition> GetHash64Definitions(TigerReader reader);
-
     public List<PackageActivityEntry> GetAllActivities(TigerReader reader);
 }
 
@@ -39,7 +39,6 @@ public struct FileView
 public interface IPackage
 {
     PackageMetadata GetPackageMetadata();
-
     FileMetadata GetFileMetadata(ushort fileId);
     FileMetadata GetFileMetadata(FileHash fileId);
     List<FileMetadata> GetAllFileMetadata();
@@ -63,7 +62,7 @@ public struct PackageActivityEntry
     public string Name;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "C59E8080", 0x10)]
+[SchemaStruct(TigerStrategy.MARATHON, "C59E8080", 0x10)]
 public struct SPackageActivityEntry
 {
     public FileHash TagHash;
@@ -133,8 +132,6 @@ public abstract class Package : IPackage
     public List<T> GetAllFiles<T>() where T : TigerFile
     {
         ConcurrentBag<T> tags = new();
-
-
         Type type = typeof(T);
         if (type.IsGenericType)
         {
@@ -178,7 +175,6 @@ public abstract class Package : IPackage
             }
         }
 
-
         return tags.ToList();
     }
 
@@ -187,7 +183,7 @@ public abstract class Package : IPackage
         List<TigerFile> tags = new();
 
         SchemaStructAttribute attribute = GetAttribute<SchemaStructAttribute>(fileType.BaseType.GenericTypeArguments[0]);
-        TigerHash referenceHash = new(attribute.ClassHash);
+        TigerHash referenceHash = new(attribute.ClassID);
 
         Parallel.For(0, FileEntries.Count, i =>
         {
@@ -486,6 +482,11 @@ public abstract class Package : IPackage
         return GetFileBytes(fileIndex).AsSpan();
     }
 
+    public bool CheckRedacted(FileHash fileHash)
+    {
+        return CheckRedacted(fileHash.FileIndex);
+    }
+
     /// <summary>
     /// Find what blocks the file is made out of. For most small files this is a single block since blocks are
     /// 262144 bytes long, but larger files will span multiple blocks.
@@ -558,6 +559,18 @@ public abstract class Package : IPackage
         return finalFileBuffer;
     }
 
+    public bool CheckRedacted(ushort fileIndex)
+    {
+        if (PackageResourcer.Get().Keys.TryGetValue(GetPackageMetadata().PackageGroup, out _))
+            return false; // assumes the key is correct
+
+        FileEntry fileEntry = FileEntries[fileIndex];
+        int blockCount = GetBlockCount(fileEntry);
+
+        List<BlockEntry> blocks = GetBlockEntries(fileEntry.StartingBlockIndex, blockCount);
+        return blocks.All(x => (x.BitFlag & 0x8) != 0);
+    }
+
     public PackageMetadata GetPackageMetadata()
     {
         PackageMetadata packageMetadata = new PackageMetadata();
@@ -568,6 +581,7 @@ public abstract class Package : IPackage
         packageMetadata.Timestamp = Header.GetTimestamp();
         packageMetadata.FileCount = Header.GetFileCount();
         packageMetadata.PackageGroup = Header.GetPackageGroup();
+        packageMetadata.Language = Header.GetLanguage();
         return packageMetadata;
     }
 
@@ -667,10 +681,12 @@ public abstract class Package : IPackage
         if (redacted) // (block.BitFlag & 0x4) == 0 
         {
             var kvp = PackageResourcer.Get().Keys;
-            if (kvp.ContainsKey(GetPackageMetadata().PackageGroup))
+            var pkg = GetPackageMetadata();
+            if (kvp.TryGetValue(pkg.PackageGroup, out var group))
             {
-                key = kvp[GetPackageMetadata().PackageGroup].First().Key;
-                iv = kvp[GetPackageMetadata().PackageGroup].First().Value;
+                key = group.AES;
+                iv = group.Nonce;
+                //Log.Debug($"Attempting Key {Convert.ToHexString(key)}:{Convert.ToHexString(iv)} for {pkg.Name} (Group {pkg.PackageGroup:X2})");
             }
             else
                 return decryptedBuffer;
@@ -726,6 +742,7 @@ public struct PackageMetadata
     public uint Timestamp;
     public uint FileCount;
     public ulong PackageGroup;
+    public TigerLanguage Language;
 }
 
 public struct FileMetadata
@@ -776,7 +793,7 @@ public struct FileEntry
 };
 
 [StructLayout(LayoutKind.Sequential)]
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "F39E8080", 0x10)]
+[SchemaStruct(TigerStrategy.MARATHON, "F39E8080", 0x10)]
 public struct FileEntryBitpacked
 {
     public uint Reference;
@@ -794,7 +811,7 @@ public struct FileEntryBitpacked
 }
 
 [StructLayout(LayoutKind.Sequential)]
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "EE9E8080", 0x30)]
+[SchemaStruct(TigerStrategy.MARATHON, "EE9E8080", 0x30)]
 public unsafe struct BlockEntry
 {
     public uint Offset;

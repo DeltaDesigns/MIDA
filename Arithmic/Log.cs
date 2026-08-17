@@ -82,16 +82,32 @@ public static class Log
         LogEvent(LogVerbosity.Fatal, message, callerMethodName, callerFile);
     }
 
+
+    /// <summary>
+    /// Logs a message directly to the console without adding it to the log history or triggering log events.
+    /// </summary>
+    public static void Console(string message, [CallerMemberName] string callerMethodName = "", [CallerFilePath] string callerFile = "")
+    {
+        string formattedMessage = MakeFormattedMessageSimple(message, callerMethodName, callerFile);
+        System.Console.WriteLine(formattedMessage);
+    }
+
     private static void LogEvent(LogVerbosity verbosity, string message, string callerMethodName, string callerFile)
     {
-        // disable if debugging things
-        if (verbosity == LogVerbosity.Debug)
-        {
-            return;
-        }
+#if !DEBUG
+    if (verbosity == LogVerbosity.Debug)
+    {
+        return;
+    }
+#endif
 
         string formattedMessage = MakeFormattedMessage(verbosity, message, callerMethodName, callerFile);
-        LogEventArgs logEventArgs = new LogEventArgs { Verbosity = verbosity, Message = formattedMessage, Time = DateTime.Now };
+        LogEventArgs logEventArgs = new LogEventArgs
+        {
+            Verbosity = verbosity,
+            Message = formattedMessage,
+            Time = DateTime.Now
+        };
         LogHistory.Add(logEventArgs);
         OnLogEvent(null, logEventArgs);
     }
@@ -99,6 +115,11 @@ public static class Log
     private static string MakeFormattedMessage(LogVerbosity verbosity, string message, string callerMethodName, string callerFile)
     {
         return $"[{DateTime.Now:yy/MM/dd HH:mm:ss.fff}] [{verbosity}] [{callerFile.Split('\\').Last().Split('.').First()}::{callerMethodName}] {message}";
+    }
+
+    private static string MakeFormattedMessageSimple(string message, string callerMethodName, string callerFile)
+    {
+        return $"[{callerFile.Split('\\').Last().Split('.').First()}::{callerMethodName}] {message}";
     }
 
     public static void Clear()

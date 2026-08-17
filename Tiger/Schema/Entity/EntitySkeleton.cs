@@ -3,8 +3,10 @@ using Internal.Fbx;
 
 namespace Tiger.Schema.Entity;
 
-public class EntitySkeleton : EntityResource
+public class EntitySkeleton : EntityComponent
 {
+    private List<BoneNode>? _cachedBoneNodes;
+
     public EntitySkeleton(FileHash resource) : base(resource)
     {
     }
@@ -15,12 +17,16 @@ public class EntitySkeleton : EntityResource
         var nodes = new List<BoneNode>();
         dynamic? resource = _tag.Unk18.GetValue(reader);
 
-        if (resource is SB79F8080 skelInfo)
+        if (resource is S80809FB7 skelInfo)
         {
             for (int i = 0; i < skelInfo.NodeHierarchy.Count; i++)
             {
                 BoneNode node = new();
+                node.Index = i;
                 node.ParentNodeIndex = skelInfo.NodeHierarchy[reader, i].ParentNodeIndex;
+                node.FirstChildNodeIndex = skelInfo.NodeHierarchy[reader, i].FirstChildNodeIndex;
+                node.NextSiblingNodeIndex = skelInfo.NodeHierarchy[reader, i].NextSiblingNodeIndex;
+
                 node.Hash = skelInfo.NodeHierarchy[reader, i].NodeHash;
                 node.DefaultObjectSpaceTransform = new ObjectSpaceTransform
                 {
@@ -37,40 +43,44 @@ public class EntitySkeleton : EntityResource
                 nodes.Add(node);
             }
         }
-        else if (resource is SAF9F8080 weirdSkelInfo)
+        else if (resource is S80809FAF weirdSkeleInfo)
         {
-            for (int i = 0; i < weirdSkelInfo.NodeHierarchy.Count; i++)
+            for (int i = 0; i < weirdSkeleInfo.NodeHierarchy.Count; i++)
             {
                 BoneNode node = new();
-                node.ParentNodeIndex = weirdSkelInfo.NodeHierarchy[reader, i].ParentNodeIndex;
-                node.Hash = weirdSkelInfo.NodeHierarchy[reader, i].NodeHash;
+                node.Index = i;
+                node.ParentNodeIndex = weirdSkeleInfo.NodeHierarchy[reader, i].ParentNodeIndex;
+                node.FirstChildNodeIndex = weirdSkeleInfo.NodeHierarchy[reader, i].FirstChildNodeIndex;
+                node.NextSiblingNodeIndex = weirdSkeleInfo.NodeHierarchy[reader, i].NextSiblingNodeIndex;
+
+                node.Hash = weirdSkeleInfo.NodeHierarchy[reader, i].NodeHash;
                 node.DefaultInverseObjectSpaceTransform = new ObjectSpaceTransform
                 {
-                    QuaternionRotation = weirdSkelInfo.DefaultInverseObjectSpaceTransforms[reader, i].Rotation,
-                    Translation = weirdSkelInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation.ToVec3(),
-                    Scale = weirdSkelInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation.W
+                    QuaternionRotation = weirdSkeleInfo.DefaultInverseObjectSpaceTransforms[reader, i].Rotation,
+                    Translation = weirdSkeleInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation.ToVec3(),
+                    Scale = weirdSkeleInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation.W
                 };
                 // no DOST, so calculate inverse DIOST
-                Vector4 inverseRotation = weirdSkelInfo.DefaultInverseObjectSpaceTransforms[reader, i].Rotation;
+                Vector4 inverseRotation = weirdSkeleInfo.DefaultInverseObjectSpaceTransforms[reader, i].Rotation;
                 inverseRotation.W = -inverseRotation.W;
 
-                Vector4 inverseTranslation = weirdSkelInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation;
+                Vector4 inverseTranslation = weirdSkeleInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation;
                 inverseTranslation = Vector4.QuaternionMultiply(inverseRotation, inverseTranslation);
-                inverseTranslation = Vector4.QuaternionMultiply(inverseTranslation, weirdSkelInfo.DefaultInverseObjectSpaceTransforms[reader, i].Rotation);
+                inverseTranslation = Vector4.QuaternionMultiply(inverseTranslation, weirdSkeleInfo.DefaultInverseObjectSpaceTransforms[reader, i].Rotation);
                 node.DefaultObjectSpaceTransform = new ObjectSpaceTransform
                 {
                     QuaternionRotation = inverseRotation,
                     Translation = inverseTranslation.ToVec3(),
-                    Scale = weirdSkelInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation.W
+                    Scale = weirdSkeleInfo.DefaultInverseObjectSpaceTransforms[reader, i].Translation.W
                 };
                 nodes.Add(node);
             }
         }
 
-        return nodes;
+        _cachedBoneNodes = nodes;
+        return _cachedBoneNodes;
     }
 }
-
 
 public struct ObjectSpaceTransform
 {
@@ -82,7 +92,22 @@ public struct BoneNode
 {
     public ObjectSpaceTransform DefaultObjectSpaceTransform;
     public ObjectSpaceTransform DefaultInverseObjectSpaceTransform;
+    public int Index { get; set; }
     public int ParentNodeIndex;
+    public int FirstChildNodeIndex;
+    public int NextSiblingNodeIndex;
     public TigerHash Hash;
     public FbxNode Node;
 }
+
+public struct ExportBoneNode
+{
+    public ObjectSpaceTransform DefaultObjectSpaceTransform { get; set; }
+    public ObjectSpaceTransform DefaultInverseObjectSpaceTransform { get; set; }
+    public int Index { get; set; }
+    public int ParentNodeIndex { get; set; }
+    public int FirstChildNodeIndex;
+    public int NextSiblingNodeIndex;
+    public string Hash { get; set; }
+}
+

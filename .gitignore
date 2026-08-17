@@ -274,6 +274,10 @@ FakesAssemblies/
 #ThirdParty/DXDecompiler
 # Include libreborb dll and hlsl exe
 !MIDA/ThirdParty/*.dll
+!MIDA/Libs/*
 !MIDA/ThirdParty/*.exe
+!MIDA/ThirdParty/dxil/*.dll
+!MIDA/ThirdParty/dxil/*.exe
+!MIDA/ThirdParty/vgmstream/*
 .vscode/tasks.json
 .vscode/launch.json

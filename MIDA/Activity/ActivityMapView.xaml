@@ -13,13 +13,9 @@
     <UserControl.Resources>
         <ControlTemplate x:Key="StaticTemplate">
             <Grid
-                Height="40"
+                Height="55"
                 Margin="0,3,0,3"
                 Background="{StaticResource BackgroundColour14a}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80*" />
-                    <ColumnDefinition Width="20*" />
-                </Grid.ColumnDefinitions>
                 <Border
                     Grid.ColumnSpan="2"
                     Panel.ZIndex="1"
@@ -40,22 +36,7 @@
                         TextAlignment="Center"
                         TextWrapping="WrapWithOverflow" />
                 </CheckBox>
-                <Button
-                    Grid.Column="1"
-                    Height="auto"
-                    Margin="2"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Click="StaticMap_OnClick"
-                    Style="{StaticResource D2StyleButton}">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium Keys}"
-                        FontSize="16"
-                        Text="View"
-                        TextAlignment="Center"
-                        TextWrapping="WrapWithOverflow" />
-                </Button>
+
             </Grid>
         </ControlTemplate>
     </UserControl.Resources>
@@ -167,7 +148,7 @@
                 Orientation="Vertical"
                 Visibility="Hidden">
                 <ContentControl
-                    Margin="0,10,0,10"
+                    Margin="0,0,0,15"
                     Content="MANUAL EXPORT"
                     Template="{StaticResource MarathonCategoryLabel}" />
 
@@ -201,10 +182,11 @@
                 x:Name="ExportControl"
                 Grid.Row="2"
                 Grid.Column="1"
-                Grid.ColumnSpan="1"
-                MouseEnter="ExportButton_MouseEnter"
-                MouseLeave="ExportButton_MouseLeave"
-                Tag="EXPORT SELECTED:Export the selected static map parts" />
+                Grid.ColumnSpan="1">
+                <local:GenericTooltipProperties.TooltipData>
+                    <local:GenericTooltip Name="EXPORT SELECTED" Description="Export the selected static map parts" />
+                </local:GenericTooltipProperties.TooltipData>
+            </local:ExportControl>
 
 
             <StackPanel
@@ -217,7 +199,7 @@
                 Visibility="Hidden">
 
                 <ContentControl
-                    Margin="0,10,0,10"
+                    Margin="0,0,0,15"
                     Content="QUICK EXPORT"
                     Template="{StaticResource MarathonCategoryLabel}" />
 
@@ -225,52 +207,57 @@
                     Margin="0,0,0,15"
                     Click="QuickControl_OnClick"
                     DataContext="0"
-                    MouseEnter="ExportButton_MouseEnter"
-                    MouseLeave="ExportButton_MouseLeave"
-                    Style="{DynamicResource D2StyleButton}"
-                    Tag="EXPORT ALL:Export everything from this map. &#x0a;(Static Map and Resources only)">
-                    <TextBlock
-                        HorizontalAlignment="Left"
-                        d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="24"
-                        Text="EXPORT ALL"
-                        TextWrapping="WrapWithOverflow" />
+                    Style="{DynamicResource MarathonStyleButton}">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip Name="EXPORT ALL" Description="Export everything from this map. &#x0a;(Static Map and Resources only)" />
+                    </local:GenericTooltipProperties.TooltipData>
+                    <Border>
+                        <TextBlock
+                            HorizontalAlignment="Left"
+                            d:FontFamily="Haas Grot Text 55 Roman"
+                            FontFamily="{DynamicResource Marathon Shapiro}"
+                            FontSize="24"
+                            Text="EXPORT ALL"
+                            TextWrapping="WrapWithOverflow" />
+                    </Border>
                 </Button>
 
                 <Button
                     Margin="0,0,0,15"
                     Click="QuickControl_OnClick"
                     DataContext="1"
-                    MouseEnter="ExportButton_MouseEnter"
-                    MouseLeave="ExportButton_MouseLeave"
-                    Style="{DynamicResource D2StyleButton}"
-                    Tag="EXPORT STATIC MAP:Export this maps statics + terrain">
-
-                    <TextBlock
-                        HorizontalAlignment="Left"
-                        d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="24"
-                        Text="EXPORT STATIC MAP"
-                        TextWrapping="WrapWithOverflow" />
+                    Style="{DynamicResource MarathonStyleButton}">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip Name="EXPORT STATIC MAP" Description="Export this maps statics + terrain" />
+                    </local:GenericTooltipProperties.TooltipData>
+                    <Border>
+                        <TextBlock
+                            HorizontalAlignment="Left"
+                            d:FontFamily="Haas Grot Text 55 Roman"
+                            FontFamily="{DynamicResource Marathon Shapiro}"
+                            FontSize="24"
+                            Text="EXPORT STATIC MAP"
+                            TextWrapping="WrapWithOverflow" />
+                    </Border>
                 </Button>
 
                 <Button
                     Margin="0,0,0,15"
                     Click="QuickControl_OnClick"
                     DataContext="2"
-                    MouseEnter="ExportButton_MouseEnter"
-                    MouseLeave="ExportButton_MouseLeave"
-                    Style="{DynamicResource D2StyleButton}"
-                    Tag="EXPORT RESOURCES:Export this maps resources. These include...&#x0a; Entities&#x0a; Sky Objects&#x0a; Decorators (foliage, small rocks, etc)&#x0a; Lights&#x0a; Decal and Cubemap information">
-                    <TextBlock
-                        HorizontalAlignment="Left"
-                        d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="24"
-                        Text="EXPORT MAP RESOURCES"
-                        TextWrapping="WrapWithOverflow" />
+                    Style="{DynamicResource MarathonStyleButton}">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip Name="EXPORT RESOURCES" Description="Export this maps resources. These include...&#x0a; Entities&#x0a; Sky Objects&#x0a; Decorators (foliage, small rocks, etc)&#x0a; Lights&#x0a; Decal and Cubemap information" />
+                    </local:GenericTooltipProperties.TooltipData>
+                    <Border>
+                        <TextBlock
+                            HorizontalAlignment="Left"
+                            d:FontFamily="Haas Grot Text 55 Roman"
+                            FontFamily="{DynamicResource Marathon Shapiro}"
+                            FontSize="24"
+                            Text="EXPORT MAP RESOURCES"
+                            TextWrapping="WrapWithOverflow" />
+                    </Border>
                 </Button>
 
                 <Button
@@ -278,17 +265,19 @@
                     Margin="0,0,0,15"
                     Click="QuickControl_OnClick"
                     DataContext="3"
-                    MouseEnter="ExportButton_MouseEnter"
-                    MouseLeave="ExportButton_MouseLeave"
-                    Style="{DynamicResource D2StyleButton}"
-                    Tag="EXPORT ACTIVITY ENTITIES:Export entities specific to the current activity and its ambient version.&#x0a;These entities aren't included in the base map.">
-                    <TextBlock
-                        HorizontalAlignment="Left"
-                        d:FontFamily="Haas Grot Text 55 Roman"
-                        FontFamily="{DynamicResource Marathon Shapiro}"
-                        FontSize="24"
-                        Text="EXPORT ACTIVITY ENTITIES"
-                        TextWrapping="WrapWithOverflow" />
+                    Style="{DynamicResource MarathonStyleButton}">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip Name="EXPORT ACTIVITY ENTITIES" Description="Export entities specific to the current activity and its ambient version.&#x0a;These entities aren't included in the base map." />
+                    </local:GenericTooltipProperties.TooltipData>
+                    <Border>
+                        <TextBlock
+                            HorizontalAlignment="Left"
+                            d:FontFamily="Haas Grot Text 55 Roman"
+                            FontFamily="{DynamicResource Marathon Shapiro}"
+                            FontSize="24"
+                            Text="EXPORT ACTIVITY ENTITIES"
+                            TextWrapping="WrapWithOverflow" />
+                    </Border>
                 </Button>
             </StackPanel>
 

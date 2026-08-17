@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
+using Tiger;
 
 namespace MIDA;
 
@@ -17,19 +16,17 @@ public partial class ConfigView : UserControl
     public ConfigView()
     {
         InitializeComponent();
-        //MouseMove += UserControl_MouseMove;
+        MouseMove += UserControl_MouseMove;
 
         controlMapping = new Dictionary<string, UIElement>
         {
             { "GENERAL", ConfigControl },
-            { "S&BOX", Source2Control },
-            { "UNREAL", UnrealControl }
+            //{ "PORTING", PortingControl },
         };
         ButtonCollection = new ObservableCollection<ButtonData>
         {
-            new ButtonData { Text = "GENERAL" },
-            new ButtonData { Text = "S&BOX", IsEnabled = false},
-            new ButtonData { Text = "UNREAL", IsEnabled = false }
+            new() { Text = "GENERAL" },
+            //new() { Text = "TEST" },
         };
 
         Settings.ItemsSource = ButtonCollection;
@@ -37,7 +34,7 @@ public partial class ConfigView : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        SelectRadioButton(Settings, 0);
+        UIHelper.SelectRadioButton(Settings, 0);
     }
 
     // Not ideal but it works
@@ -49,9 +46,9 @@ public partial class ConfigView : UserControl
         string buttonText = textBlock.Text;
 
         // Set all controls to collapsed initially
-        foreach (var control in controlMapping.Values)
+        foreach (UIElement control in controlMapping.Values)
         {
-            UIHelper.AnimateFadeIn(control, 0.25f, 0.25f, 1);
+            UIHelper.AnimateFade(control, 0.25f, 0.25f, 1);
             control.Visibility = Visibility.Collapsed;
         }
 
@@ -59,31 +56,15 @@ public partial class ConfigView : UserControl
         if (controlMapping.TryGetValue(buttonText, out UIElement targetControl))
         {
             targetControl.Visibility = Visibility.Visible;
-            UIHelper.AnimateFadeIn(targetControl, 0.25f, 1, 0.25f);
+            UIHelper.AnimateFade(targetControl, 0.25f, 1, 0.25f);
         }
-    }
-
-    public void SelectRadioButton(ItemsControl itemsControl, int index)
-    {
-        Dispatcher.BeginInvoke(new Action(() =>
-        {
-            if (index < 0 || index >= itemsControl.Items.Count)
-                return;
-
-            var item = itemsControl.Items[index];
-            if (itemsControl.ItemContainerGenerator.ContainerFromItem(item) is ContentPresenter contentPresenter)
-            {
-                var radioButton = UIHelper.FindVisualChild<RadioButton>(contentPresenter);
-                if (radioButton != null)
-                {
-                    radioButton.IsChecked = true;
-                }
-            }
-        }), DispatcherPriority.Background);
     }
 
     private void UserControl_MouseMove(object sender, MouseEventArgs e)
     {
+        if (!ConfigSubsystem.Get().GetMotionEffects())
+            return;
+
         System.Windows.Point position = e.GetPosition(this);
         TranslateTransform gridTransform = (TranslateTransform)SettingsPage.RenderTransform;
         gridTransform.X = position.X * -0.0075;
@@ -93,6 +74,5 @@ public partial class ConfigView : UserControl
     public class ButtonData
     {
         public string Text { get; set; }
-        public bool IsEnabled { get; set; } = true;
     }
 }

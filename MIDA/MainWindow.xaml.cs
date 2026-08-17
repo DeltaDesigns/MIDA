@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Tiger;
@@ -23,6 +26,7 @@ public partial class MainWindow
 {
     public static ProgressView Progress = null;
     private static TabItem _newestTab = null;
+    public TabItem CurrentTab = null;
     private static LogView _logView = null;
     private static TabItem _logTab = null;
     private bool _bHasInitialised = false;
@@ -30,13 +34,46 @@ public partial class MainWindow
 
     public static MainWindow Current;
     public Spinner2 Spinner;
+    public Tooltip2 _ToolTip => ToolTip;
+    public TabControl _MainTabControl => MainTabControl;
 
     public MainWindow()
     {
         InitializeComponent();
-
+        Current = this;
         Progress = ProgressView;
+        Initialize();
+        CompositionTarget.Rendering += OnRender;
+    }
 
+    private void OnRender(object sender, EventArgs e)
+    {
+        if (!ConfigSubsystem.Get().GetMotionEffects())
+            return;
+
+        float x = -12f / (float)this.ActualWidth;
+        float y = -12f / (float)this.ActualHeight;
+
+        System.Windows.Point position = Mouse.GetPosition(this);
+        TranslateTransform gridTransform = (TranslateTransform)OverlayRoot.RenderTransform;
+        gridTransform.X = (int)Math.Round(position.X * x);
+        gridTransform.Y = (int)Math.Round(position.Y * y);
+    }
+
+    private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
+    {
+        if (MainMenuTab.Visibility == Visibility.Visible)
+        {
+            Task.Run(InitialiseHandlers);
+            _bHasInitialised = true;
+        }
+
+        Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        MIDAIcon.Source = GetBitmapSource(appIcon);
+    }
+
+    public void Initialize()
+    {
         int numSingletons = InitialiseStrategistSingletons();
 
         Strategy.BeforeStrategyEvent += args => { Progress.SetProgressStages(Enumerable.Range(1, numSingletons).Select(num => $"Initialising game version {args.Strategy}: {num}/{numSingletons}").ToList()); };
@@ -51,11 +88,22 @@ public partial class MainWindow
                     .Where(t => t.Tag is 1 && !t.Header.ToString().Contains("configuration", StringComparison.InvariantCultureIgnoreCase))
                     .ToList()
                     .ForEach(t => MainTabControl.Items.Remove(t));
-                CurrentStrategyText.Text = args.Strategy.ToString().Split(".").Last();
+                CurrentStrategyText.Text = $"{App.CurrentVersion.Id}: {args.Strategy.GetEnumDescription().ToUpper()}";
+                CheckGameVersion();
             });
         };
 
         InitialiseSubsystems();
+
+        if (ConfigSubsystem.Get().GetAnimatedBackground())
+        {
+            if (Spinner is null)
+                Spinner = new Spinner2((int)Width, (int)Height);
+
+            SpinnerContainer.Children.Add(Spinner);
+        }
+        else
+            SpinnerContainer.Visibility = Visibility.Collapsed;
 
         _logView = new LogView();
         LogHandler.Initialise(_logView);
@@ -80,10 +128,14 @@ public partial class MainWindow
             {
                 ShowAgreement();
             }
+
+            // TODO, only shows on initial load after a version is already set, doesnt work when changing version
+            LogConfigDetails();
         }
         else
         {
-            MakeNewTab("Configuration", new ConfigView());
+            //MakeNewTab("Configuration", new ConfigView());
+            SetCurrentTab("settings");
             SetNewestTabSelected();
         }
 
@@ -101,31 +153,28 @@ public partial class MainWindow
                 versionChanged.Show();
             });
         };
+
+        // Global ToolTip detection
+        EventManager.RegisterClassHandler(
+            typeof(ButtonBase),
+            UIElement.MouseEnterEvent,
+            new MouseEventHandler(OnAnyButtonMouseEnter)
+        );
+
+        EventManager.RegisterClassHandler(
+            typeof(ButtonBase),
+            UIElement.MouseLeaveEvent,
+            new MouseEventHandler(OnAnyButtonMouseLeave)
+        );
     }
 
-    private void OnControlLoaded(object sender, RoutedEventArgs routedEventArgs)
+    private void LogConfigDetails()
     {
-        if (MainMenuTab.Visibility == Visibility.Visible)
-        {
-            Task.Run(InitialiseHandlers);
-            _bHasInitialised = true;
-        }
+        ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
 
-        Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        MIDAIcon.Source = GetBitmapSource(appIcon);
-
-        if (ConfigSubsystem.Get().GetAnimatedBackground())
-        {
-            if (Spinner is null)
-                Spinner = new Spinner2((int)Width, (int)Height);
-
-            SpinnerContainer.Children.Add(Spinner);
-        }
-        else
-            SpinnerContainer.Visibility = Visibility.Hidden;
-
-        Current = this;
-
+        Arithmic.Log.Info($"Package Path: {config.GetPackagesPath(Strategy.CurrentStrategy)}");
+        Arithmic.Log.Info($"Total Package Count: {Directory.GetFiles(config.GetPackagesPath(Strategy.CurrentStrategy)).Where(x => x.EndsWith(".pkg")).Count()}");
+        Arithmic.Log.Info($"Export Path: {config.GetExportSavePath()}");
     }
 
     private void ShowAgreement()
@@ -133,20 +182,42 @@ public partial class MainWindow
         PopupBanner warn = new()
         {
             DarkenBackground = true,
-            Icon = $"{Char.ConvertFromUtf32(0xEE21)[0]}",
+            //Icon = "⚠️",
             Title = "ATTENTION",
             Subtitle = "MIDA is NOT a datamining tool!",
-            Description = $"MIDA's main purpose is focused towards 3D artists, content preservation and learning how the game works!" +
-            $"\n\nBy using MIDA, you agree to:" +
-            $"\n• Not use this to leak content." +
-            $"\n• Not use this to spread spoilers." +
-            $"\n\nSeeing leaks come from here makes public releases and updates less and less likely.\nDon't ruin the experience for yourself and others. Uncover things the way they were intended!",
+            Description =
+            "MIDA is intended for 3D artists, content preservation, and understanding how the Tiger engine works." +
+            "\n\nBy using MIDA, you agree to the following:" +
+            "\n• You WILL NOT use MIDA to share spoilers or secrets that may ruin the experience for others." +
+            "\n• You WILL NOT use MIDA to leak or distribute unreleased content." +
+            "\n     - Including but not limited to screenshots, recordings, or exports." +
+            "\n• You WILL NOT use MIDA in any way that violates Bungie’s Terms of Service." +
+            "\n     - Including but not limited to using code to develop cheats and/or exploits." +
+            "\n\nBreaking any of the above WILL reduce public updates and result in the removal of features.",
 
             Style = PopupBanner.PopupStyle.Warning,
-            UserInput = "Accept",
+            UserInput = $"Accept{(!FontHandler.FontsLoaded ? " (Left Mouse)" : "")}",
+            UserInputSecondary = $"Reject{(!FontHandler.FontsLoaded ? " (Right Mouse)" : "")}",
             HoldDuration = 4000,
             Progress = true
         };
+        warn.MouseRightButtonDown += (s, e) =>
+        {
+            warn.Remove(true);
+            PopupBanner warn2 = new()
+            {
+                DarkenBackground = true,
+                //Icon = "⚠️",
+                Title = "THAT'S TOO BAD",
+                Subtitle = "You must accept the agreement to use MIDA!",
+                Description = "MIDA will now close. You can try reading it again if you want.",
+                Style = PopupBanner.PopupStyle.Warning,
+                UserInput = "Okay",
+            };
+            warn2.OnProgressComplete += () => Application.Current.Shutdown(0);
+            warn2.Show();
+        };
+
         warn.OnProgressComplete += () => ConfigSubsystem.Get().SetAcceptedAgreement(true);
         warn.Show();
     }
@@ -181,18 +252,18 @@ public partial class MainWindow
         return strategistSingletons.Count;
     }
 
-    private static IEnumerable<Type> SortByInitializationOrder(IEnumerable<Type> types)
+    private static List<Type> SortByInitializationOrder(IEnumerable<Type> types)
     {
         var dependencyMap = new Dictionary<Type, List<Type>>();
         var dependencyCount = new Dictionary<Type, int>();
 
         // Build dependency map and count dependencies
-        foreach (var type in types)
+        foreach (Type type in types)
         {
-            var attributes = type.GenericTypeArguments[0].GetCustomAttributes(typeof(InitializeAfterAttribute), true);
+            object[] attributes = type.GenericTypeArguments[0].GetCustomAttributes(typeof(InitializeAfterAttribute), true);
             foreach (InitializeAfterAttribute attribute in attributes)
             {
-                var dependentType = attribute.TypeToInitializeAfter.GetNonGenericParent(
+                Type? dependentType = attribute.TypeToInitializeAfter.GetNonGenericParent(
                     typeof(Strategy.StrategistSingleton<>));
                 if (!dependencyMap.ContainsKey(dependentType))
                 {
@@ -209,12 +280,12 @@ public partial class MainWindow
         var queue = new Queue<Type>(dependencyMap.Keys.Where(k => dependencyCount[k] == 0));
         while (queue.Count > 0)
         {
-            var type = queue.Dequeue();
+            Type type = queue.Dequeue();
             sortedTypes.Add(type);
 
             if (dependencyMap.ContainsKey(type))
             {
-                foreach (var dependentType in dependencyMap[type])
+                foreach (Type dependentType in dependencyMap[type])
                 {
                     dependencyCount[dependentType]--;
                     if (dependencyCount[dependentType] == 0)
@@ -237,10 +308,9 @@ public partial class MainWindow
     {
         Arithmic.Log.Info("Initialising MIDA subsystems");
         string[] args = Environment.GetCommandLineArgs();
-        TigerInstance.Args = new InstanceArgs(args);
+        TigerInstance.Args = new TigerArgs(args);
         TigerInstance.InitialiseSubsystems();
         Arithmic.Log.Info("Initialised MIDA subsystems");
-
     }
 
     private void CheckGameVersion()
@@ -248,7 +318,7 @@ public partial class MainWindow
         try
         {
             ConfigSubsystem config = TigerInstance.GetSubsystem<ConfigSubsystem>();
-            var path = config.GetPackagesPath(Strategy.CurrentStrategy).Split("packages")[0] + "Marathon.exe";
+            string path = config.GetPackagesPath(Strategy.CurrentStrategy).Split("packages")[0] + "marathon.exe";
             var versionInfo = FileVersionInfo.GetVersionInfo(path);
             string version = versionInfo.FileVersion;
             GameInfo = versionInfo;
@@ -256,6 +326,7 @@ public partial class MainWindow
         }
         catch (Exception e)
         {
+            GameInfo = null;
             Arithmic.Log.Error($"Could not get game version error {e}.");
         }
     }
@@ -263,27 +334,25 @@ public partial class MainWindow
     private async void CheckVersion()
     {
         Arithmic.Log.Info($"MIDA Version: {App.CurrentVersion.Id}");
-        return; // TODO, dont check for updates cus theres no release yet
-        var versionChecker = new ApplicationVersionChecker("https://github.com/DeltaDesigns/MIDA/raw/main/", App.CurrentVersion);
+        var versionChecker = new ApplicationVersionChecker("https://github.com/DeltaDesigns/MIDA/raw/main", App.CurrentVersion);
         versionChecker.LatestVersionName = "version";
         try
         {
-            var latestVersion = await versionChecker.GetLatestVersion();
-            var latestID = int.Parse(latestVersion.Id.Replace(".", ""));
-            var currentID = int.Parse(App.CurrentVersion.Id.Replace(".", ""));
+            ApplicationVersion latestVersion = await versionChecker.GetLatestVersion();
+            int latestID = int.Parse(latestVersion.Id.Replace(".", ""));
+            int currentID = int.Parse(App.CurrentVersion.Id.Replace(".", ""));
 
             bool upToDate = currentID >= latestID;
             if (!upToDate)
             {
                 //MessageBox.Show($"New version available on GitHub! (local {versionChecker.CurrentVersion.Id} vs ext {versionChecker.LatestVersion.Id})");
-                Arithmic.Log.Info($"Version is not up-to-date (local {versionChecker.CurrentVersion.Id} vs ext {latestVersion.Id}).");
+                Arithmic.Log.Info($"Version is not up-to-date (Local {versionChecker.CurrentVersion.Id} vs Github {latestVersion.Id}).");
 
                 PopupBanner update = new()
                 {
                     DarkenBackground = true,
-                    Icon = "",
                     Title = "UPDATE AVAILABLE",
-                    Subtitle = "A new MIDA version is available!",
+                    Subtitle = "A new MIDA update is available!",
                     Description =
                     $"Current Version: v{App.CurrentVersion.Id}\n" +
                     $"Latest Version: v{latestVersion.Id}",
@@ -299,22 +368,18 @@ public partial class MainWindow
             }
             else
             {
-                Arithmic.Log.Info($"Version is up to date (v{versionChecker.CurrentVersion.Id}, Github v{latestVersion.Id}).");
+                Arithmic.Log.Info($"Version is up to date (Local v{versionChecker.CurrentVersion.Id}, Github v{latestVersion.Id}).");
             }
         }
         catch (Exception e)
         {
-            // Could not get or parse version file
-#if !DEBUG
-            MessageBox.Show("Could not get version.");
-#endif
-            Arithmic.Log.Error($"Could not get version error {e}.");
+            Arithmic.Log.Error($"Could not get version. Error {e}.");
         }
     }
 
     private void OpenLatestRelease(object sender, MouseButtonEventArgs e)
     {
-        Process.Start(new ProcessStartInfo { FileName = $"https://github.com/DeltaDesigns/MIDA/releases", UseShellExecute = true });
+        Process.Start(new ProcessStartInfo { FileName = $"https://github.com/DeltaDesigns/MIDA/releases/latest", UseShellExecute = true });
     }
 
     private async void InitialiseHandlers()
@@ -324,16 +389,15 @@ public partial class MainWindow
         TextureExtractor.SetTextureFormat(config.GetOutputTextureFormat());
     }
 
-    private void OpenConfigPanel_OnClick(object sender, RoutedEventArgs e)
-    {
-        MakeNewTab("Configuration", new ConfigView());
-        SetNewestTabSelected();
-    }
-
     private void OpenLogPanel_OnClick(object sender, RoutedEventArgs e)
     {
         MakeNewTab("Log", _logView);
         SetNewestTabSelected();
+    }
+
+    public void SetLoggerSelected()
+    {
+        MainTabControl.SelectedItem = _logTab;
     }
 
     public void HideMainMenu()
@@ -344,7 +408,8 @@ public partial class MainWindow
     public void ShowMainMenu()
     {
         MainMenuTab.Visibility = Visibility.Visible;
-        // MainTabControl.SelectedItem = MainMenuTab;
+        MainTabControl.SelectedItem = MainMenuTab;
+
         if (_bHasInitialised == false)
         {
             Task.Run(InitialiseHandlers);
@@ -362,11 +427,6 @@ public partial class MainWindow
         MainTabControl.SelectedItem = _newestTab;
     }
 
-    public void SetLoggerSelected()
-    {
-        MainTabControl.SelectedItem = _logTab;
-    }
-
     public void SetNewestTabName(string newName)
     {
         _newestTab.Header = newName.Replace('_', '.');
@@ -378,7 +438,7 @@ public partial class MainWindow
         name = name.ToUpper();
         name = name.Replace('_', '.');
         // Check if the name already exists, if so set newest tab to that
-        var items = MainTabControl.Items;
+        ItemCollection items = MainTabControl.Items;
         foreach (TabItem item in items)
         {
             if (name == (string)item.Header)
@@ -397,7 +457,7 @@ public partial class MainWindow
         name = name.ToUpper();
         name = name.Replace('_', '.');
         // Check if the name already exists, if so set newest tab to that
-        var items = MainTabControl.Items;
+        ItemCollection items = MainTabControl.Items;
         foreach (TabItem item in items)
         {
             if (name == (string)item.Header)
@@ -427,6 +487,47 @@ public partial class MainWindow
             {
                 av.Dispose();
             }
+            else if (content is EntityListView entityView)
+            {
+                entityView.Dispose();
+            }
+            else if (content is AudioListView audioView)
+            {
+                audioView.MusicPlayer.Dispose();
+            }
+        }
+    }
+
+    private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.Source is TabControl tabControl)
+        {
+            if (tabControl.SelectedItem is TabItem selectedTab)
+            {
+                CurrentTab = selectedTab;
+                switch (selectedTab.Content)
+                {
+                    case null: // bug, first time start up
+                        if (Spinner is not null)
+                            Spinner.PositionScale = new(2, 2, -1, -1);
+                        break;
+                    case MainMenuView:
+                        UIHelper.AnimateFade(SpinnerContainer, 0.1f, 1.0f, 0.5f);
+                        if (Spinner is not null)
+                            Spinner.PositionScale = new(2, 2, -1, -1);
+                        break;
+                    case ConfigView:
+                        if (Spinner is not null)
+                            Spinner.PositionScale = new(4f, 4f, -3.6f, -3.3f);
+                        UIHelper.AnimateFade(SpinnerContainer, 0.1f, 1f, 1);
+                        break;
+                    default:
+                        if (Spinner is not null)
+                            Spinner.PositionScale = new(100f, 100f, -100f, -100f); // Setting all to 0 has bad side effects
+                        UIHelper.AnimateFade(SpinnerContainer, 0.1f, 1f, 1);
+                        break;
+                }
+            }
         }
     }
 
@@ -446,10 +547,10 @@ public partial class MainWindow
         }
         else if (e.Key == Key.Escape)
         {
-            var tab = (TabItem)MainTabControl.Items[MainTabControl.SelectedIndex];
-            dynamic content = tab.Content;
-            if (content is APIItemView || content is CategoryView)
-                MainTabControl.Items.Remove(tab);
+            //var tab = (TabItem)MainTabControl.Items[MainTabControl.SelectedIndex];
+            //dynamic content = tab.Content;
+            //if (content is ItemView or CategoryView)
+            //    MainTabControl.Items.Remove(tab);
         }
         else if (e.Key == Key.W
             && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control
@@ -458,7 +559,7 @@ public partial class MainWindow
             PopupBanner test = new()
             {
                 DarkenBackground = false,
-                Icon = "ℹ️",
+                //Icon = "ℹ️",
                 Title = "INFORMATION",
                 Subtitle = "Test Information Popup Subtitle",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -482,7 +583,7 @@ public partial class MainWindow
             PopupBanner test = new()
             {
                 DarkenBackground = false,
-                Icon = "⚠️",
+                //Icon = "⚠️",
                 Title = "ERROR",
                 Subtitle = "Test Error Popup Subtitle",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nError code: Valumptious",
@@ -492,18 +593,6 @@ public partial class MainWindow
                 Progress = true
             };
             test.Show();
-
-            //PopupBanner test = new()
-            //{
-            //    DarkenBackground = false,
-            //    Icon = "⚠️",
-            //    IconImage = ApiImageUtils.MakeBitmapImage(new Texture(new FileHash("7180DC80")).GetTexture(), 648, 495),
-            //    Title = "OOPS",
-            //    Subtitle = "WE DELETED THE FUCKING SERVERS",
-            //    Description = "Jimmy the new intern downloaded a 72 yottabyte zip bomb and deleted all of our server data. The game is gone.\n\nThank you for all of your time and money for Pete...I mean supporting Destiny 2!",
-            //    Style = PopupBanner.PopupStyle.Warning,
-            //};
-            //test.Show();
 
             NotificationBanner test2 = new()
             {
@@ -521,7 +610,7 @@ public partial class MainWindow
             PopupBanner test = new()
             {
                 DarkenBackground = false,
-                Icon = "💬",
+                //Icon = "💬",
                 Title = "GENERAL",
                 Subtitle = "Test General Popup Subtitle",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -554,5 +643,72 @@ public partial class MainWindow
                  icon.Handle,
                  new Int32Rect(0, 0, icon.Width, icon.Height),
                  BitmapSizeOptions.FromEmptyOptions());
+    }
+
+    private void OnAnyButtonMouseEnter(object sender, MouseEventArgs e)
+    {
+        FrameworkElement element = sender as FrameworkElement;
+        if (element != null)
+        {
+            if (element.DataContext != null && !GenericTooltipProperties.HasTooltipData(element))
+            {
+                switch (element.DataContext)
+                {
+                    case GearViewItem item:
+                        ToolTip.ActiveItem = element;
+                        ToolTip.MakeTooltip(item.Item, item.ParentSocketStyle);
+                        break;
+                        //case Category item:
+                        //    ToolTip.MakeTooltip(item);
+                        //    break;
+
+                        //case CategoryEntry item:
+                        //    if (item.EntryType == CategoryEntryType.Record)
+                        //    {
+                        //        ToolTip.MakeTooltip(item);
+                        //    }
+                        //    else if (item.EntryType == CategoryEntryType.Collectible)
+                        //    {
+                        //        ToolTip.MakeTooltip(item.Item);
+                        //    }
+                        //    break;
+                }
+            }
+            else
+            {
+                var tooltipData = GenericTooltipProperties.GetTooltipData(element);
+                if (tooltipData == null)
+                {
+                    // If not set directly, look up the visual tree to check the parent
+                    DependencyObject current = element;
+
+                    while (current != null)
+                    {
+                        if (current is not ContainerVisual)
+                        {
+                            tooltipData = GenericTooltipProperties.GetTooltipData((UIElement)current);
+                            if (tooltipData != null)
+                                break;
+                        }
+                        else
+                            return;
+
+                        current = VisualTreeHelper.GetParent(current);
+                    }
+                }
+
+                if (tooltipData != null)
+                {
+                    ToolTip.ActiveItem = element;
+                    ToolTip.MakeTooltip(tooltipData);
+                }
+            }
+        }
+    }
+
+    private void OnAnyButtonMouseLeave(object sender, MouseEventArgs e)
+    {
+        ToolTip.ActiveItem = null;
+        ToolTip.ClearTooltip();
     }
 }

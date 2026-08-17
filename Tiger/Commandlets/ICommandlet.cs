@@ -2,19 +2,19 @@
 
 public interface ICommandlet
 {
-    public void Run(InstanceArgs args);
+    public void Run(TigerArgs args);
 }
 
-public class InstanceArgs
+public class TigerArgs
 {
     private string[] _args { get; }
 
-    public InstanceArgs()
+    public TigerArgs()
     {
         _args = Environment.GetCommandLineArgs();
     }
 
-    public InstanceArgs(string[] args)
+    public TigerArgs(string[] args)
     {
         _args = args;
     }

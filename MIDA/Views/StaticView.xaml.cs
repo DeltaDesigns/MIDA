@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using HelixToolkit.SharpDX;
 using Tiger;
 using Tiger.Exporters;
 using Tiger.Schema;
@@ -31,13 +32,13 @@ public partial class StaticView : UserControl
         ModelView.TextureCheckBox.Visibility = Visibility.Visible;
 
         StaticMesh staticMesh = FileResourcer.Get().GetFile<StaticMesh>(hash);
-        var parts = staticMesh.Load(detailLevel);
+        List<StaticPart> parts = staticMesh.Load(detailLevel);
 
         if (MVM is null)
             MVM = (MainViewModel)ModelView.UCModelView.Resources["MVM"];
 
         MVM.Clear();
-        var displayParts = MakeDisplayParts(parts);
+        List<MainViewModel.DisplayPart> displayParts = MakeDisplayParts(parts);
         MVM.SetChildren(displayParts);
         MVM.Title = hash;
         MVM.SubTitle = $"{displayParts.Sum(p => p.BasePart.Indices.Count)} triangles";
@@ -60,28 +61,18 @@ public partial class StaticView : UserControl
         staticMesh.SaveMaterialsFromParts(scene, parts);
 
         Directory.CreateDirectory(savePath);
-        if (exportType == ExportTypeFlag.Full)
-        {
-            if (config.GetUnrealInteropEnabled())
-            {
-                AutomatedExporter.SaveInteropUnrealPythonFile(savePath, meshName, AutomatedExporter.ImportType.Static, config.GetOutputTextureFormat());
-            }
-        }
-
         if (extraPath != string.Empty)
             Exporter.Get().Export($"{savePath}");
         else
             Exporter.Get().Export();
     }
 
-
-
     private List<MainViewModel.DisplayPart> MakeDisplayParts(List<StaticPart> containerParts)
     {
         bool useTextures = ModelView.TextureCheckBox.IsChecked == true;
         List<MainViewModel.DisplayPart> displayParts = new();
 
-        foreach (var part in containerParts)
+        foreach (StaticPart part in containerParts)
         {
             var displayPart = new MainViewModel.DisplayPart
             {
@@ -93,10 +84,10 @@ public partial class StaticView : UserControl
 
             if (useTextures && part.Material?.Pixel.Textures.Any() == true)
             {
-                var texture = TextureView.RemoveAlpha(part.Material.Pixel.Textures[0].Texture.GetTexture());
+                Stream texture = TextureView.RemoveAlpha(part.Material.Pixel.Textures[0].Texture.GetTexture());
                 displayPart.DiffuseMaterial = new()
                 {
-                    DiffuseMap = new HelixToolkit.SharpDX.Core.TextureModel(texture, true),
+                    DiffuseMap = new TextureModel(texture, true),
                 };
             }
 
@@ -123,3 +114,4 @@ public partial class StaticView : UserControl
         LoadStatic(currentHash, currentDetailLevel);
 
 }
+

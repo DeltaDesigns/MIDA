@@ -14,26 +14,16 @@
     <UserControl.Resources>
         <DataTemplate x:Key="SettingsButtonTemplate">
             <RadioButton
-                Margin="2"
+                Margin="0"
                 Checked="SettingsCategory_OnClick"
+                Content="{Binding Text}"
+                FontSize="30"
                 GroupName="SettingsCategory"
-                IsEnabled="{Binding IsEnabled}"
-                Style="{DynamicResource D2StyleRadioButton}">
-
-                <TextBlock
-                    Margin="10,30,150,30"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    d:FontFamily="Marathon Shapiro 65"
-                    FontSize="32"
-                    FontStyle="Normal"
-                    Text="{Binding Text}" />
-
-            </RadioButton>
+                Style="{DynamicResource MarathonStyleTabButton}" />
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource GridDarken}">
+    <Grid>
         <Grid.Triggers>
             <EventTrigger RoutedEvent="Grid.Loaded">
                 <BeginStoryboard>
@@ -47,24 +37,22 @@
                 </BeginStoryboard>
             </EventTrigger>
         </Grid.Triggers>
-
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="15*" />
             <ColumnDefinition Width="50*" />
         </Grid.ColumnDefinitions>
 
-
         <Grid Grid.Column="0" Background="Transparent">
             <StackPanel
-                Margin="0,0,0,0"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+                Margin="50,100,0,0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top">
                 <ItemsControl x:Name="Settings" ItemTemplate="{StaticResource SettingsButtonTemplate}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel
                                 Margin="0,0,0,0"
-                                HorizontalAlignment="Center"
+                                HorizontalAlignment="Stretch"
                                 VerticalAlignment="Center" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
@@ -75,16 +63,13 @@
         <Grid
             x:Name="SettingsPage"
             Grid.Column="1"
-            Margin="0,100,0,0"
-            VerticalAlignment="Top"
             Background="Transparent">
             <Grid.RenderTransform>
                 <TranslateTransform />
             </Grid.RenderTransform>
 
             <local:GeneralConfigView x:Name="ConfigControl" Visibility="Collapsed" />
-            <local:Source2ConfigView x:Name="Source2Control" Visibility="Collapsed" />
-            <local:UnrealConfigView x:Name="UnrealControl" Visibility="Collapsed" />
+            <local:PortingConfigView x:Name="PortingControl" Visibility="Collapsed" />
 
         </Grid>
 

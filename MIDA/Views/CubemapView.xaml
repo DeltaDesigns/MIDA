@@ -51,7 +51,7 @@
                         x:Name="Hash"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                         FontSize="20"
                         IsHitTestVisible="False"
                         TextAlignment="Center" />
@@ -59,7 +59,7 @@
                         x:Name="Dimensions"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                         FontSize="20"
                         IsHitTestVisible="False"
                         TextAlignment="Center" />
@@ -68,7 +68,7 @@
                         x:Name="Format"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                         FontFamily="{DynamicResource PP Fraktion Mono Medium}"
                         FontSize="20"
                         IsHitTestVisible="False"
                         TextAlignment="Center" />

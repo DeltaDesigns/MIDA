@@ -86,6 +86,7 @@ public enum TfxExtern : byte
     WaterDepthPrepass,
     OverheadVisibilityMapMain,
     OverheadVisibilityMapInterior,
+    OverheadVisibilityMapOcclusion,
     ParticleCompute,
     CubemapFiltering,
     CubemapDiffuseCapture,
@@ -116,6 +117,7 @@ public enum TfxExtern : byte
     WaterReflection,
     OcclusionCullingReprojectDepth,
     OcclusionCullingVisibilityTesting,
+    VariableRateShading,
 }
 
 public static class Externs
@@ -129,6 +131,8 @@ public static class Externs
     /// <exception cref="InvalidCastException"></exception>
     public static TfxExtern GetExtern(byte value)
     {
+        return (TfxExtern)value;
+
         string name = ((TfxExtern)value).ToString();
         if (Enum.TryParse(name, out TfxExtern result))
             return result;

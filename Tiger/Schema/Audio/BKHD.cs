@@ -8,7 +8,6 @@ public class BKHD : Tag
 {
     public BKHD(FileHash hash) : base(hash)
     {
-
     }
 
     private string GetNameFromStringHash()

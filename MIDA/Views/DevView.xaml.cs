@@ -17,7 +17,6 @@ using Tiger.Exporters;
 using Tiger.Schema;
 using Tiger.Schema.Audio;
 using Tiger.Schema.Entity;
-using Tiger.Schema.Investment;
 using Tiger.Schema.Shaders;
 using Decorator = Tiger.Schema.Decorator;
 
@@ -67,9 +66,8 @@ public partial class DevView : UserControl
         }
         else
         {
-            // Flips tag hash to the "intended" way (sigh) ex 80BB6216 -> 1662BB80
-            if ((strHash.StartsWith("80") || strHash.StartsWith("81")) &&
-                (!strHash.EndsWith("80") && !strHash.EndsWith("81")) && strHash.Length == 8)
+            if ((strHash.EndsWith("80") || strHash.EndsWith("81")) &&
+                (!strHash.StartsWith("80") && !strHash.StartsWith("81")) && strHash.Length == 8)
             {
                 byte[] bytes = Helpers.HexStringToByteArray(strHash);
                 Array.Reverse(bytes);
@@ -81,31 +79,10 @@ public partial class DevView : UserControl
 
         if (!hash.IsValid())
         {
-            if (uint.TryParse(strHash, out uint apiHash))
-            {
-                Investment.LazyInit();
-                var item = Investment.Get().TryGetInventoryItem(new TigerHash(apiHash));
-                if (item is not null)
-                {
-                    MainWindow.Progress.SetProgressStages(new() { "Starting investment system" });
-                    Investment.LazyInit();
-                    MainWindow.Progress.CompleteStage();
 
-                    item.Load();
-                    APIItemView apiItemView = new APIItemView(item);
-                    _mainWindow.MakeNewTab(Investment.Get().GetItemName(item), apiItemView);
-                    _mainWindow.SetNewestTabSelected();
-                }
-                else
-                    TagHashBox.Text = "INVALID API HASH";
+            TagHashBox.Text = "INVALID HASH";
+            return;
 
-                return;
-            }
-            else
-            {
-                TagHashBox.Text = "INVALID HASH";
-                return;
-            }
         }
         //uint to int
         switch (e.Key)
@@ -210,7 +187,7 @@ public partial class DevView : UserControl
                     List<Entity> entities = new List<Entity> { entity };
                     entities.AddRange(entity.GetEntityChildren());
 
-                    EntityView.Export(entities, hash, ExportTypeFlag.Full);
+                    EntityView.Export(entities, hash);
                     _mainWindow.MakeNewTab(hash, entityView);
                     _mainWindow.SetNewestTabSelected();
                     break;
@@ -218,7 +195,7 @@ public partial class DevView : UserControl
                 case 0x8080881C: // Entity model
                     EntityModel entityModel = FileResourcer.Get().GetFile<EntityModel>(hash);
                     ExporterScene scene = Exporter.Get().CreateScene(hash, ExportType.Entities);
-                    scene.AddModel(entityModel, ExportDetailLevel.AllLevels);
+                    scene.AddModel(entityModel);
                     var parts = entityModel.Load(ExportDetailLevel.AllLevels, null);
                     foreach (DynamicMeshPart part in parts)
                     {
@@ -236,7 +213,7 @@ public partial class DevView : UserControl
 
                 case 0x80808635:
                     StaticView staticView = new StaticView();
-                    staticView.LoadStatic(hash, ExportDetailLevel.AllLevels);
+                    staticView.LoadStatic(hash, ExportDetailLevel.MostDetailed);
                     _mainWindow.MakeNewTab(hash, staticView);
                     _mainWindow.SetNewestTabSelected();
                     break;
@@ -245,14 +222,6 @@ public partial class DevView : UserControl
                     ActivityView activityView = new ActivityView();
                     activityView.LoadActivity(hash);
                     _mainWindow.MakeNewTab(hash, activityView);
-                    _mainWindow.SetNewestTabSelected();
-                    break;
-
-                case 0x808099EF:
-                    var stringView = new TagView();
-                    stringView.SetViewer(TagView.EViewerType.TagList);
-                    stringView.TagListControl.LoadContent(ETagListType.Strings, hash, true);
-                    _mainWindow.MakeNewTab(hash, stringView);
                     _mainWindow.SetNewestTabSelected();
                     break;
 
@@ -279,10 +248,11 @@ public partial class DevView : UserControl
                     Exporter.Get().Export();
                     break;
 
-                case 0x80806C98: // Decorator 8080857D
+                case 0x8080857D: // Decorator
                     Decorator decorator = FileResourcer.Get().GetFile<Decorator>(hash);
                     ExporterScene decoratorScene = Exporter.Get().CreateScene(hash, ExportType.Decorators);
-                    decorator.LoadIntoExporter(decoratorScene, ConfigSubsystem.Get().GetExportSavePath());
+                    ExporterScene treesScene = Exporter.Get().CreateScene(hash, ExportType.SpeedTrees);
+                    decorator.LoadIntoExporter(decoratorScene, treesScene, ConfigSubsystem.Get().GetExportSavePath());
                     Exporter.Get().Export();
                     break;
 

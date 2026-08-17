@@ -12,15 +12,6 @@ namespace Tiger.Schema.Static
         public uint IndexOffset;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct StaticMeshInfo
-    {
-        public Vector4 MeshTransform;
-        public float TexcoordScale;
-        public Vector2 TexcoordTranslation;
-        public uint Unk;
-    }
-
     public interface IStaticMeshData : ISchema
     {
         public List<StaticPart> Load(ExportDetailLevel detailLevel, SStaticMesh parent);
@@ -30,7 +21,7 @@ namespace Tiger.Schema.Static
     }
 }
 
-namespace Tiger.Schema.Static.MARATHON_ALPHA
+namespace Tiger.Schema.Static.MARATHON
 {
     public class StaticMeshData : Tag<SStaticMeshData>, IStaticMeshData
     {

@@ -40,6 +40,7 @@ public class GlobalExporter : AbstractExporter
             if (atmosphere.Lookup4 != null)
                 AtmosTextures.Add(atmosphere.Lookup4);
 
+            // TODO, stitch together D1 atmos textures to resemble D2
             //foreach (var tex in atmosphere.D1Lookup)
             //{
             //    tex.Load();
@@ -49,12 +50,10 @@ public class GlobalExporter : AbstractExporter
             string texSavePath = $"{SavePath}/Textures/Atmosphere";
             Directory.CreateDirectory(texSavePath);
 
-            foreach (var tex in AtmosTextures)
+            foreach (Texture tex in AtmosTextures)
             {
                 // Not ideal but it works
                 TextureExtractor.SaveTextureToFile($"{texSavePath}/{tex.Hash}", tex.IsVolume() ? Texture.FlattenVolume(tex.GetScratchImage(true)) : tex.GetScratchImage());
-                if (_config.GetS2ShaderExportEnabled())
-                    Source2Handler.SaveVTEX(tex, $"{texSavePath}", "Atmosphere");
             }
 
             string dataSavePath = $"{SavePath}/Rendering";
@@ -84,7 +83,7 @@ public class GlobalExporter : AbstractExporter
 
                 if (dayCycle.Unk10 is not null && dayCycle.Unk10.TagData.Unk10 is not null)
                 {
-                    var cycles = dayCycle.Unk10.TagData.Unk10;
+                    Tag<SC88A8080> cycles = dayCycle.Unk10.TagData.Unk10;
                     data.DayCycle.Unk2 = cycles.TagData.Unk08;
                     data.DayCycle.Unk3 = cycles.TagData.Unk0C;
                     data.DayCycle.Rotations = cycles.TagData.Unk30.Enumerate(cycles.GetReader()).Select(x => x.Vec).ToList();
@@ -108,9 +107,9 @@ public class GlobalExporter : AbstractExporter
             string dataSavePath = $"{SavePath}/Rendering";
             Directory.CreateDirectory(dataSavePath);
 
-            foreach (var lensFlare in GlobalScene.GetAllOfType<LensFlare>())
+            foreach (LensFlare lensFlare in GlobalScene.GetAllOfType<LensFlare>())
             {
-                var lensFlareData = data.GetOrAdd(lensFlare.Hash, _ => new LensFlareData
+                LensFlareData lensFlareData = data.GetOrAdd(lensFlare.Hash, _ => new LensFlareData
                 {
                     Instances = new(),
                     Materials = lensFlare.Materials.Select(x => x.ToString()).ToList()
@@ -136,13 +135,13 @@ public class GlobalExporter : AbstractExporter
             string dataSavePath = $"{SavePath}/Rendering";
             Directory.CreateDirectory(dataSavePath);
 
-            List<Texture> textures = new List<Texture>();
+            List<Texture> textures = new();
             string texSavePath = $"{SavePath}/Textures/Cubemaps";
             Directory.CreateDirectory(texSavePath);
 
-            foreach (var cubemapEntry in GlobalScene.GetAllOfType<Cubemap>())
+            foreach (Cubemap cubemapEntry in GlobalScene.GetAllOfType<Cubemap>())
             {
-                var cubemap = cubemapEntry.CubemapEntry;
+                Schema.Entity.SMapCubemapResource cubemap = cubemapEntry.CubemapEntry;
                 string name = $"Cubemap_{cubemap.WorldID:X}";
                 _ = data.GetOrAdd(name, _ => new CubemapData
                 {
@@ -162,11 +161,15 @@ public class GlobalExporter : AbstractExporter
                     textures.Add(cubemap.CubemapIBLTexture);
             }
 
-            foreach (var tex in textures)
+            foreach (Texture tex in textures)
             {
-                TextureExtractor.SaveTextureToFile($"{texSavePath}/{tex.Hash}", tex.IsVolume() ? Texture.FlattenVolume(tex.GetScratchImage(true)) : Texture.FlattenCubemap(tex.GetScratchImage()));
-                if (_config.GetS2ShaderExportEnabled())
-                    Source2Handler.SaveVTEX(tex, $"{texSavePath}", "Cubemaps");
+                if (tex is null)
+                    continue;
+
+                if (tex.IsVolume())
+                    TextureExtractor.SaveTextureToFile($"{texSavePath}/{tex.Hash}", Texture.FlattenVolume(tex.GetScratchImage(true)));
+                else
+                    tex.SavetoFile($"{texSavePath}/{tex.Hash}");
             }
 
             File.WriteAllText($"{dataSavePath}/Cubemaps.json", JsonConvert.SerializeObject(data, Formatting.Indented));
@@ -181,15 +184,15 @@ public class GlobalExporter : AbstractExporter
             string dataSavePath = $"{SavePath}/Rendering";
             Directory.CreateDirectory(dataSavePath);
 
-            List<Texture> textures = new List<Texture>();
+            List<Texture> textures = new();
             string texSavePath = $"{SavePath}/Textures/Lights";
             Directory.CreateDirectory(texSavePath);
 
-            foreach (var light in GlobalScene.GetAllOfType<Lights.LightData>())
+            foreach (Lights.LightData light in GlobalScene.GetAllOfType<Lights.LightData>())
             {
                 // this is so stupid...but ensures theres no accidental overwrites with mismatches
-                var hash = Helpers.Fnv($"{light.LightType}{light.Material}{light.Hash}");
-                var lightData = data.GetOrAdd($"{light.LightType}_{hash.ToString("X")}", _ => new LightData
+                uint hash = Helpers.Fnv1a32($"{light.LightType}{light.Material}{light.Hash}");
+                LightData lightData = data.GetOrAdd($"{light.LightType}_{hash.ToString("X")}", _ => new LightData
                 {
                     Type = light.LightType.ToString(),
                     Instances = new(),
@@ -212,11 +215,12 @@ public class GlobalExporter : AbstractExporter
                     textures.Add(new Texture(light.Cookie));
             }
 
-            foreach (var tex in textures)
+            foreach (Texture tex in textures)
             {
+                if (tex is null)
+                    continue;
+
                 tex.SavetoFile($"{texSavePath}/{tex.Hash}");
-                if (_config.GetS2ShaderExportEnabled())
-                    Source2Handler.SaveVTEX(tex, $"{texSavePath}", "Lights");
             }
             var jsonSettings = new JsonSerializerSettings
             {
@@ -235,18 +239,18 @@ public class GlobalExporter : AbstractExporter
             string dataSavePath = $"{SavePath}/Rendering";
             Directory.CreateDirectory(dataSavePath);
 
-            foreach (var decal in GlobalScene.GetAllOfType<Decals>())
+            foreach (Decals decal in GlobalScene.GetAllOfType<Decals>())
             {
                 List<Transform> transforms = decal.GetTransforms();
                 foreach (var instance in decal.TagData.DecalResources.Enumerate(decal.GetReader()))
                 {
                     for (int i = instance.StartIndex; i < instance.StartIndex + instance.Count; i++)
                     {
-                        var loc = transforms[i].Position;
-                        var rot = transforms[i].Quaternion;
-                        var scale = transforms[i].Scale;
+                        Vector3 loc = transforms[i].Position;
+                        Vector4 rot = transforms[i].Quaternion;
+                        Vector3 scale = transforms[i].Scale;
 
-                        var decalData = data.GetOrAdd(instance.Material.Hash, _ => new DecalsData
+                        DecalsData decalData = data.GetOrAdd(instance.Material.Hash, _ => new DecalsData
                         {
                             Instances = new(),
                         });
@@ -265,40 +269,97 @@ public class GlobalExporter : AbstractExporter
         }
     }
 
+    // TODO
     private void ExportGlobalChannels()
     {
-        if (GlobalScene.Any<S4EB68080>())
-        {
-            List<GlobalChannelData> channels = new();
-            string dataSavePath = $"{SavePath}/Rendering";
-            Directory.CreateDirectory(dataSavePath);
+        //if (GlobalScene.Any<EntityComponent>())
+        //{
+        //    Dictionary<string, GlobalChannelData> channels = new();
+        //    string dataSavePath = $"{SavePath}/Rendering";
+        //    Directory.CreateDirectory(dataSavePath);
 
-            foreach (var globals in GlobalScene.GetAllOfType<S4EB68080>())
-            {
-                channels.Add(new GlobalChannelData
-                {
-                    Index = globals.ChannelIndex,
-                    Bytecode = globals.UnkBytecode.Select(x => x.Value).ToList(),
-                    Constants = globals.Values.Select(x => x.Vec).ToList()
-                });
+        //    var defaults = Globals.Get().GlobalChannelDefaults;
 
-                //System.Console.WriteLine($"\t-{globals.Value}: Index {globals.ChannelIndex}");
+        //    // Just gonna export all channels
+        //    foreach (var defaultChannel in defaults)
+        //    {
+        //        channels.TryAdd(defaultChannel.Key, new GlobalChannelData
+        //        {
+        //            Name = GlobalChannels.KnownChannelNames.TryGetValue(defaultChannel.Key.Hash32, out string name) ? name : defaultChannel.Key.ToString(),
+        //            Index = defaults.Keys.ToList().IndexOf(defaultChannel.Key),
+        //            Bytecode = new List<byte>(), // No bytecode for defaults
+        //            Constants = new List<Vector4> { defaultChannel.Value } // Default value
+        //        });
+        //    }
 
-                //TfxBytecodeInterpreter bytecode = new(TfxBytecodeOp.ParseAll(globals.UnkBytecode));
-                //System.Console.WriteLine($"\t-Bytecode ops ({bytecode.Opcodes.Count})");
-                //foreach (var op in bytecode.Opcodes)
-                //{
-                //    System.Console.WriteLine($"\t\t--{op.op}");
-                //}
-                //System.Console.WriteLine($"\t-Values ({globals.Values.Count})");
-                //foreach (var value in globals.Values)
-                //{
-                //    System.Console.WriteLine($"\t\t--{value.Vec.ToString()}");
-                //}
-            }
+        //    // Overwrites defaults with any from the scene
+        //    foreach (EntityComponent resource in GlobalScene.GetAllOfType<EntityComponent>())
+        //    {
+        //        switch (resource.TagData.Unk10.GetValue(resource.GetReader()))
+        //        {
+        //            case S79948080:
+        //                var globals = ((S79818080)resource.TagData.Unk18.GetValue(resource.GetReader()));
+        //                DynamicArray<SF1918080> map = globals.Array1;
+        //                map.AddRange(globals.Array2);
 
-            File.WriteAllText($"{dataSavePath}/GlobalChannels.json", JsonConvert.SerializeObject(channels, Formatting.Indented));
-        }
+        //                foreach (SF1918080 entry in map)
+        //                {
+        //                    if (entry.Unk10.GetValue(resource.GetReader()) is SD1918080 global)
+        //                    {
+        //                        var id = globals.Array3[global.ChannelIndex].ID;
+
+        //                        if (channels.ContainsKey(id))
+        //                        {
+        //                            channels[id] = new GlobalChannelData
+        //                            {
+        //                                Name = GlobalChannels.KnownChannelNames.TryGetValue(id.Hash32, out string name) ? name : id.ToString(),
+        //                                Index = Globals.Get().GlobalChannelDefaults.Keys.ToList().IndexOf(id),
+        //                                Bytecode = global.UnkBytecode.Select(x => x.Value).ToList(),
+        //                                Constants = global.Values.Select(x => x.Vec).ToList()
+        //                            };
+        //                        }
+        //                        else
+        //                        {
+        //                            // Idk what to do with these, so just gonna skip for now
+        //                        }
+        //                    }
+        //                    else if (entry.Unk10.GetValue(resource.GetReader()) is SCF918080 lut)
+        //                    {
+        //                        if (lut.Unk28 is null || lut.Unk28.TagData.LUT is null || channels.ContainsKey("LUT"))
+        //                            continue;
+
+        //                        Directory.CreateDirectory($"{SavePath}/Textures/LUT");
+        //                        lut.Unk28.TagData.LUT.SavetoFile($"{SavePath}/Textures/LUT/{lut.Unk28.TagData.LUT.Hash}");
+        //                        Source2Handler.SaveVTEX(lut.Unk28.TagData.LUT, $"{SavePath}/Textures/LUT/", "LUT");
+
+        //                        // TODO move out of global channels when theres more general stuff to export
+        //                        channels.TryAdd("LUT", new GlobalChannelData
+        //                        {
+        //                            Name = $"{lut.Unk28.TagData.LUT.Hash}",
+        //                            Index = -1
+        //                        });
+        //                    }
+        //                }
+        //                break;
+        //        }
+
+        //        //System.Console.WriteLine($"\t-{globals.Unk00}: Index {globals.ChannelIndex}");
+
+        //        //TfxBytecodeInterpreter bytecode = new(TfxBytecodeOp.ParseAll(globals.UnkBytecode));
+        //        //System.Console.WriteLine($"\t-Bytecode ops ({bytecode.Opcodes.Count})");
+        //        //foreach (var op in bytecode.Opcodes)
+        //        //{
+        //        //    System.Console.WriteLine($"\t\t--{op.op}");
+        //        //}
+        //        //System.Console.WriteLine($"\t-Values ({globals.Values.Count})");
+        //        //foreach (var value in globals.Values)
+        //        //{
+        //        //    System.Console.WriteLine($"\t\t--{value.Vec.ToString()}");
+        //        //}
+        //    }
+
+        //    File.WriteAllText($"{dataSavePath}/GlobalChannels.json", JsonConvert.SerializeObject(channels, Formatting.Indented));
+        //}
     }
 
     private struct AtmosphereData
@@ -358,6 +419,7 @@ public class GlobalExporter : AbstractExporter
 
     private struct GlobalChannelData
     {
+        public string Name;
         public int Index;
         public List<byte> Bytecode;
         public List<Vector4> Constants;

@@ -5,7 +5,7 @@ namespace Tiger.Commandlets;
 
 public class PerfTestCommandlet : ICommandlet
 {
-    public void Run(InstanceArgs args)
+    public void Run(TigerArgs args)
     {
         TestPackageReads();
         TestAllPackagesAndFiles();

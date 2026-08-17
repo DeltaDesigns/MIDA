@@ -55,7 +55,7 @@ public partial class DialogueView : UserControl
             }
             else
             {
-                S3FAA8080 entry = dyn;
+                S8080AA3F entry = dyn;
                 if (entry.SoundM is null || entry.VoicelineM is null)
                     continue;
 

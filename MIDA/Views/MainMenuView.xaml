@@ -10,7 +10,6 @@
     Loaded="OnControlLoaded"
     mc:Ignorable="d">
 
-
     <Grid x:Name="MainContainer" Background="Transparent">
         <Grid.Triggers>
             <EventTrigger RoutedEvent="Grid.Loaded">
@@ -28,7 +27,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="90*" />
-            <RowDefinition Height="10*" />
+            <RowDefinition Height="5*" />
         </Grid.RowDefinitions>
         <Grid.RenderTransform>
             <TranslateTransform />
@@ -36,12 +35,12 @@
 
         <TextBlock
             x:Name="Symbols"
-            Grid.Row="1"
+            Grid.Row="0"
             Margin="20,0,0,0"
             HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            FontFamily="{StaticResource Goliath Beta Encrypted}"
-            FontSize="24"
+            VerticalAlignment="Bottom"
+            FontFamily="{StaticResource Code Language}"
+            FontSize="22"
             Foreground="{StaticResource MarathonYellow}"
             Text="A B C D E F 1 2 3 4 5 6 7 8 9 0" />
 
@@ -59,17 +58,17 @@
                         Grid.Column="1"
                         Margin="0,10,0,0"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
+                        BorderBrush="#363841"
                         BorderThickness="0,0,0,2" />
                     <Border
                         Grid.Column="1"
                         Height="10"
-                        Margin="0,0,0,-10"
+                        Margin="-1,0,0,-10"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
-                        BorderThickness="1" />
+                        BorderBrush="#363841"
+                        BorderThickness="2" />
                     <Border
                         Grid.Column="1"
                         Height="10"
@@ -77,7 +76,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Bottom"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
+                        BorderBrush="#363841"
                         BorderThickness="1" />
                     <Border
                         Grid.Column="1"
@@ -86,24 +85,24 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
+                        BorderBrush="#363841"
                         BorderThickness="1" />
                 </Grid>
 
                 <Button
-                    Margin="10,10,10,30"
+                    Margin="0,30,0,30"
                     Click="ActivitiesViewButton_OnClick"
-                    MouseEnter="CategoryButton_MouseEnter"
-                    MouseLeave="CategoryButton_MouseLeave"
-                    Style="{DynamicResource D2StyleButton}"
-                    Tag="MAPS AND ACTIVITIES:View Maps and Activity related content.">
-
-                    <TextBlock
-                        d:FontFamily="Marathon Shapiro 65 Wide"
-                        FontFamily="{DynamicResource Marathon Shapiro}"
-                        Text="MAPS AND ACTIVITIES"
-                        TextWrapping="WrapWithOverflow" />
-
+                    Style="{DynamicResource MarathonStyleButton}">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip Name="MAPS AND ACTIVITIES" Description="View Maps and Activity related content." />
+                    </local:GenericTooltipProperties.TooltipData>
+                    <Border>
+                        <TextBlock
+                            d:FontFamily="Marathon Shapiro 65 Wide"
+                            FontFamily="{DynamicResource Marathon Shapiro}"
+                            Text="MAPS AND ACTIVITIES"
+                            TextWrapping="WrapWithOverflow" />
+                    </Border>
                 </Button>
 
                 <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
@@ -117,71 +116,74 @@
                         <Button
                             x:Name="ApiButton"
                             Grid.Column="1"
-                            Margin="10,5,5,5"
+                            Margin="10"
                             Click="ApiViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="API VIEWER:View and export any Player Gear.">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="API" />
-
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="GEAR VIEWER" Description="View and export any Player Gear." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="GEAR" />
+                            </Border>
                         </Button>
 
                         <Button
                             x:Name="BagsButton"
+                            Margin="10"
                             Click="NamedEntitiesBagsViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="NAMED BAGS:View and export entities contained in developer named 'bags', like a collection of prefabs."
+                            Style="{DynamicResource MarathonStyleButton}"
                             Visibility="Collapsed">
-
-                            <TextBlock
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource KH Interference Light}"
-                                Text="NAMED BAGS" />
-
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="NAMED BAGS" Description="View and export entities contained in developer named 'bags', like a collection of prefabs." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="NAMED BAGS" />
+                            </Border>
                         </Button>
 
                         <Button
-                            Margin="10,5,5,5"
-                            Click="AllEntitiesViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="DYNAMICS:View and export entities, some are even named!">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="DYNAMICS" />
-
+                            Margin="10"
+                            Click="AllEntitiesView2Button_OnClick"
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="ENTITIES" Description="View and export entities, some are even named!" />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="ENTITIES" />
+                            </Border>
                         </Button>
 
                         <Button
                             x:Name="StaticsButton"
-                            Margin="10,5,5,5"
+                            Margin="10"
                             Click="AllStaticsViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="STATICS:View and export static models. These are what make a map.">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="STATICS" />
-
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="STATICS" Description="View and export static models. These are what make a map." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="STATICS" />
+                            </Border>
                         </Button>
-
-
                     </StackPanel>
 
                     <StackPanel
@@ -193,34 +195,54 @@
                         <Button
                             Margin="10"
                             Click="AllAudioViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="ALL SOUNDS:View and export any audio in the game.">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="ALL SOUNDS" />
-
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="ALL SOUNDS" Description="View and export any audio in the game." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="ALL SOUNDS" />
+                            </Border>
                         </Button>
 
                         <Button
                             x:Name="WeaponAudioButton"
-                            Margin="10,5,5,5"
+                            Margin="10"
                             Click="WeaponAudioViewButton_Click"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="WEAPON SOUNDS:View and export specific weapon sounds.">
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="WEAPON SOUNDS" Description="View and export specific weapon sounds." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="WEAPONS" />
+                            </Border>
+                        </Button>
 
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="WEAPON AUDIO" />
-
+                        <Button
+                            x:Name="SoundBanksButton"
+                            Margin="10"
+                            Click="AllBKHDViewButton_OnClick"
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="SOUND BANKS" Description="View and export sounds from Wwise soundbanks.&#x0a;Slightly more organized than 'All Sounds'.&#x0a;Some may be named but may be inaccurate." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="SOUND BANKS" />
+                            </Border>
                         </Button>
 
                     </StackPanel>
@@ -232,69 +254,37 @@
                         <ContentControl Content="OTHER" Template="{StaticResource MarathonCategoryLabel}" />
 
                         <Button
-                            Margin="10,5,5,5"
-                            Click="AllStringsViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="STRINGS:View and export strings.">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="STRINGS" />
-
-                        </Button>
-
-                        <Button
-                            Margin="10,5,5,5"
+                            Margin="10"
                             Click="AllTexturesView2Button_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="TEXTURES:View and export textures.">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="TEXTURES" />
-
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="TEXTURES" Description="View and export textures." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="TEXTURES" />
+                            </Border>
                         </Button>
 
                         <Button
-                            Margin="10,5,5,5"
+                            Margin="10"
                             Click="AllMaterialsViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="MATERIALS:View and export materials. These make everything look pretty.">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="MATERIALS" />
-
-                        </Button>
-
-                        <Button
-                            x:Name="CollectionsButton"
-                            Grid.Column="1"
-                            Margin="10,5,5,5"
-                            Click="CollectionsViewButton_OnClick"
-                            MouseEnter="CategoryButton_MouseEnter"
-                            MouseLeave="CategoryButton_MouseLeave"
-                            Style="{DynamicResource D2StyleButton}"
-                            Tag="COLLECTIONS:View and inspect Player Gear in detail, just like in-game!">
-
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                d:FontFamily="Marathon Shapiro 65 Wide"
-                                FontFamily="{DynamicResource Marathon Shapiro}"
-                                Text="COLLECTIONS" />
-
+                            Style="{DynamicResource MarathonStyleButton}">
+                            <local:GenericTooltipProperties.TooltipData>
+                                <local:GenericTooltip Name="MATERIALS" Description="View and export materials. These make everything look pretty." />
+                            </local:GenericTooltipProperties.TooltipData>
+                            <Border>
+                                <TextBlock
+                                    Margin="10,10,50,10"
+                                    HorizontalAlignment="Left"
+                                    d:FontFamily="Marathon Shapiro 65 Wide"
+                                    FontFamily="{DynamicResource Marathon Shapiro}"
+                                    Text="MATERIALS" />
+                            </Border>
                         </Button>
 
 
@@ -306,7 +296,7 @@
                         Grid.Column="1"
                         Margin="0,10,0,0"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
+                        BorderBrush="#363841"
                         BorderThickness="0,0,0,2" />
                     <Border
                         Grid.Column="1"
@@ -315,7 +305,7 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
+                        BorderBrush="#363841"
                         BorderThickness="1" />
                     <Border
                         Grid.Column="1"
@@ -324,7 +314,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
+                        BorderBrush="#363841"
                         BorderThickness="1" />
                     <Border
                         Grid.Column="1"
@@ -333,7 +323,7 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Background="Transparent"
-                        BorderBrush="#AEFFFFFF"
+                        BorderBrush="#363841"
                         BorderThickness="1" />
                 </Grid>
             </StackPanel>
@@ -342,8 +332,8 @@
 
         <Grid
             Grid.Row="1"
-            Margin="0,40,0,0"
-            Background="#66121212">
+            Margin="0,0,0,0"
+            Background="{StaticResource MarathonDark}">
             <TextBlock
                 x:Name="GameVersion"
                 Margin="15,0,0,0"
@@ -362,11 +352,34 @@
                 Orientation="Horizontal">
                 <Button
                     Margin="5,0,5,0"
+                    Click="ChangelogButton_OnClick"
+                    Style="{DynamicResource MarathonStyleButton}">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip
+                            Name="CHANGELOG"
+                            Description="View recent changes to MIDA."
+                            Style="Category" />
+                    </local:GenericTooltipProperties.TooltipData>
+                    <TextBlock
+                        Margin="10"
+                        d:FontFamily="KH Interference Regular"
+                        FontFamily="{DynamicResource KH Interference Regular}"
+                        FontSize="16"
+                        Foreground="{StaticResource BackgroundColour7}"
+                        Text="CHANGELOG" />
+                </Button>
+
+                <Button
+                    Margin="5,0,5,0"
                     Click="GithubButton_OnClick"
-                    MouseEnter="CategoryButton_MouseEnter"
-                    MouseLeave="CategoryButton_MouseLeave"
-                    Style="{DynamicResource D2StyleButton}"
-                    Tag="GITHUB:View the source code for MIDA">
+                    Style="{DynamicResource MarathonStyleButton}"
+                    Visibility="Collapsed">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip
+                            Name="GITHUB"
+                            Description="View the source code for MIDA."
+                            Style="Category" />
+                    </local:GenericTooltipProperties.TooltipData>
                     <TextBlock
                         Margin="10"
                         d:FontFamily="KH Interference Regular"
@@ -379,10 +392,13 @@
                 <Button
                     Margin="5,0,5,0"
                     Click="AboutButton_OnClick"
-                    MouseEnter="CategoryButton_MouseEnter"
-                    MouseLeave="CategoryButton_MouseLeave"
-                    Style="{DynamicResource D2StyleButton}"
-                    Tag="ABOUT:View the credits for MIDA">
+                    Style="{DynamicResource MarathonStyleButton}">
+                    <local:GenericTooltipProperties.TooltipData>
+                        <local:GenericTooltip
+                            Name="ABOUT"
+                            Description="View the credits for MIDA."
+                            Style="Category" />
+                    </local:GenericTooltipProperties.TooltipData>
                     <TextBlock
                         Margin="10"
                         d:FontFamily="KH Interference Regular"

@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using HelixToolkit.SharpDX.Core;
-using HelixToolkit.SharpDX.Core.Assimp;
-using HelixToolkit.SharpDX.Core.Model.Scene;
+using CommunityToolkit.Mvvm.Input;
+using HelixToolkit;
+using HelixToolkit.Geometry;
+using HelixToolkit.Maths;
+using HelixToolkit.SharpDX;
+using HelixToolkit.SharpDX.Assimp;
+using HelixToolkit.SharpDX.Model.Scene;
 using HelixToolkit.Wpf.SharpDX;
-using Microsoft.Toolkit.Mvvm.Input;
-using SharpDX;
 using Tiger.Schema;
 using Tiger.Schema.Entity;
-using Color4 = SharpDX.Color4;
 using Log = Arithmic.Log;
 using Media3D = System.Windows.Media.Media3D;
 using Point3D = System.Windows.Media.Media3D.Point3D;
@@ -20,7 +23,6 @@ using Vector3D = System.Windows.Media.Media3D.Vector3D;
 using Vector4 = Tiger.Schema.Vector4;
 
 namespace MIDA;
-using System.ComponentModel;
 
 /// <summary>
 /// Provides a ViewModel for the Main window.
@@ -70,7 +72,6 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public LineGeometry3D Grid { get; private set; }
     public Media3D.Transform3D GridTransform { get; private set; }
-    public TextureModel BackgroundTexture { get; private set; }
 
     public MainViewModel()
     {
@@ -94,9 +95,6 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         GridTransform = new TranslateTransform3D(-5, 0, -5);
 
         // EnvironmentMap = TextureModel.Create("C:/T/full/Textures/2D47A280.dds");
-        BackgroundTexture = new TextureModel(
-         BitmapExtensions.CreateSolidColorBitmapStream(EffectsManager, 2, 2,
-         Direct2DImageFormat.Bmp, new Color4(26 / 255f, 26 / 255f, 28 / 255f, 1)));
     }
 
     private void ResetCamera()
@@ -130,16 +128,14 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
     public struct DisplayPart
     {
         public MeshPart BasePart = new();
-        public DynamicMeshPart EntityPart = new();
-        public List<Vector3> Translations = new List<Vector3>();
-        public List<Vector4> Rotations = new List<Vector4>();
-        public List<Vector3> Scales = new List<Vector3>();
-        public DiffuseMaterial DiffuseMaterial = new DiffuseMaterial
-        {
-            DiffuseColor = new Color4(0.9f, 0.9f, 0.9f, 1.0f)
-        };
-
+        public List<Vector3> Translations = new();
+        public List<Vector4> Rotations = new();
+        public List<Vector3> Scales = new();
         public List<BoneNode> BoneNodes = new();
+        public DiffuseMaterial DiffuseMaterial = new()
+        {
+            DiffuseColor = new(0.9f, 0.9f, 0.9f, 1.0f)
+        };
 
         public DisplayPart()
         {
@@ -154,7 +150,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         {
             if (node is MeshNode mn)
             {
-                MeshGeometry3D mesh = mn.Geometry as MeshGeometry3D;
+                HelixToolkit.SharpDX.MeshGeometry3D mesh = mn.Geometry as HelixToolkit.SharpDX.MeshGeometry3D;
                 mn.Instances = null;
                 mesh.ClearAllGeometryData();
                 var q = mesh as IDisposable;
@@ -187,15 +183,15 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         }
         bool bSkel = false;
         ModelGroup.AddNode(scene.Root);
-        foreach (var node in scene.Root.Items.Traverse(false))
+        foreach (SceneNode? node in scene.Root.Items.Traverse(false))
         {
             if (node is MeshNode mn)
             {
                 var material = new DiffuseMaterial
                 {
-                    DiffuseColor = new Color4(0.7f, 0.7f, 0.7f, 1.0f)
+                    DiffuseColor = new(0.7f, 0.7f, 0.7f, 1.0f)
                 };
-                mn.ModelMatrix = node.ModelMatrix * SharpDX.Matrix.RotationX(-(float)Math.PI / 2) * SharpDX.Matrix.RotationY(-(float)Math.PI / 2);
+                mn.ModelMatrix = node.ModelMatrix * MatrixHelper.RotationX(-(float)Math.PI / 2) * MatrixHelper.RotationY(-(float)Math.PI / 2);
                 mn.Material = material;
                 if (mn is BoneSkinMeshNode m)
                 {
@@ -203,9 +199,9 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                     {
                         var mat = new DiffuseMaterial
                         {
-                            DiffuseColor = new Color4(1f, 0f, 0f, 1.0f)
+                            DiffuseColor = new(1f, 0f, 0f, 1.0f)
                         };
-                        var skeleton = m.CreateSkeletonNode(mat, importer.Configuration.SkeletonEffects, importer.Configuration.SkeletonSizeScale);
+                        BoneSkinMeshNode skeleton = m.CreateSkeletonNode(mat, importer.Configuration.SkeletonEffects, importer.Configuration.SkeletonSizeScale);
                         skeleton.ModelMatrix = m.ModelMatrix;
                         ModelGroup.AddNode(skeleton);
                         ModelGroup.AddNode(new NodePostEffectXRayGrid
@@ -226,31 +222,31 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
     // https://stackoverflow.com/questions/33374434/improve-wpf-rendering-performance-using-helix-toolkit
     public void SetChildren(List<DisplayPart> parts)
     {
-        foreach (var part in parts)
+        foreach (DisplayPart part in parts)
         {
-            MeshNode model = new MeshNode();
-            Matrix[] ModelInstances = new Matrix[part.Translations.Count];
+            MeshNode model = new();
+            System.Numerics.Matrix4x4[] ModelInstances = new System.Numerics.Matrix4x4[part.Translations.Count];
 
-            HelixToolkit.SharpDX.Core.MeshGeometry3D mesh = new HelixToolkit.SharpDX.Core.MeshGeometry3D();
-            IntCollection triangleIndices = new IntCollection();
-            Vector3Collection positions = new Vector3Collection();
-            Vector3Collection normals = new Vector3Collection();
-            Vector2Collection textureCoordinates = new Vector2Collection();
+            HelixToolkit.SharpDX.MeshGeometry3D mesh = new();
+            IntCollection triangleIndices = new();
+            Vector3Collection positions = new();
+            Vector3Collection normals = new();
+            Vector2Collection textureCoordinates = new();
             mesh.SetAsTransient();
             //Random rand = new();
 
             if (part.BasePart.Indices.Count > 0)
             {
                 // Conversion lookup table
-                Dictionary<int, int> lookup = new Dictionary<int, int>();
+                Dictionary<int, int> lookup = new();
                 for (int i = 0; i < part.BasePart.VertexIndices.Count; i++)
                 {
                     lookup[(int)part.BasePart.VertexIndices[i]] = i;
                 }
 
-                foreach (var vertexIndex in part.BasePart.VertexIndices)
+                foreach (uint vertexIndex in part.BasePart.VertexIndices)
                 {
-                    var v4p = part.BasePart.VertexPositions[lookup[(int)vertexIndex]];
+                    Vector4 v4p = part.BasePart.VertexPositions[lookup[(int)vertexIndex]];
                     if (float.IsInfinity(v4p.X) || float.IsNaN(v4p.X))
                         v4p.X = 0;
                     if (float.IsInfinity(v4p.Y) || float.IsNaN(v4p.Y))
@@ -258,20 +254,20 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                     if (float.IsInfinity(v4p.Z) || float.IsNaN(v4p.Z))
                         v4p.Z = 0;
 
-                    SharpDX.Vector3 p = new SharpDX.Vector3(v4p.X, v4p.Y, v4p.Z);
+                    Vector3 p = new(v4p.X, v4p.Y, v4p.Z);
                     positions.Add(p);
                     // We need to check if the normal is Euler or Quaternion
                     if (part.BasePart.VertexNormals.Count > 0)
                     {
-                        var v4n = part.BasePart.VertexNormals[lookup[(int)vertexIndex]];
-                        var v3ne = part.BasePart is DynamicMeshPart ? new Vector3(v4n.X, v4n.Y, v4n.Z) : ConsiderQuatToEulerConvert(v4n);
-                        SharpDX.Vector3 n = new SharpDX.Vector3(v3ne.X, v3ne.Y, v3ne.Z);
+                        Vector4 v4n = part.BasePart.VertexNormals[lookup[(int)vertexIndex]];
+                        Vector3 v3ne = part.BasePart is DynamicMeshPart ? new Vector3(v4n.X, v4n.Y, v4n.Z) : ConsiderQuatToEulerConvert(v4n);
+                        Vector3 n = new(v3ne.X, v3ne.Y, v3ne.Z);
                         normals.Add(n);
                     }
                     if (part.BasePart.VertexTexcoords0.Count > 0)
                     {
-                        var v2t = part.BasePart.VertexTexcoords0[lookup[(int)vertexIndex]];
-                        SharpDX.Vector2 t = new SharpDX.Vector2(v2t.X, 1 - v2t.Y);
+                        Tiger.Schema.Vector2 v2t = part.BasePart.VertexTexcoords0[lookup[(int)vertexIndex]];
+                        System.Numerics.Vector2 t = new(v2t.X, 1 - v2t.Y);
                         textureCoordinates.Add(t);
                     }
                 }
@@ -284,7 +280,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
             }
             if (part.BoneNodes.Count > 0)
             {
-                AddSkeletonVisual(part.BoneNodes);
+                AddSkeletonVisual(part);
             }
 
             mesh.Positions = positions;
@@ -296,19 +292,18 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
             model.Material = part.DiffuseMaterial;
             model.CullMode = SharpDX.Direct3D11.CullMode.Back;
 
-            List<Matrix> instances = new List<Matrix>();
+            List<System.Numerics.Matrix4x4> instances = new();
             for (int i = 0; i < part.Translations.Count; i++)
             {
-                SharpDX.Vector3 scale = new SharpDX.Vector3(part.Scales[i].X, part.Scales[i].Y, part.Scales[i].Z);
-                SharpDX.Quaternion rotation = new SharpDX.Quaternion(part.Rotations[i].X, part.Rotations[i].Y, part.Rotations[i].Z, part.Rotations[i].W);
-                SharpDX.Vector3 translation = new SharpDX.Vector3(part.Translations[i].X, part.Translations[i].Y, part.Translations[i].Z);
-                SharpDX.Matrix matrix = new SharpDX.Matrix();
-                SharpDX.Vector3 scalingOrigin = SharpDX.Vector3.Zero;
-                matrix = SharpDX.Matrix.Transformation(scalingOrigin, SharpDX.Quaternion.Identity, scale, SharpDX.Vector3.Zero, rotation, translation);
-                // Transform Y-up to Z-up
-                // instances.Add(matrix * SharpDX.Matrix.RotationX(-(float)Math.PI / 2) * SharpDX.Matrix.RotationY(-(float)Math.PI / 2));
-                instances.Add(matrix * SharpDX.Matrix.RotationX(-(float)Math.PI / 2) * SharpDX.Matrix.RotationY(-(float)Math.PI / 2));
+                Vector3 scale = new(part.Scales[i].X, part.Scales[i].Y, part.Scales[i].Z);
+                System.Numerics.Quaternion rotation = new(part.Rotations[i].X, part.Rotations[i].Y, part.Rotations[i].Z, part.Rotations[i].W);
+                Vector3 translation = new(part.Translations[i].X, part.Translations[i].Y, part.Translations[i].Z);
+                System.Numerics.Matrix4x4 matrix = new();
+                Vector3 scalingOrigin = Vector3.Zero;
+                matrix = MatrixHelper.Transformation(scalingOrigin, System.Numerics.Quaternion.Identity, scale, Vector3.Zero, rotation, translation);
 
+                // Transform Y-up to Z-up
+                instances.Add(matrix * MatrixHelper.RotationX(-(float)Math.PI / 2) * MatrixHelper.RotationY(-(float)Math.PI / 2));
             }
             ModelInstances = instances.ToArray();
             model.Instances = ModelInstances;
@@ -316,31 +311,35 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public void AddSkeletonVisual(List<BoneNode> bones)
+    public void AddSkeletonVisual(DisplayPart part)
     {
         var positions = new Vector3Collection();
         var indices = new IntCollection();
-        var correction = SharpDX.Matrix.RotationX(-(float)Math.PI / 2) * SharpDX.Matrix.RotationY(-(float)Math.PI / 2);
+        System.Numerics.Matrix4x4 correction =
+            HelixToolkit.Maths.Matrix3x3.RotationQuaternion(new System.Numerics.Quaternion(part.Rotations[0].X,
+                                                            part.Rotations[0].Y,
+                                                            part.Rotations[0].Z,
+                                                            part.Rotations[0].W)).ToMatrix()
+            * MatrixHelper.RotationX(-(float)Math.PI / 2)
+            * MatrixHelper.RotationY(-(float)Math.PI / 2);
 
-        foreach (var bone in bones)
+        var bones = part.BoneNodes;
+        foreach (BoneNode bone in bones)
         {
             if (bone.ParentNodeIndex > 0 && bone.ParentNodeIndex < bones.Count)
             {
-                var parent = bones[bone.ParentNodeIndex];
+                BoneNode parent = bones[bone.ParentNodeIndex];
 
                 int startIndex = positions.Count;
 
-                var childPos = SharpDX.Vector3.TransformCoordinate(
-                    new SharpDX.Vector3(bone.DefaultObjectSpaceTransform.Translation.X,
-                                        bone.DefaultObjectSpaceTransform.Translation.Y,
-                                        bone.DefaultObjectSpaceTransform.Translation.Z),
-                    correction);
+                var childTrans = bone.DefaultObjectSpaceTransform.Translation + part.Translations[0];
+                var parentTrans = parent.DefaultObjectSpaceTransform.Translation + part.Translations[0];
 
-                var parentPos = SharpDX.Vector3.TransformCoordinate(
-                    new SharpDX.Vector3(parent.DefaultObjectSpaceTransform.Translation.X,
-                                        parent.DefaultObjectSpaceTransform.Translation.Y,
-                                        parent.DefaultObjectSpaceTransform.Translation.Z),
-                    correction);
+                var childPos = Vector3Helper.TransformCoordinate(
+                    new Vector3(childTrans.X, childTrans.Y, childTrans.Z), correction);
+
+                var parentPos = Vector3Helper.TransformCoordinate(
+                    new Vector3(parentTrans.X, parentTrans.Y, parentTrans.Z), correction);
 
                 positions.Add(childPos);
                 positions.Add(parentPos);
@@ -350,21 +349,18 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
 
                 // Adds sphere at joint
-                var jointPos = SharpDX.Vector3.TransformCoordinate(
-                    new SharpDX.Vector3(bone.DefaultObjectSpaceTransform.Translation.X,
-                                        bone.DefaultObjectSpaceTransform.Translation.Y,
-                                        bone.DefaultObjectSpaceTransform.Translation.Z),
-                    correction);
+                var jointPos = Vector3Helper.TransformCoordinate(
+                    new Vector3(childTrans.X, childTrans.Y, childTrans.Z), correction);
 
                 var sphereMeshBuilder = new MeshBuilder();
-                sphereMeshBuilder.AddSphere(new SharpDX.Vector3(jointPos.X, jointPos.Y, jointPos.Z), 0.0075, 6, 6);
+                sphereMeshBuilder.AddSphere(new Vector3(jointPos.X, jointPos.Y, jointPos.Z), 0.0075f, 6, 6);
 
                 var sphereModel = new MeshGeometryModel3D
                 {
                     Geometry = sphereMeshBuilder.ToMeshGeometry3D(),
                     Material = new DiffuseMaterial
                     {
-                        DiffuseColor = new Color4(1, 0, 0, 1)
+                        DiffuseColor = new HelixToolkit.Maths.Color4(1, 0, 0, 1)
                     },
                     DepthBias = -int.MaxValue
                 };
@@ -390,12 +386,12 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
     private Vector3 ConsiderQuatToEulerConvert(Vector4 v4N)
     {
-        Vector3 res = new Vector3();
+        Vector3 res = new();
         if (Math.Abs(v4N.Magnitude - 1) < 0.01)  // Quaternion
         {
             var quat = new Quaternion(v4N.X, v4N.Y, v4N.Z, v4N.W);
-            var a = new SharpDX.Vector3(1, 0, 0);
-            var result = SharpDX.Vector3.Transform(a, quat);
+            var a = new System.Numerics.Vector3(1, 0, 0);
+            var result = System.Numerics.Vector3.Transform(a, quat);
             res.X = result.X;
             res.Y = result.Y;
             res.Z = result.Z;

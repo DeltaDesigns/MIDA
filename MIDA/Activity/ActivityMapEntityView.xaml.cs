@@ -66,7 +66,7 @@ public partial class ActivityMapEntityView : UserControl
         displayActivity.Data = displayActivity;
         maps.Add(displayActivity);
 
-        var ambient = (activity as Tiger.Schema.Activity.MARATHON_ALPHA.Activity).TagData.AmbientActivity;
+        var ambient = (activity as Tiger.Schema.Activity.MARATHON.Activity).TagData.AmbientActivity;
         if (ambient is not null)
         {
             DisplayEntBubble ambientActivity = new();
@@ -207,11 +207,14 @@ public partial class ActivityMapEntityView : UserControl
 
             dataEntries.ForEach(entry =>
             {
-                if (!entities.ContainsKey(entry.Entity.Hash))
+                if (entry.Entity != null)
                 {
-                    entities[entry.Entity.Hash] = new ConcurrentBag<ulong>();
+                    if (!entities.ContainsKey(entry.Entity.Hash))
+                    {
+                        entities[entry.Entity.Hash] = new ConcurrentBag<ulong>();
+                    }
+                    entities[entry.Entity.Hash].Add(entry.WorldID);
                 }
-                entities[entry.Entity.Hash].Add(entry.WorldID);
             });
         });
 
@@ -300,7 +303,7 @@ public partial class ActivityMapEntityView : UserControl
             return;
         }
 
-        List<string> mapStages = maps.Select((x, i) => $"Preparing {i + 1}/{maps.Count}").ToList();
+        List<string> mapStages = maps.Select((x, i) => $"Preparing {i + 1}/{maps.Count}\nThis may take some time.").ToList();
         mapStages.Add("Exporting");
         MainWindow.Progress.SetProgressStages(mapStages);
 
@@ -327,11 +330,6 @@ public partial class ActivityMapEntityView : UserControl
     {
         Directory.CreateDirectory(savePath);
         ExtractDataTables(dataTables, hash, savePath);
-
-        if (_config.GetUnrealInteropEnabled())
-        {
-            AutomatedExporter.SaveInteropUnrealPythonFile(savePath, hash, AutomatedExporter.ImportType.Map, _config.GetOutputTextureFormat(), _config.GetSingleFolderMapAssetsEnabled());
-        }
     }
 
     private static void ExtractDataTables(List<FileHash> dataTables, string hash, string savePath)
@@ -343,29 +341,34 @@ public partial class ActivityMapEntityView : UserControl
         ExporterScene entitiesScene = Exporter.Get().CreateScene($"{hash}_Entities", ExportType.Entities, DataExportType.Map);
         ExporterScene skyScene = Exporter.Get().CreateScene($"{hash}_SkyObjects", ExportType.SkyObjects, DataExportType.Map);
         ExporterScene decoratorsScene = Exporter.Get().CreateScene($"{hash}_Decorators", ExportType.Decorators, DataExportType.Map);
+        ExporterScene treesScene = Exporter.Get().CreateScene($"{hash}_SpeedTrees", ExportType.SpeedTrees, DataExportType.Map);
         ExporterScene roadDecalsScene = Exporter.Get().CreateScene($"{hash}_RoadDecals", ExportType.RoadDecals, DataExportType.Map);
         ExporterScene waterDecalsScene = Exporter.Get().CreateScene($"{hash}_WaterDecals", ExportType.WaterDecals, DataExportType.Map);
 
         Parallel.ForEach(dataTables, data =>
+        //dataTables.ForEach(data =>
         {
             var dataTable = FileResourcer.Get().GetSchemaTag<SMapDataTable>(data);
             dataTable.TagData.DataEntries.ForEach(entry =>
             {
+                if (entry.Entity is null)
+                    return;
+
                 Entity entity = FileResourcer.Get().GetFile<Entity>(entry.Entity.Hash);
                 if (entity.HasGeometry())
                 {
-                    entitiesScene.AddMapEntity(entry, entity);
+                    entitiesScene.AddMapEntity(entry);
                     entity.SaveMaterialsFromParts(entitiesScene, entity.Load(ExportDetailLevel.MostDetailed));
                 }
                 else
                 {
-                    foreach (var resourceHash in entity.TagData.EntityResources.Select(entity.GetReader(), r => r.Resource))
+                    foreach (var resourceHash in entity.Components)
                     {
-                        EntityResource resource = FileResourcer.Get().GetFile<EntityResource>(resourceHash);
+                        EntityComponent resource = FileResourcer.Get().GetFile<EntityComponent>(resourceHash);
                         switch (resource.TagData.Unk10.GetValue(resource.GetReader()))
                         {
-                            case S9AB68080:
-                                var a = ((S519F8080)resource.TagData.Unk18.GetValue(resource.GetReader()));
+                            case S8080B69A:
+                                var a = ((S80809F51)resource.TagData.Unk18.GetValue(resource.GetReader()));
                                 var b = a.Array1;
                                 b.AddRange(a.Array2);
 
@@ -373,6 +376,7 @@ public partial class ActivityMapEntityView : UserControl
                                 {
                                     if (c.Unk10.GetValue(resource.GetReader()) is S4EB68080 globals)
                                     {
+                                        //Log.Debug($"Loading GlobalChannels {dataTable.Hash} into Exporter.");
                                         globalScene.AddToGlobalScene(globals);
                                     }
                                 }
@@ -396,6 +400,7 @@ public partial class ActivityMapEntityView : UserControl
                     case SMapCubemapResource cubemapResource:
                         Cubemap cubemap = new(cubemapResource);
                         cubemap.CubemapTransform = entry.Transfrom;
+                        //Log.Debug($"Loading Cubemaps {dataTable.Hash} into Exporter.");
                         cubemap.LoadIntoExporter();
                         break;
 
@@ -423,7 +428,7 @@ public partial class ActivityMapEntityView : UserControl
                     case SDecoratorMapResource decorator:
                         decorator.Decorator?.Load();
                         if (decorator.Decorator is not null)
-                            decorator.Decorator.LoadIntoExporter(decoratorsScene, savePath);
+                            decorator.Decorator.LoadIntoExporter(decoratorsScene, treesScene, savePath);
                         break;
 
                     case SMapWaterDecal waterDecal:
@@ -432,10 +437,12 @@ public partial class ActivityMapEntityView : UserControl
 
                         WaterDecals water = new(waterDecal);
                         water.Transform = entry.Transfrom;
+                        //Log.Debug($"Loading WaterDecal {dataTable.Hash} into Exporter.");
                         water.LoadIntoExporter(waterDecalsScene);
                         break;
 
                     case SMapAtmosphere atmosphere:
+                        Log.Debug($"Loading Atmosphere {dataTable.Hash} into Exporter.");
                         globalScene.AddToGlobalScene(atmosphere, true);
                         break;
 
@@ -443,6 +450,7 @@ public partial class ActivityMapEntityView : UserControl
                         if (lensFlare.LensFlare is not null)
                         {
                             lensFlare.LensFlare.Transform = entry.Transfrom;
+                            Log.Debug($"Loading LensFlare {dataTable.Hash} into Exporter.");
                             lensFlare.LensFlare.LoadIntoExporter(entitiesScene);
                         }
                         break;
@@ -615,7 +623,7 @@ public partial class ActivityMapEntityView : UserControl
                         {
                             List<Entity> entities = new List<Entity> { entity };
                             entities.AddRange(entity.GetEntityChildren());
-                            EntityView.Export(entities, entity.Hash, ExportTypeFlag.Full);
+                            EntityView.Export(entities, entity.Hash);
                         }
                     }
 
@@ -632,7 +640,7 @@ public partial class ActivityMapEntityView : UserControl
                 Entity entity = FileResourcer.Get().GetFile<Entity>(tagHash);
                 List<Entity> entities = new List<Entity> { entity };
                 entities.AddRange(entity.GetEntityChildren());
-                EntityView.Export(entities, entity.Hash, ExportTypeFlag.Full);
+                EntityView.Export(entities, entity.Hash);
                 MainWindow.Progress.CompleteStage();
             });
         }

@@ -33,7 +33,7 @@ namespace Tiger.Schema.Activity
     }
 }
 
-namespace Tiger.Schema.Activity.MARATHON_ALPHA
+namespace Tiger.Schema.Activity.MARATHON
 {
     public class Activity : Tag<SActivity>, IActivity
     {
@@ -63,7 +63,7 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
 
         public IEnumerable<Bubble> EnumerateBubbles()
         {
-            var stringContainer = FileResourcer.Get().GetSchemaTag<S8B8E8080>(_tag.Destination).TagData.StringContainer;
+            var stringContainer = _tag.Destination.TagData.StringContainer;
             foreach (var mapEntry in _tag.Unk50)
             {
                 foreach (var mapReference in mapEntry.MapReferences)
@@ -87,7 +87,7 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
 
         public IEnumerable<ActivityEntities> EnumerateActivityEntities(FileHash UnkActivity = null)
         {
-            var stringContainer = FileResourcer.Get().GetSchemaTag<S8B8E8080>(_tag.Destination).TagData.StringContainer;
+            var stringContainer = _tag.Destination.TagData.StringContainer;
             foreach (var entry in _tag.Unk50)
             {
                 foreach (var resource in entry.Unk18)
@@ -111,15 +111,15 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
             var entry = FileResourcer.Get().GetSchemaTag<S8080B381>(hash);
             var Unk18 = FileResourcer.Get().GetSchemaTag<S8080B3EA>(entry.TagData.Unk18.Hash);
 
-            foreach (var resource in Unk18.TagData.EntityResources)
+            foreach (var resource in Unk18.TagData.EntityComponents)
             {
-                if (resource.EntityResourceParent != null)
+                if (resource.EntityComponentParent != null)
                 {
-                    var resourceValue = resource.EntityResourceParent.TagData.EntityResource.TagData.Unk18.GetValue(resource.EntityResourceParent.TagData.EntityResource.GetReader());
+                    var resourceValue = resource.EntityComponentParent.TagData.EntityComponent.TagData.Unk18.GetValue(resource.EntityComponentParent.TagData.EntityComponent.GetReader());
                     switch (resourceValue)
                     {
-                        case SA5B18080:
-                            var tag = (SA5B18080)resourceValue;
+                        case S8080B1A5:
+                            var tag = (S8080B1A5)resourceValue;
                             if (tag.Unk84 is not null && tag.Unk84.TagData.DataEntries.Count > 0)
                             {
                                 items.Add(tag.Unk84.Hash);
@@ -147,14 +147,14 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
             var entry = FileResourcer.Get().GetSchemaTag<S8080B381>(hash);
             var Unk18 = FileResourcer.Get().GetSchemaTag<S8080B3EA>(entry.TagData.Unk18.Hash);
 
-            foreach (var resource in Unk18.TagData.EntityResources)
+            foreach (var resource in Unk18.TagData.EntityComponents)
             {
-                if (resource.EntityResourceParent != null)
+                if (resource.EntityComponentParent != null)
                 {
-                    var entResource = resource.EntityResourceParent.TagData.EntityResource;
+                    var entResource = resource.EntityComponentParent.TagData.EntityComponent;
                     try // Fuck it, bruce forcing time
                     {
-                        var resourceValue = (S99B18080)entResource.TagData.Unk18.GetValue(entResource.GetReader());
+                        var resourceValue = (S8080B199)entResource.TagData.Unk18.GetValue(entResource.GetReader());
 
                         if (entResource.TagData.UnkHash80 != null)
                         {
@@ -163,7 +163,7 @@ namespace Tiger.Schema.Activity.MARATHON_ALPHA
                             {
                                 if (a.Unk00.Value?.Name.Value is not null)
                                 {
-                                    strings.TryAdd(Helpers.Fnv(a.Unk00.Value.Value.Name.Value), a.Unk00.Value.Value.Name.Value);
+                                    strings.TryAdd(Helpers.Fnv1a32(a.Unk00.Value.Value.Name.Value), a.Unk00.Value.Value.Name.Value);
                                 }
                             }
                             foreach (var worldid in resourceValue.Unk58)

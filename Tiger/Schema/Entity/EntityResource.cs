@@ -1,21 +1,27 @@
 ﻿namespace Tiger.Schema.Entity;
 
-public class EntityResource : Tag<S8080BADB>
+public class EntityComponent : Tag<S8080BADB>
 {
-    public EntityResource(FileHash hash) : base(hash)
+    public EntityComponent(FileHash hash) : base(hash)
     {
     }
 
-    //// Used only for D1 / ROI
-    //public List<SMapDataEntry> CollapseIntoDataEntry()
-    //{
-    //    List<SMapDataEntry> entries = new List<SMapDataEntry>();
-    //    if (Strategy.CurrentStrategy != TigerStrategy.DESTINY1_RISE_OF_IRON)
-    //        return entries;
+    public TigerReader Reader => GetReader();
+    public dynamic GetUnk10(bool deserialize = true)
+    {
+        return _tag.Unk10.GetValue(Reader, deserialize);
+    }
+    public dynamic GetUnk10(TigerReader reader, bool deserialize = true)
+    {
+        return _tag.Unk10.GetValue(reader, deserialize);
+    }
 
-    //    if (_tag.Unk10.GetValue(GetReader()) is S2E098080)
-    //        entries.AddRange(((SDD078080)_tag.Unk18.GetValue(GetReader())).DataEntries);
-
-    //    return entries;
-    //}
+    public dynamic GetUnk18(bool deserialize = true)
+    {
+        return _tag.Unk18.GetValue(Reader, deserialize);
+    }
+    public dynamic GetUnk18(TigerReader reader, bool deserialize = true)
+    {
+        return _tag.Unk18.GetValue(reader, deserialize);
+    }
 }

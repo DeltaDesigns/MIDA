@@ -3,15 +3,16 @@
 ## What is this?
 
 * MIDA (**M**arathon **I**nformation and **D**ata **A**ssistant?) is a fork of [Charm](https://github.com/MontagueM/Charm/tree/delta/EOF) designed solely for Marathon
-* MIDA is designed for extracting 3D models for artists, content creators, and for content preservation.
+* MIDA is designed for 3D artists, content creators, content preservation, and nerds who like the inner workings of the Tiger Engine. It's main focus is on extracting 3D models.
 
 > [!WARNING]
 > * MIDA is still WIP, expect issues/bugs/crashes.
+> * For developers: *A lot* of the schema structs are leftover from Charm for Destiny. Some parts of the code are probably also obsolete as certain things are no longer required for Marathon. I will clean these things up at some point.
 
 > [!CAUTION]
 > # Disclaimer
 > * Before you go any further, understand that MIDA ***IS NOT a datamining tool!!***
-> * While it can access many things in the game files, it's main purpose is focused towards **content creation**!
+> * While it can access many things in the game files, it's main purpose is focused towards **3D artists, content preservation and learning how the game works**!
 > * Please ***DO NOT*** use this tool to spread leaks and spoilers or anything that may break Bungie's TOS. Don't ruin the experience for yourself and others. Uncover things the way they were intended!
 > * Seeing this tool used for such acts WILL result in fewer public updates and the removal of certain features!
 
@@ -45,4 +46,5 @@ It would help greatly if you provide the latest crash log (`/Logs` folder) and s
 - Use the [Blender Importer addon](https://github.com/DeltaDesigns/d2-map-importer-addon) to simplify and automate importing maps and models into Blender.
 
 ## License
-The public MIDA source code is licensed under GPLv3. All other used code and DLLs are subject to their own licenses.
+The MIDA source code is licensed under GPLv3. All other used code and DLLs are subject to their own licenses.
+Just don't misuse the code. Respect developers.

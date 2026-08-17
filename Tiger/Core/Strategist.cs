@@ -5,21 +5,18 @@ using Arithmic;
 
 namespace Tiger;
 
-
-
 public class StrategyEventArgs : EventArgs
 {
     public TigerStrategy Strategy { get; set; }
 }
-
 
 // Order of values matters; Tag definitions are processed top to bottom so if you only provide a tag definition for WQ and not LF,
 // the code will presume that LF is the same as WQ. If this is not the case it will throw an exception.
 public enum TigerStrategy
 {
     NONE = 0,
-    [Description("Marathon Alpha"), StrategyMetadata("w64")]
-    MARATHON_ALPHA = 0001, // at this point screw the version number
+    [Description("Marathon"), StrategyMetadata("w64")]
+    MARATHON = 1000, // Marathon Release
 }
 
 public struct StrategyConfiguration
@@ -59,7 +56,6 @@ public class Strategy
     public static event ResetStrategyEventHandler OnStrategyResetEvent = delegate { };
 
     static Strategy() { SetStrategy(_defaultStrategy); }
-
 
     /// <exception cref="ArgumentException">'strategyString' does not exist.</exception>
     public static void SetStrategy(string strategyString)
@@ -104,7 +100,7 @@ public class Strategy
     /// <exception cref="ArgumentException">'strategy' does not exist.</exception>
     public static StrategyConfiguration GetStrategyConfiguration(TigerStrategy strategy)
     {
-        bool strategyExists = _strategyConfigurations.TryGetValue(strategy, out var configuration);
+        bool strategyExists = _strategyConfigurations.TryGetValue(strategy, out StrategyConfiguration configuration);
         if (!strategyExists)
         {
             throw new ArgumentException($"Game strategy does not exist '{strategy}'");
@@ -180,7 +176,7 @@ public class Strategy
     /// </summary>
     /// <exception cref="DirectoryNotFoundException">Package directory does not exist.</exception>
     /// <exception cref="ArgumentException">Package directory contents is invalid.</exception>
-    private static bool CheckValidPackagesDirectory(TigerStrategy strategy, string packagesDirectory)
+    public static bool CheckValidPackagesDirectory(TigerStrategy strategy, string packagesDirectory)
     {
         if (PackagesDirectoryDoesNotExist(packagesDirectory))
         {
@@ -190,19 +186,20 @@ public class Strategy
 
         if (PackagesDirectoryEmpty(packagesDirectory))
         {
-            Log.Error($"The packages directory is empty: {packagesDirectory}");
+            Log.Error($"The packages directory contains no package files: {packagesDirectory}");
             return false;
+        }
+
+        // Warn but allow non-pkg files, shouldn't be a big deal as they will just be ignored
+        if (PackageFilesHasInvalidExtension(packagesDirectory))
+        {
+            Log.Warning($"The packages directory contains files without the .pkg extension: {packagesDirectory}");
+            //return false;
         }
 
         if (PackageFilesHasInvalidPrefix(strategy, packagesDirectory))
         {
             Log.Error($"The packages directory contains a package without the correct prefix '{GetStrategyPackagePrefix(strategy)}': {packagesDirectory}");
-            return false;
-        }
-
-        if (PackageFilesHasInvalidExtension(packagesDirectory))
-        {
-            Log.Error($"The packages directory contains a package without the correct extension '.pkg': {packagesDirectory}");
             return false;
         }
 
@@ -216,20 +213,22 @@ public class Strategy
 
     private static bool PackagesDirectoryEmpty(string packagesDirectory)
     {
-        return !Directory.EnumerateFiles(packagesDirectory).Any();
+        return !Directory.EnumerateFiles(packagesDirectory).Any(path => path.EndsWith(".pkg"));
     }
 
     private static bool PackageFilesHasInvalidPrefix(TigerStrategy strategy, string packagesDirectory)
     {
-        var packagePaths = Directory.EnumerateFiles(packagesDirectory);
+        IEnumerable<string> packagePaths = Directory.EnumerateFiles(packagesDirectory);
         string prefix = GetStrategyPackagePrefix(strategy);
 
-        return packagePaths.Any(path => !path.Contains(prefix + "_"));
+        return packagePaths
+            .Where(path => path.EndsWith(".pkg"))
+            .Any(path => !path.Contains(prefix + "_"));
     }
 
     private static bool PackageFilesHasInvalidExtension(string packagesDirectory)
     {
-        var packagePaths = Directory.EnumerateFiles(packagesDirectory);
+        IEnumerable<string> packagePaths = Directory.EnumerateFiles(packagesDirectory);
         return packagePaths.Any(path => !path.EndsWith(".pkg"));
     }
 
@@ -241,7 +240,7 @@ public class Strategy
 
     public static string GetStrategyPackagePrefix(TigerStrategy strategy)
     {
-        var member = typeof(TigerStrategy).GetMember(strategy.ToString());
+        MemberInfo[] member = typeof(TigerStrategy).GetMember(strategy.ToString());
         StrategyMetadataAttribute? attribute = (StrategyMetadataAttribute?)member[0].GetCustomAttribute(typeof(StrategyMetadataAttribute), false);
         if (attribute == null)
         {
@@ -288,7 +287,7 @@ public class Strategy
         // todo test this
         public static T Get(TigerStrategy strategy)
         {
-            if (_strategyInstances.TryGetValue(strategy, out var instance))
+            if (_strategyInstances.TryGetValue(strategy, out T? instance))
             {
                 return instance;
             }
@@ -373,6 +372,9 @@ public class Strategy
         /// <returns></returns>
         public static void LazyInit()
         {
+            if (_instance is not null && _instance._strategy != CurrentStrategy)
+                _instance = null;
+
             if (_instance == null)
             {
                 AddNewStrategyInstance(_currentStrategy);
@@ -390,14 +392,14 @@ public static class StrategyExtensions
 {
     public static StrategyMetadataAttribute GetStrategyMetadata(this TigerStrategy strategy)
     {
-        var member = typeof(TigerStrategy).GetMember(strategy.ToString());
+        MemberInfo[] member = typeof(TigerStrategy).GetMember(strategy.ToString());
         StrategyMetadataAttribute attribute = (StrategyMetadataAttribute)member[0].GetCustomAttribute(typeof(StrategyMetadataAttribute), false);
         return attribute;
     }
 
     public static StrategyConfiguration GetStrategyConfiguration(this TigerStrategy strategy)
     {
-        var member = typeof(TigerStrategy).GetMember(strategy.ToString());
+        MemberInfo[] member = typeof(TigerStrategy).GetMember(strategy.ToString());
         StrategyConfiguration strategyConfiguration = Strategy.GetStrategyConfiguration(strategy);
         return strategyConfiguration;
     }

@@ -1,6 +1,6 @@
 ﻿namespace Tiger.Schema;
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "808031D8", 0x3D0)]
+[SchemaStruct(TigerStrategy.MARATHON, "808031D8", 0x3D0)]
 public struct SMaterial // Errm Ackchyually its called "technique" 🤓
 {
     public long FileSize;
@@ -8,18 +8,18 @@ public struct SMaterial // Errm Ackchyually its called "technique" 🤓
     public uint Unk0C;
     public uint Unk10;
 
-    [SchemaField(0x20, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x20, TigerStrategy.MARATHON)]
     public ScopeBits UsedScopes;
 
     //public ScopeBits CompatibleScopes; // Not really important, but they are there after each UsedScopes
 
-    [SchemaField(0x30, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x30, TigerStrategy.MARATHON)]
     public StateSelection RenderStates;
 
-    [SchemaField(0x58, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x58, TigerStrategy.MARATHON)]
     public DynamicStruct<SMaterialShader> Vertex;
 
-    [SchemaField(0x278, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x278, TigerStrategy.MARATHON)]
     public DynamicStruct<SMaterialShader> Pixel;
 
     //[SchemaField(0x348, TigerStrategy.DESTINY1_RISE_OF_IRON)] // Unsure, everything else has 6 shader stages, D1 has 7? (Doesnt matter anyways)
@@ -34,25 +34,25 @@ public struct SMaterial // Errm Ackchyually its called "technique" 🤓
     }
 }
 
-[NonSchemaStruct(TigerStrategy.MARATHON_ALPHA, 0x90)]
+[NonSchemaStruct(TigerStrategy.MARATHON, 0x90)]
 public struct SMaterialShader
 {
-    [SchemaField(0x0, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x0, TigerStrategy.MARATHON)]
     public ShaderBytecode Shader;
 
-    [SchemaField(0x8, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x8, TigerStrategy.MARATHON)]
     public DynamicArray<STextureTag> Textures;
 
-    [SchemaField(0x20, TigerStrategy.MARATHON_ALPHA)]
-    public DynamicArray<SUint8> TFX_Bytecode;
+    [SchemaField(0x20, TigerStrategy.MARATHON)]
+    public DynamicArray<SUInt8> TFX_Bytecode;
     public DynamicArray<Vec4> TFX_Bytecode_Constants;
     public DynamicArray<SDirectXSamplerTag> Samplers;
     public DynamicArray<Vec4> CBuffers; // Fallback if Vector4Container doesn't exist, I guess..?
 
-    [SchemaField(0x64, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x64, TigerStrategy.MARATHON)]
     public int Unk64;
 
-    [SchemaField(0x68, TigerStrategy.MARATHON_ALPHA)] // unsure
+    [SchemaField(0x68, TigerStrategy.MARATHON)] // unsure
     public int BufferSlot;
     public FileHash Vector4Container;
 
@@ -109,19 +109,19 @@ public struct SMaterialShader
     }
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "C6868080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON, "C6868080", 0x18)]
 public struct STextureTag
 {
     public uint TextureIndex;
 
-    [SchemaField(0x8, TigerStrategy.MARATHON_ALPHA, Tag64 = true)]
+    [SchemaField(0x8, TigerStrategy.MARATHON, Tag64 = true)]
     public Texture Texture;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "3F018080", 0x10)]
+[SchemaStruct(TigerStrategy.MARATHON, "3F018080", 0x10)]
 public struct SDirectXSamplerTag
 {
-    [SchemaField(TigerStrategy.MARATHON_ALPHA, Tag64 = true)]
+    [SchemaField(TigerStrategy.MARATHON, Tag64 = true)]
     public DirectXSampler Sampler;
 
     public DirectXSampler GetSampler()
@@ -130,11 +130,6 @@ public struct SDirectXSamplerTag
     }
 }
 
-[SchemaStruct("80800090", 0x10)]
-public struct Vec4
-{
-    public Vector4 Vec;
-}
 
 [Flags]
 public enum ScopeBits : ulong
@@ -180,4 +175,5 @@ public enum ScopeBits : ulong
     PLAYER_CENTERED_CASCADED_GRID = 1UL << 38,
     GEAR_DYE_012 = 1UL << 39,
     COLOR_GRADING_UBERSHADER = 1UL << 40,
+    CUI_DRAWING = 1UL << 41,
 }

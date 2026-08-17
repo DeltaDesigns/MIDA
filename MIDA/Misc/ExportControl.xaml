@@ -56,7 +56,7 @@
                 x:Name="ExportButton"
                 Grid.Column="1"
                 HorizontalAlignment="Center"
-                Style="{StaticResource D2StyleButton}">
+                Style="{StaticResource MarathonStyleButton}">
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Center"

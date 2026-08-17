@@ -7,7 +7,7 @@ public class GenerateFileReferenceGraphCommandlet : ICommandlet
     private string bytesStr;
     private byte[] bytes;
 
-    public void Run(InstanceArgs args)
+    public void Run(TigerArgs args)
     {
         string packageFilter;
         if (!args.GetArgValue("packageFilter", out packageFilter))

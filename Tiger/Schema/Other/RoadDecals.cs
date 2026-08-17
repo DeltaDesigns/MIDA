@@ -1,3 +1,4 @@
+using Arithmic;
 using Tiger.Exporters;
 using Tiger.Schema.Entity;
 using Tiger.Schema.Model;
@@ -15,6 +16,7 @@ public class RoadDecals : Tag<SMapRoadDecals>
 
     public void LoadIntoExporter(ExporterScene scene)
     {
+        Log.Debug($"Loading RoadDecals {Hash} into Exporter.");
         foreach (var a in _tag.Entries)
         {
             Transform transform = new Transform
@@ -36,14 +38,14 @@ public class RoadDecals : Tag<SMapRoadDecals>
     }
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "B0818080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON, "B0818080", 0x18)]
 public struct SMapRoadDecalsResource
 {
     [SchemaField(0x10), NoLoad]
     public RoadDecals RoadDecals; // Contrary to the name, it is more than just decals on roads
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "808081B2", 0x58)]
+[SchemaStruct(TigerStrategy.MARATHON, "808081B2", 0x58)]
 public struct SMapRoadDecals
 {
     public ulong FileSize;
@@ -53,7 +55,7 @@ public struct SMapRoadDecals
     public AABB UnkBounds;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "AB818080", 0x60)]
+[SchemaStruct(TigerStrategy.MARATHON, "AB818080", 0x60)]
 public struct SAB818080
 {
     public Material Material;

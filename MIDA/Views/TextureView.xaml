@@ -41,8 +41,8 @@
                 <Border BorderBrush="{StaticResource ForegroundColour50}" BorderThickness="1">
                     <Grid Background="Transparent">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel
@@ -75,14 +75,17 @@
                                 TextAlignment="Center" />
                         </StackPanel>
 
-                        <StackPanel
+                        <Grid
                             x:Name="SliceViewer"
                             Grid.Column="1"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal">
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50*" />
+                                <ColumnDefinition Width="50*" />
+                            </Grid.ColumnDefinitions>
 
-                            <StackPanel Orientation="Vertical">
+                            <StackPanel Grid.Column="0" Orientation="Vertical">
                                 <TextBlock
                                     Margin="5"
                                     HorizontalAlignment="Center"
@@ -104,9 +107,16 @@
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Click="Slice_OnBackClicked"
-                                        Content="⮜"
                                         FontSize="24"
-                                        Style="{StaticResource D2StyleButton}" />
+                                        Style="{StaticResource MarathonStyleButton}">
+                                        <TextBlock
+                                            Margin="0"
+                                            VerticalAlignment="Center"
+                                            FontSize="16"
+                                            IsHitTestVisible="False"
+                                            Text="⮜"
+                                            TextAlignment="Center" />
+                                    </Button>
 
                                     <TextBlock
                                         Grid.Column="1"
@@ -129,15 +139,21 @@
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Click="Slice_OnForwardClicked"
-                                        Content="⮞"
-                                        FontSize="24"
-                                        Style="{StaticResource D2StyleButton}" />
+                                        Style="{StaticResource MarathonStyleButton}">
+                                        <TextBlock
+                                            Margin="0"
+                                            VerticalAlignment="Center"
+                                            FontSize="16"
+                                            IsHitTestVisible="False"
+                                            Text="⮞"
+                                            TextAlignment="Center" />
+                                    </Button>
                                 </StackPanel>
                             </StackPanel>
 
                             <CheckBox
                                 x:Name="FlattenVolume"
-                                Grid.Column="0"
+                                Grid.Column="1"
                                 Margin="10"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
@@ -150,10 +166,11 @@
                                     FontSize="18"
                                     IsHitTestVisible="False"
                                     Text="Export All Slices"
-                                    TextAlignment="Center" />
+                                    TextAlignment="Center"
+                                    TextWrapping="WrapWithOverflow" />
                             </CheckBox>
 
-                        </StackPanel>
+                        </Grid>
 
                     </Grid>
 

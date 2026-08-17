@@ -5,55 +5,23 @@ using Tiger.Schema;
 
 namespace Tiger;
 
-// public class ConfigAttribute : Attribute
-// {
-//
-// }
-//
-// [ConfigSubsystem]
-
 public struct Settings
 {
     public CommonSettings Common;
-    public UnrealSettings Unreal;
-    public BlenderSettings Blender;
-    public Source2Settings Source2;
 }
 
 public class CommonSettings
 {
     public Dictionary<TigerStrategy, string> PackagesPath { get; set; } = new Dictionary<TigerStrategy, string>();
     public TigerStrategy CurrentStrategy { get; set; } = TigerStrategy.NONE;
+    public TextureExportFormat OutputTextureFormat { get; set; } = TextureExportFormat.PNG;
     public string ExportPath { get; set; } = "";
     public bool SingleFolderMapAssetsEnabled { get; set; } = false;
-    public bool IndividualStaticsEnabled { get; set; } = false;
-    public TextureExportFormat OutputTextureFormat { get; set; } = TextureExportFormat.PNG;
     public bool AnimatedBackground { get; set; } = true;
-    public bool ExportMaterials { get; set; } = false;
-
+    public bool MotionEffects { get; set; } = false; // Marathon doesnt have this effect
+    public bool SaveShaderHLSL { get; set; } = false; // Experimental due to DX12
+    public bool SaveEquirectCubemaps { get; set; } = false;
     public bool AcceptedAgreement { get; set; } = false;
-}
-
-// [ConfigSubsystem]
-public class UnrealSettings
-{
-    public bool UnrealInteropEnabled { get; set; } = false;
-    public string UnrealInteropPath { get; set; } = "";
-}
-
-// [ConfigSubsystem]
-public class BlenderSettings
-{
-    public bool BlenderInteropEnabled { get; set; } = false;
-}
-
-// [ConfigSubsystem]
-public class Source2Settings
-{
-    public bool Source2ShaderExportsEnabled { get; set; } = false;
-    public bool Source2VMDLExportsEnabled { get; set; } = false;
-    public bool Source2ResizeTexPow2Enabled { get; set; } = false;
-    public string Source2Path { get; set; } = "";
 }
 
 // class TypeExtensions
@@ -129,22 +97,12 @@ public class ConfigSubsystem : Subsystem<ConfigSubsystem>
 
     public bool TrySetPackagePath(string path, TigerStrategy strategy)
     {
-        if (path == "")
-        {
+        if (path == "" || !Strategy.CheckValidPackagesDirectory(strategy, path))
             return false;
-        }
-
-        // Verify this is a valid path by checking to see if a .pkg file is inside
-        string[] files = Directory.GetFiles(path, "*.pkg", SearchOption.TopDirectoryOnly);
-        if (files.Length == 0)
-        {
-            return false;
-        }
 
         if (_settings.Common.PackagesPath.ContainsKey(strategy))
-        {
             _settings.Common.PackagesPath.Remove(strategy);
-        }
+
         _settings.Common.PackagesPath.Add(strategy, path);
 
         Save();
@@ -182,71 +140,6 @@ public class ConfigSubsystem : Subsystem<ConfigSubsystem>
 
     #endregion
 
-    #region source2Path
-
-    public string GetSource2Path()
-    {
-        return _settings.Source2.Source2Path;
-    }
-
-    public bool TrySetSource2Path(string path)
-    {
-        if (path == "")
-        {
-            return false;
-        }
-
-        if (!path.EndsWith("win64"))
-        {
-            return false;
-        }
-
-        _settings.Source2.Source2Path = path;
-
-        Save();
-        return true;
-    }
-
-    #endregion
-
-    #region source2ExportsEnabled
-
-    public void SetS2ShaderExportEnabled(bool bS2ShaderExportEnabled)
-    {
-        _settings.Source2.Source2ShaderExportsEnabled = bS2ShaderExportEnabled;
-        Save();
-    }
-
-    public bool GetS2ShaderExportEnabled()
-    {
-        return _settings.Source2.Source2ShaderExportsEnabled;
-    }
-
-    public void SetS2VMDLExportEnabled(bool bS2VMDLExportEnabled)
-    {
-        _settings.Source2.Source2VMDLExportsEnabled = bS2VMDLExportEnabled;
-        Save();
-    }
-
-    public bool GetS2VMDLExportEnabled()
-    {
-        return _settings.Source2.Source2VMDLExportsEnabled;
-    }
-
-    public void SetS2TexPow2Enabled(bool bS2TexPow2Enabled)
-    {
-        _settings.Source2.Source2ResizeTexPow2Enabled = bS2TexPow2Enabled;
-        Save();
-    }
-
-    public bool GetS2TexPow2Enabled()
-    {
-        return _settings.Source2.Source2ResizeTexPow2Enabled;
-    }
-
-    #endregion
-
-
     #region exportSavePath
 
     public string GetExportSavePath()
@@ -265,64 +158,6 @@ public class ConfigSubsystem : Subsystem<ConfigSubsystem>
 
         Save();
         return true;
-    }
-
-    #endregion
-
-    #region unrealInteropPath
-
-    public bool TrySetUnrealInteropPath(string interopPath)
-    {
-        if (!interopPath.Contains("Content"))
-        {
-            SetUnrealInteropEnabled(false);
-            return false;
-        }
-
-        _settings.Unreal.UnrealInteropPath = interopPath;
-        SetUnrealInteropEnabled(true);
-
-        Save();
-        return true;
-    }
-
-    public string GetUnrealInteropPath()
-    {
-        return _settings.Unreal.UnrealInteropPath;
-    }
-
-    #endregion
-
-    #region unrealInteropEnabled
-
-    public void SetUnrealInteropEnabled(bool bUnrealInteropEnabled)
-    {
-        _settings.Unreal.UnrealInteropEnabled = bUnrealInteropEnabled;
-        Save();
-    }
-
-    public bool GetUnrealInteropEnabled()
-    {
-        if (_settings.Unreal == null)
-        {
-            return false;
-        }
-        return _settings.Unreal.UnrealInteropEnabled;
-    }
-
-    #endregion
-
-    #region blenderInteropEnabled
-
-    public void SetBlenderInteropEnabled(bool bBlenderInteropEnabled)
-    {
-        _settings.Blender.BlenderInteropEnabled = bBlenderInteropEnabled;
-        Save();
-    }
-
-    public bool GetBlenderInteropEnabled()
-    {
-        return _settings.Blender.BlenderInteropEnabled;
     }
 
     #endregion
@@ -381,6 +216,39 @@ public class ConfigSubsystem : Subsystem<ConfigSubsystem>
         return _settings.Common.AnimatedBackground;
     }
 
+    public void SetMotionEffects(bool b)
+    {
+        _settings.Common.MotionEffects = b;
+        Save();
+    }
+
+    public bool GetMotionEffects()
+    {
+        return _settings.Common.MotionEffects;
+    }
+
+    public void SetSaveShaderHLSL(bool val)
+    {
+        _settings.Common.SaveShaderHLSL = val;
+        Save();
+    }
+
+    public bool GetSaveShaderHLSL()
+    {
+        return _settings.Common.SaveShaderHLSL;
+    }
+
+    public void SetExportEquirectCubemaps(bool val)
+    {
+        _settings.Common.SaveEquirectCubemaps = val;
+        Save();
+    }
+
+    public bool GetExportEquirectCubemaps()
+    {
+        return _settings.Common.SaveEquirectCubemaps;
+    }
+
     private string _configFilePath = "./config.json";
     // private Dictionary<string, dynamic?> _settings;
     private Settings _settings;
@@ -423,9 +291,6 @@ public class ConfigSubsystem : Subsystem<ConfigSubsystem>
         if (_settings.Common == null)
         {
             _settings.Common = new CommonSettings();
-            _settings.Blender = new BlenderSettings();
-            _settings.Unreal = new UnrealSettings();
-            _settings.Source2 = new Source2Settings();
             WriteConfig();
         }
 

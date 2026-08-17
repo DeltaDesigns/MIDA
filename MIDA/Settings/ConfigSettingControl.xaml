@@ -17,7 +17,7 @@
 
         <Border
             Grid.ColumnSpan="3"
-            Background="#B140454F"
+            Background="#B12F3239"
             CornerRadius="10" />
         <StackPanel
             Grid.Column="0"
@@ -28,7 +28,7 @@
                 Margin="0,3,0,3"
                 VerticalAlignment="Center"
                 FontFamily="{DynamicResource PP Fraktion Mono Medium}"
-                FontSize="24"
+                FontSize="22"
                 Foreground="{StaticResource ForegroundColour90}"
                 Text="{Binding SettingName}"
                 TextWrapping="Wrap" />
@@ -67,11 +67,13 @@
             IsReadOnly="True"
             Text="{Binding SettingValue}" />
 
+
         <Button
             x:Name="ChangeButton"
             Grid.Column="2"
             Margin="0"
-            Style="{DynamicResource D2StyleButton}">
+            local:StyleHelper.CornerRadius="0,10,10,0"
+            Style="{DynamicResource MarathonStyleButton}">
             <TextBlock
                 d:FontFamily="Haas Grot Text 55 Roman"
                 FontFamily="{DynamicResource PP Fraktion Mono Medium}"

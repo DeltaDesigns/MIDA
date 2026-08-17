@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 using Tiger;
-using Tiger.Schema.Activity.MARATHON_ALPHA;
+using Tiger.Schema.Activity.MARATHON;
 
 namespace MIDA;
 

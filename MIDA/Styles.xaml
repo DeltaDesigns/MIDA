@@ -7,6 +7,21 @@
     xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.AeroLite">
     <!--  https://material.io/design/color/dark-theme.html#ui-application  -->
 
+    <mida:HolofoilEnabledConverter x:Key="HolofoilEnabledConverter" />
+    <mida:IsCollectionEmptyToVisConverter x:Key="IsCollectionEmptyToVisConverter" />
+    <mida:StringContainsConverter x:Key="StringContainsConverter" />
+    <mida:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
+    <mida:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    <mida:StringNullOrEmptyVisibilityConverter x:Key="StringNullOrEmptyVisibilityConverter" />
+    <mida:CharSpacingConverter x:Key="CharSpacingConverter" />
+    <mida:StringToUpperConverter x:Key="StringToUpperConverter" />
+    <mida:ColorToBrushConverter x:Key="ColorToBrush" />
+    <mida:TextureFromHashConverter x:Key="TextureFromHashConverter" />
+    <mida:TextureFromIconContainerConverter x:Key="TextureFromIconContainerConverter" />
+    <mida:AddOneConverter x:Key="AddOneConverter" />
+    <mida:Investment_IsFeaturedItem x:Key="Investment_IsFeaturedItem" />
+    <mida:ListCountConverter x:Key="ListCountConverter" />
+
     <!--  IDFK why I HAVE to compile this font as a resource for it to work  -->
     <FontFamily x:Key="Marathon Shapiro">
         /MIDA;component/ThirdParty/fonts/#Marathon Shapiro 65
@@ -14,6 +29,10 @@
 
     <FontFamily x:Key="Goliath Beta Encrypted">
         /MIDA;component/ThirdParty/fonts/#Goliath Beta Encrypted
+    </FontFamily>
+
+    <FontFamily x:Key="Code Language">
+        /MIDA;component/ThirdParty/fonts/#Code Language 2.1 Monospace
     </FontFamily>
 
     <!--  Numbers come from the luminance  -->
@@ -27,6 +46,7 @@
     <Brush x:Key="BackgroundColour30">#4d4d4d</Brush>
     <Brush x:Key="BackgroundColour30a">#904d4d4d</Brush>
     <Brush x:Key="BackgroundColour50">#808080</Brush>
+
     <Brush x:Key="ForegroundColour100">#ffffff</Brush>
     <Color x:Key="ForegroundColour100C">#ffffff</Color>
     <Brush x:Key="ForegroundColour95">#FAFAFA</Brush>
@@ -36,6 +56,7 @@
     <Brush x:Key="ForegroundColour75">#bfbfbf</Brush>
     <Brush x:Key="ForegroundColour70">#b3b3b3</Brush>
     <Brush x:Key="ForegroundColour60">#A0A0A0</Brush>
+    <Brush x:Key="ForegroundColour65">#A6A6A6</Brush>
     <Brush x:Key="ForegroundColour50">#808080</Brush>
 
     <Brush x:Key="GridDarken">#9E121212</Brush>
@@ -46,6 +67,16 @@
 
     <Brush x:Key="MarathonYellow">#c9fe00</Brush>
     <Color x:Key="MarathonYellowC">#c9fe00</Color>
+
+    <Brush x:Key="MarathonGray">#333237</Brush>
+    <Color x:Key="MarathonGrayC">#333237</Color>
+
+    <Brush x:Key="MarathonDark">#1c1b1f</Brush>
+    <Color x:Key="MarathonDarkC">#1c1b1f</Color>
+
+    <Brush x:Key="MarathonDarker">#141417</Brush>
+    <Color x:Key="MarathonDarkerC">#141417</Color>
+
 
     <Style x:Key="ColumnHeaderBorder" TargetType="Border">
         <Setter Property="BorderBrush" Value="#AEFFFFFF" />
@@ -92,12 +123,23 @@
             <TextBlock
                 Margin="10,0,0,0"
                 VerticalAlignment="Center"
-                FontFamily="{DynamicResource Marathon Shapiro}"
+                FontFamily="{DynamicResource KH Interference Regular Keys}"
                 FontSize="34"
                 Foreground="{StaticResource ForegroundColour90}"
                 Text="{TemplateBinding Content}"
                 TextWrapping="Wrap" />
         </StackPanel>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="MarathonCategoryLabelNoPlus" TargetType="ContentControl">
+        <TextBlock
+            Margin="0,0,0,0"
+            VerticalAlignment="Center"
+            FontFamily="{DynamicResource KH Interference Regular Keys}"
+            FontSize="30"
+            Foreground="{StaticResource ForegroundColour90}"
+            Text="{TemplateBinding Content}"
+            TextWrapping="Wrap" />
     </ControlTemplate>
 
     <Style TargetType="Grid">
@@ -142,6 +184,35 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="GreyBorderWhiteOnHover" TargetType="Border">
+        <Setter Property="BorderBrush" Value="#B7B7B7" />
+        <Style.Triggers>
+            <!--  This reacts to IsMouseOver on *any parent*  -->
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Grid}}" Value="True">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                To="White"
+                                Duration="0:0:0.3" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+                <DataTrigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                To="#b7b7b7"
+                                Duration="0:0:0.3" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.ExitActions>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="GradientBackground" TargetType="Grid">
@@ -234,6 +305,7 @@
         <Setter Property="Background" Value="{StaticResource BackgroundColour7}" />
         <Setter Property="BorderBrush" Value="{StaticResource BackgroundColour7}" />
         <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontFamily" Value="{DynamicResource PP Fraktion Mono Medium Keys}" />
         <Setter Property="Foreground" Value="{StaticResource ForegroundColour50}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -243,7 +315,7 @@
                             Name="Border"
                             Margin="2,0,2,0"
                             Background="Transparent"
-                            BorderBrush="{StaticResource ForegroundColour80}"
+                            BorderBrush="{StaticResource MarathonYellow}"
                             BorderThickness="0"
                             CornerRadius="0"
                             Opacity="0.9">
@@ -262,7 +334,7 @@
                             <Setter TargetName="Border" Property="Opacity" Value="1" />
                             <Setter TargetName="Border" Property="Background" Value="{StaticResource BackgroundColour20}" />
                             <Setter TargetName="Border" Property="CornerRadius" Value="0" />
-                            <Setter TargetName="Border" Property="BorderThickness" Value="0,0,0,2" />
+                            <Setter TargetName="Border" Property="BorderThickness" Value="3,0,0,0" />
                             <Setter Property="Background" Value="{StaticResource BackgroundColour30}" />
                             <Setter Property="Foreground" Value="{StaticResource ForegroundColour80}" />
                         </Trigger>
@@ -314,7 +386,7 @@
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border
                         x:Name="ButtonBackground"
-                        Background="#90242424"
+                        Background="#00000000"
                         BorderBrush="#66FFFFFF"
                         BorderThickness="1">
                         <ContentPresenter Margin="1,1,1,1" />
@@ -326,7 +398,7 @@
                                         <ColorAnimation
                                             Storyboard.TargetName="ButtonBackground"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-                                            To="#70232429"
+                                            To="#00000000"
                                             Duration="0:0:0.1" />
                                     </Storyboard>
                                 </VisualState>
@@ -439,7 +511,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="D2StyleButton" TargetType="Button">
+    <Style x:Key="MarathonStyleButton" TargetType="Button">
         <Style.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource BackgroundColour7}" />
@@ -456,10 +528,10 @@
                     <Grid Background="Transparent" Cursor="Hand">
                         <Border
                             x:Name="Main"
-                            Background="White"
+                            Background="#DEDEDE"
                             BorderBrush="Transparent"
                             BorderThickness="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mida:StyleHelper.BorderThickness)}"
-                            CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mida:StyleHelper.ButtonCornerRadius)}">
+                            CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mida:StyleHelper.CornerRadius)}">
                             <ContentPresenter Margin="1" />
                         </Border>
 
@@ -470,7 +542,7 @@
                                         <ColorAnimation
                                             Storyboard.TargetName="Main"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-                                            To="White"
+                                            To="#DEDEDE"
                                             Duration="0:0:0.1" />
                                     </Storyboard>
                                 </VisualState>
@@ -480,7 +552,7 @@
                                         <ColorAnimation
                                             Storyboard.TargetName="Main"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-                                            To="#DEDEDE"
+                                            To="{StaticResource ForegroundColour100C}"
                                             Duration="0:0:0.1" />
                                     </Storyboard>
                                 </VisualState>
@@ -494,16 +566,121 @@
                                             Duration="0:0:0.1" />
                                     </Storyboard>
                                 </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Trigger.Setters>
+                                <Setter Property="Cursor" Value="Hand" />
+                            </Trigger.Setters>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MarathonStyleTabButton" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontFamily" Value="{DynamicResource PP Fraktion Mono Medium}" />
+        <Setter Property="FontSize" Value="34" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Padding" Value="10" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid Background="Transparent" Cursor="Hand">
+                        <Border
+                            x:Name="Main"
+                            Background="White"
+                            BorderBrush="Transparent"
+                            BorderThickness="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mida:StyleHelper.BorderThickness)}"
+                            CornerRadius="0">
+                            <TextBlock
+                                x:Name="Text"
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                FontWeight="{TemplateBinding FontWeight}"
+                                Foreground="{TemplateBinding Foreground}"
+                                Text="{TemplateBinding Content}" />
+                        </Border>
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+
+                                <VisualState x:Name="Normal">
+                                    <Storyboard>
+                                        <ColorAnimation
+                                            Storyboard.TargetName="Main"
+                                            Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                            To="Transparent"
+                                            Duration="0:0:0.1" />
+
+                                        <ColorAnimation
+                                            Storyboard.TargetName="Text"
+                                            Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                            To="White"
+                                            Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </VisualState>
+
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <ColorAnimation
+                                            Storyboard.TargetName="Main"
+                                            Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                            To="#DEDEDE"
+                                            Duration="0:0:0.1" />
+
+                                        <ColorAnimation
+                                            Storyboard.TargetName="Text"
+                                            Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                            To="Black"
+                                            Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </VisualState>
+
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ColorAnimation
+                                            Storyboard.TargetName="Main"
+                                            Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                            To="#B0B0B0"
+                                            Duration="0:0:0.1" />
+
+                                        <ColorAnimation
+                                            Storyboard.TargetName="Text"
+                                            Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                            To="Black"
+                                            Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </VisualState>
 
                                 <VisualState x:Name="Checked">
                                     <Storyboard>
                                         <ColorAnimation
                                             Storyboard.TargetName="Main"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-                                            To="#ccccce"
+                                            To="White"
+                                            Duration="0:0:0.1" />
+
+                                        <ColorAnimation
+                                            Storyboard.TargetName="Text"
+                                            Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                            To="Black"
                                             Duration="0:0:0.1" />
                                     </Storyboard>
                                 </VisualState>
+
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                     </Grid>
@@ -544,7 +721,7 @@
                             Background="White"
                             BorderBrush="Transparent"
                             BorderThickness="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mida:StyleHelper.BorderThickness)}"
-                            CornerRadius="10">
+                            CornerRadius="0">
                             <ContentPresenter Margin="1" />
                         </Border>
 
@@ -552,13 +729,11 @@
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal">
                                     <Storyboard>
-
                                         <ColorAnimation
                                             Storyboard.TargetName="Main"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-                                            To="White"
+                                            To="#C0C0C0"
                                             Duration="0:0:0.1" />
-
                                     </Storyboard>
                                 </VisualState>
 
@@ -567,31 +742,27 @@
                                         <ColorAnimation
                                             Storyboard.TargetName="Main"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-                                            To="#DEDEDE"
+                                            To="#EEEEEE"
                                             Duration="0:0:0.1" />
-
                                     </Storyboard>
                                 </VisualState>
 
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
-
                                         <ColorAnimation
                                             Storyboard.TargetName="Main"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
                                             To="#B0B0B0"
                                             Duration="0:0:0.1" />
-
                                     </Storyboard>
                                 </VisualState>
 
                                 <VisualState x:Name="Checked">
                                     <Storyboard>
-
                                         <ColorAnimation
                                             Storyboard.TargetName="Main"
                                             Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-                                            To="#ccccce"
+                                            To="White"
                                             Duration="0:0:0.1" />
                                     </Storyboard>
                                 </VisualState>
@@ -765,6 +936,100 @@
                             <Setter Property="Opacity" Value="0.4" />
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="BorderedScrollBar" TargetType="ScrollBar">
+        <Setter Property="Orientation" Value="Vertical" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.Width>
+                            <Binding
+                                FallbackValue="6"
+                                Path="Width"
+                                RelativeSource="{RelativeSource TemplatedParent}" />
+                        </Grid.Width>
+
+                        <Border
+                            Grid.RowSpan="3"
+                            BorderBrush="White"
+                            BorderThickness="1"
+                            CornerRadius="0"
+                            Focusable="False"
+                            Opacity="0.5" />
+                        <Track
+                            x:Name="PART_Track"
+                            Grid.Row="1"
+                            HorizontalAlignment="Stretch"
+                            IsDirectionReversed="true">
+                            <Track.Thumb>
+                                <Thumb
+                                    Margin="2"
+                                    Padding="0"
+                                    Background="White"
+                                    Opacity="0.3" />
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="VerticalScrollBarStyle" TargetType="ScrollBar">
+        <Setter Property="Orientation" Value="Vertical" />
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.Width>
+                            <Binding
+                                FallbackValue="10"
+                                Path="Width"
+                                RelativeSource="{RelativeSource TemplatedParent}" />
+                        </Grid.Width>
+
+                        <Border
+                            Grid.RowSpan="3"
+                            Background="{StaticResource BackgroundColour30a}"
+                            CornerRadius="0" />
+                        <Track
+                            x:Name="PART_Track"
+                            Grid.Row="1"
+                            IsDirectionReversed="true">
+                            <Track.Thumb>
+                                <Thumb Margin="0,0,0,0" Style="{StaticResource ScrollBarThumb}">
+                                    <Thumb.BorderBrush>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <LinearGradientBrush.GradientStops>
+                                                <GradientStopCollection>
+                                                    <GradientStop Offset="0.0" Color="{StaticResource BackgroundColour14C}" />
+                                                    <GradientStop Offset="1.0" Color="{StaticResource BackgroundColour14C}" />
+                                                </GradientStopCollection>
+                                            </LinearGradientBrush.GradientStops>
+                                        </LinearGradientBrush>
+                                    </Thumb.BorderBrush>
+
+                                    <Thumb.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <LinearGradientBrush.GradientStops>
+                                                <GradientStopCollection>
+                                                    <GradientStop Offset="0.0" Color="{StaticResource BackgroundColour14C}" />
+                                                    <GradientStop Offset="1.0" Color="{StaticResource BackgroundColour14C}" />
+                                                </GradientStopCollection>
+                                            </LinearGradientBrush.GradientStops>
+                                        </LinearGradientBrush>
+                                    </Thumb.Background>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -1005,12 +1270,12 @@
                 Margin="0,0,10,0"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Fill="{StaticResource BackgroundColour7}"
-                Points="0, 0 80, 50, 0, 100"
+                Fill="{StaticResource MarathonDark}"
+                Points="0, 0 70, 60, 0, 120"
                 RenderTransformOrigin="0.5, 0.5">
                 <Polygon.LayoutTransform>
                     <TransformGroup>
-                        <ScaleTransform x:Name="ArrowScaleTransform" CenterX="0.5" CenterY="0.5" ScaleX="0.2" ScaleY="0.2" />
+                        <ScaleTransform x:Name="ArrowScaleTransform" CenterX="0.5" CenterY="0.5" ScaleX="0.15" ScaleY="0.15" />
                         <SkewTransform />
                         <RotateTransform Angle="90" />
                         <TranslateTransform />
@@ -1117,7 +1382,7 @@
                             <ContentPresenter.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="FontSize" Value="18" />
-                                    <Setter Property="Foreground" Value="{StaticResource BackgroundColour7}" />
+                                    <Setter Property="Foreground" Value="{StaticResource ForegroundColour90}" />
                                     <Setter Property="FontFamily" Value="{DynamicResource PP Fraktion Mono Medium}" />
                                 </Style>
                             </ContentPresenter.Resources>
@@ -1125,7 +1390,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="true">
-                            <Setter TargetName="Border" Property="Background" Value="#43000000" />
+                            <Setter TargetName="Border" Property="Background" Value="#41444b" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Foreground" Value="{StaticResource BackgroundColour50}" />
@@ -1160,8 +1425,8 @@
 
                         <ContentPresenter
                             Name="ContentSite"
-                            Margin="0,0,0,0"
-                            HorizontalAlignment="Center"
+                            Margin="10,0,0,0"
+                            HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Content="{TemplateBinding SelectionBoxItem}"
                             ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
@@ -1181,30 +1446,31 @@
                             AllowsTransparency="True"
                             Focusable="False"
                             IsOpen="{TemplateBinding IsDropDownOpen}"
-                            Placement="Bottom"
+                            Placement="Left"
                             PopupAnimation="Fade">
 
                             <Grid
                                 Name="DropDown"
                                 MinWidth="{TemplateBinding ActualWidth}"
                                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                Background="{StaticResource ForegroundColour90}"
+                                Background="{StaticResource MarathonDark}"
                                 SnapsToDevicePixels="True">
                                 <Border
                                     x:Name="DropDownBorder"
                                     Background="Transparent"
-                                    BorderBrush="Transparent"
-                                    BorderThickness="0" />
-                                <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                    BorderBrush="White"
+                                    BorderThickness="1"
+                                    Opacity="0.25" />
+                                <ScrollViewer Margin="0" SnapsToDevicePixels="True">
                                     <StackPanel
                                         Background="Transparent"
                                         IsItemsHost="True"
                                         KeyboardNavigation.DirectionalNavigation="Contained" />
                                 </ScrollViewer>
-
                             </Grid>
                         </Popup>
                     </Grid>
+
                     <ControlTemplate.Triggers>
                         <Trigger Property="HasItems" Value="false">
                             <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95" />
@@ -1217,7 +1483,7 @@
                         </Trigger>
                         <Trigger SourceName="Popup" Property="Popup.AllowsTransparency" Value="true">
                             <Setter TargetName="DropDownBorder" Property="CornerRadius" Value="0" />
-                            <Setter TargetName="DropDownBorder" Property="Margin" Value="0,2,0,0" />
+                            <Setter TargetName="DropDownBorder" Property="Margin" Value="0,0,0,0" />
                         </Trigger>
                         <Trigger Property="IsEditable" Value="true">
                             <Setter Property="IsTabStop" Value="false" />
@@ -1586,5 +1852,153 @@
         </Setter>
     </Style>
 
+    <!--  TODO? Make look better but it works for now  -->
+    <Style x:Key="D2StyleToggleBoxButton" TargetType="ToggleButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid Background="Transparent" Cursor="Hand">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+
+
+                        <Border
+                            Grid.Column="0"
+                            MinWidth="25"
+                            MinHeight="25"
+                            Background="Black"
+                            BorderThickness="2"
+                            Opacity="1"
+                            Style="{StaticResource GreyBorderWhiteOnHover}">
+                            <Border
+                                x:Name="CheckBoxInner"
+                                Grid.Column="0"
+                                MinWidth="20"
+                                MinHeight="20"
+                                BorderThickness="2">
+                                <Border.Background>
+                                    <SolidColorBrush x:Name="CheckBoxInnerColor" Color="Transparent" />
+                                </Border.Background>
+                            </Border>
+                        </Border>
+
+
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontFamily="{DynamicResource PP Fraktion Mono Medium}"
+                            FontSize="{TemplateBinding FontSize}"
+                            Text="{TemplateBinding Content}" />
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <Storyboard />
+                                </VisualState>
+
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard />
+                                </VisualState>
+
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard />
+                                </VisualState>
+                            </VisualStateGroup>
+
+                            <VisualStateGroup x:Name="CheckStates">
+                                <VisualState x:Name="Unchecked">
+                                    <Storyboard>
+                                        <ColorAnimation
+                                            Storyboard.TargetName="CheckBoxInnerColor"
+                                            Storyboard.TargetProperty="Color"
+                                            To="Transparent"
+                                            Duration="0:0:0.05" />
+
+                                        <ThicknessAnimation
+                                            Storyboard.TargetName="CheckBoxInner"
+                                            Storyboard.TargetProperty="BorderThickness"
+                                            To="0"
+                                            Duration="0:0:0.05" />
+                                    </Storyboard>
+                                </VisualState>
+
+                                <VisualState x:Name="Checked">
+                                    <Storyboard>
+                                        <ColorAnimation
+                                            Storyboard.TargetName="CheckBoxInnerColor"
+                                            Storyboard.TargetProperty="Color"
+                                            To="{StaticResource MarathonGreenC}"
+                                            Duration="0:0:0.15">
+                                            <ColorAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut" />
+                                            </ColorAnimation.EasingFunction>
+                                        </ColorAnimation>
+
+                                        <ThicknessAnimation
+                                            Storyboard.TargetName="CheckBoxInner"
+                                            Storyboard.TargetProperty="BorderThickness"
+                                            To="2"
+                                            Duration="0:0:0.1">
+                                            <ThicknessAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseIn" />
+                                            </ThicknessAnimation.EasingFunction>
+                                        </ThicknessAnimation>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Trigger.Setters>
+                                <Setter Property="Cursor" Value="Hand" />
+                            </Trigger.Setters>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="SpinningCircleTemplate" TargetType="ContentControl">
+        <Grid Background="Transparent">
+            <Ellipse
+                Width="80"
+                Height="80"
+                RenderTransformOrigin="0.5,0.5"
+                Stroke="{StaticResource MarathonGreen}"
+                StrokeDashArray="2 6"
+                StrokeThickness="10">
+                <Ellipse.RenderTransform>
+                    <RotateTransform x:Name="SpinnerTransform" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsVisible" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard x:Name="SpinStoryboard">
+                        <Storyboard RepeatBehavior="Forever">
+                            <DoubleAnimation
+                                Storyboard.TargetName="SpinnerTransform"
+                                Storyboard.TargetProperty="Angle"
+                                To="360"
+                                Duration="0:0:1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <RemoveStoryboard BeginStoryboardName="SpinStoryboard" />
+                </Trigger.ExitActions>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
 
 </ResourceDictionary>

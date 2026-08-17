@@ -1,4 +1,5 @@
-﻿using Arithmic;
+﻿using System.Text;
+using Arithmic;
 using Tiger;
 using Tiger.Schema;
 using Tiger.Schema.Shaders;
@@ -8,6 +9,8 @@ public class TfxBytecodeInterpreter
     public List<TfxData> Opcodes { get; set; }
     public List<string> Stack { get; set; }
     public List<string> Temp { get; set; }
+
+    public StringBuilder PrintedOps = new();
 
     public TfxBytecodeInterpreter(List<TfxData> opcodes)
     {
@@ -51,90 +54,78 @@ public class TfxBytecodeInterpreter
 
     public Dictionary<int, string> Evaluate(DynamicArray<Vec4> constants, bool print = false, Material? material = null)
     {
-        bool bInline = CanInlineBytecode() || material?.RenderStage == TfxRenderStage.WaterReflection;
-
         Dictionary<int, string> hlsl = new();
         try
         {
-            if (print)
-                Console.WriteLine($"--------Evaluating Bytecode:");
-            foreach ((int _ip, var op) in Opcodes.Select((value, index) => (index, value)))
+            foreach ((int _ip, TfxData op) in Opcodes.Select((value, index) => (index, value)))
             {
                 if (print)
-                    Console.WriteLine($"0x{op.op:X} {op.op} : {TfxBytecodeOp.TfxToString(op, constants, material)}");
+                {
+                    var opString = $"0x{op.op:X} {op.op} : {TfxBytecodeOp.TfxToString(op, constants, material)}";
+                    PrintedOps.AppendLine(opString);
+                }
+
                 switch (op.op)
                 {
                     case TfxBytecode.Add:
                     case TfxBytecode.Add2:
-                        var add = StackPop(2);
+                        List<string> add = StackPop(2);
                         StackPush($"({add[0]} + {add[1]})");
                         break;
                     case TfxBytecode.Subtract:
-                        var sub = StackPop(2);
+                        List<string> sub = StackPop(2);
                         StackPush($"({sub[0]} - {sub[1]})");
                         break;
                     case TfxBytecode.Multiply:
                     case TfxBytecode.Multiply2:
-                        var mul = StackPop(2);
+                        List<string> mul = StackPop(2);
                         StackPush($"({mul[0]} * {mul[1]})");
                         break;
                     case TfxBytecode.Divide:
-                        var div = StackPop(2);
+                        List<string> div = StackPop(2);
                         StackPush($"({div[0]} / {div[1]})");
                         break;
                     case TfxBytecode.IsZero:
-                        var isZero = StackTop();
+                        string isZero = StackTop();
                         StackPush($"(float4({isZero}.x == 0 ? 1 : 0, " +
                             $"{isZero}.y == 0 ? 1 : 0, " +
                             $"{isZero}.z == 0 ? 1 : 0, " +
                             $"{isZero}.w == 0 ? 1 : 0))");
                         break;
                     case TfxBytecode.Min:
-                        var min = StackPop(2);
+                        List<string> min = StackPop(2);
                         StackPush($"(min({min[0]}, {min[1]}))");
                         break;
                     case TfxBytecode.Max:
-                        var max = StackPop(2);
+                        List<string> max = StackPop(2);
                         StackPush($"(max({max[0]}, {max[1]}))");
                         break;
                     case TfxBytecode.LessThan: //I dont think I need to do < for each element?
-                        var lessThan = StackPop(2);
+                        List<string> lessThan = StackPop(2);
                         StackPush(LessThan(lessThan[0], lessThan[1]));
                         break;
                     case TfxBytecode.Dot:
-                        var dot = StackPop(2);
-                        if (bInline)
-                            StackPush($"(dot({dot[0]}, {dot[1]}))");
-                        else
-                            StackPush($"(dot4({dot[0]}, {dot[1]}))");
+                        List<string> dot = StackPop(2);
+                        StackPush($"(dot4({dot[0]}, {dot[1]}))");
                         break;
                     case TfxBytecode.Merge_1_3:
-                        var merge = StackPop(2);
-                        if (bInline)
-                            StackPush($"float4({merge[0]}.x, {merge[1]}.xyz)");
-                        else
-                            StackPush($"(float4({merge[0]}.x, {merge[1]}.x, {merge[1]}.y, {merge[1]}.z))");
+                        List<string> merge = StackPop(2);
+                        StackPush($"(float4({merge[0]}.x, {merge[1]}.x, {merge[1]}.y, {merge[1]}.z))");
                         break;
                     case TfxBytecode.Merge_2_2:
-                        var merge2_2 = StackPop(2);
-                        if (bInline)
-                            StackPush($"float4({merge2_2[0]}.xy, {merge2_2[1]}.xy)");
-                        else
-                            StackPush($"(float4({merge2_2[0]}.x, {merge2_2[0]}.y, {merge2_2[1]}.x, {merge2_2[1]}.y))");
+                        List<string> merge2_2 = StackPop(2);
+                        StackPush($"(float4({merge2_2[0]}.x, {merge2_2[0]}.y, {merge2_2[1]}.x, {merge2_2[1]}.y))");
                         break;
                     case TfxBytecode.Merge_3_1:
-                        var merge3_1 = StackPop(2);
-                        if (bInline)
-                            StackPush($"(float4({merge3_1[0]}.xyz, {merge3_1[1]}.x))");
-                        else
-                            StackPush($"(float4({merge3_1[0]}.x, {merge3_1[0]}.y, {merge3_1[0]}.z, {merge3_1[1]}.x))");
+                        List<string> merge3_1 = StackPop(2);
+                        StackPush($"(float4({merge3_1[0]}.x, {merge3_1[0]}.y, {merge3_1[0]}.z, {merge3_1[1]}.x))");
                         break;
                     case TfxBytecode.Cubic:
-                        var Unk0f = StackPop(2);
+                        List<string> Unk0f = StackPop(2);
                         StackPush($"((({Unk0f[1]}.xxxx * {Unk0f[0]} + {Unk0f[1]}.yyyy) * ({Unk0f[0]} * {Unk0f[0]}) + ({Unk0f[1]}.zzzz * {Unk0f[0]} + {Unk0f[1]}.wwww)))");
                         break;
                     case TfxBytecode.Lerp:
-                        var lerp = StackPop(3);
+                        List<string> lerp = StackPop(3);
                         StackPush($"(lerp({lerp[1]}, {lerp[0]}, {lerp[2]}))");
                         break;
                     case TfxBytecode.LerpSaturated:
@@ -142,11 +133,11 @@ public class TfxBytecodeInterpreter
                         StackPush($"(saturate(lerp({lerp[1]}, {lerp[0]}, {lerp[2]})))");
                         break;
                     case TfxBytecode.MultiplyAdd:
-                        var mulAdd = StackPop(3);
+                        List<string> mulAdd = StackPop(3);
                         StackPush($"({mulAdd[0]} * {mulAdd[1]} + {mulAdd[2]})");
                         break;
                     case TfxBytecode.Clamp:
-                        var clamp = StackPop(3);
+                        List<string> clamp = StackPop(3);
                         StackPush($"(clamp({clamp[0]}, {clamp[1]}, {clamp[2]}))");
                         break;
                     case TfxBytecode.Abs:
@@ -172,175 +163,142 @@ public class TfxBytecodeInterpreter
                         StackPush($"(-{StackTop()})");
                         break;
                     case TfxBytecode.VecRotSin:
-                        if (bInline)
-                            StackPush($"_trig_helper_vector_sin_rotations_estimate({StackTop()})");
-                        else
-                            StackPush(_trig_helper_vector_sin_rotations_estimate(StackTop()));
+                        StackPush(_trig_helper_vector_sin_rotations_estimate(StackTop()));
                         break;
                     case TfxBytecode.VecRotCos:
-                        if (bInline)
-                            StackPush($"_trig_helper_vector_cos_rotations_estimate({StackTop()})");
-                        else
-                            StackPush(_trig_helper_vector_cos_rotations_estimate(StackTop()));
+                        StackPush(_trig_helper_vector_cos_rotations_estimate(StackTop()));
                         break;
                     case TfxBytecode.VecRotSinCos:
-                        if (bInline)
-                            StackPush($"_trig_helper_vector_sin_cos_rotations_estimate({StackTop()})");
-                        else
-                            StackPush(_trig_helper_vector_sin_cos_rotations_estimate(StackTop()));
+                        StackPush(_trig_helper_vector_sin_cos_rotations_estimate(StackTop()));
                         break;
                     case TfxBytecode.PermuteAllX:
                         StackPush($"({StackTop()}.xxxx)");
                         break;
                     case TfxBytecode.Permute:
-                        var param = ((PermuteData)op.data).fields;
-                        var permute = StackTop();
+                        byte param = ((TfxData1Byte)op.data).value;
+                        string permute = StackTop();
                         StackPush($"({permute}{TfxBytecodeOp.DecodePermuteParam(param)})");
                         break;
                     case TfxBytecode.Saturate:
                         StackPush($"(saturate({StackTop()}))");
                         break;
                     case TfxBytecode.Triangle:
-                        if (bInline)
-                            StackPush($"bytecode_op_triangle({StackTop()})");
-                        else
-                            StackPush(bytecode_op_triangle(StackTop()));
+                        StackPush(bytecode_op_triangle(StackTop()));
                         break;
                     case TfxBytecode.Jitter:
-                        if (bInline)
-                            StackPush($"bytecode_op_jitter({StackTop()})");
-                        else
-                            StackPush(bytecode_op_jitter(StackTop()));
+                        StackPush(bytecode_op_jitter(StackTop()));
                         break;
                     case TfxBytecode.Wander:
-                        if (bInline)
-                            StackPush($"bytecode_op_wander({StackTop()})");
-                        else
-                            StackPush($"{bytecode_op_wander(StackTop())}");
+                        StackPush($"{bytecode_op_wander(StackTop())}");
                         break;
                     case TfxBytecode.Rand:
-                        if (bInline)
-                            StackPush($"bytecode_op_rand({StackTop()})");
-                        else
-                            StackPush(bytecode_op_rand(StackTop()));
+                        StackPush(bytecode_op_rand(StackTop()));
                         break;
                     case TfxBytecode.RandSmooth:
-                        if (bInline)
-                            StackPush($"bytecode_op_rand_smooth({StackTop()})");
-                        else
-                            StackPush(bytecode_op_rand_smooth(StackTop()));
+                        StackPush(bytecode_op_rand_smooth(StackTop()));
                         break;
                     case TfxBytecode.TransformVec4:
-                        var TransformVec4 = StackPop(5);
+                        List<string> TransformVec4 = StackPop(5);
                         StackPush($"{mul_vec4(TransformVec4)}");
                         break;
                     case TfxBytecode.PushConstantVec4:
-                        var vec = constants[((PushConstantVec4Data)op.data).constant_index].Vec;
+                        Vector4 vec = constants[((TfxData1Byte)op.data).value].Vec;
                         StackPush($"float4{vec}");
                         break;
                     case TfxBytecode.LerpConstant:
-                        var t = StackTop();
-                        var a = constants[((LerpConstantData)op.data).constant_start].Vec;
-                        var b = constants[((LerpConstantData)op.data).constant_start + 1].Vec;
+                        string t = StackTop();
+                        Vector4 a = constants[((TfxData1Byte)op.data).value].Vec;
+                        Vector4 b = constants[((TfxData1Byte)op.data).value + 1].Vec;
 
                         StackPush($"(lerp(float4{a}, float4{b}, {t}))");
                         break;
                     case TfxBytecode.LerpConstantSaturated:
                         t = StackTop();
-                        a = constants[((LerpConstantData)op.data).constant_start].Vec;
-                        b = constants[((LerpConstantData)op.data).constant_start + 1].Vec;
+                        a = constants[((TfxData1Byte)op.data).value].Vec;
+                        b = constants[((TfxData1Byte)op.data).value + 1].Vec;
 
                         StackPush($"(saturate(lerp(float4{a}, float4{b}, {t})))");
                         break;
                     case TfxBytecode.Spline4Const:
-                        var X = StackTop();
-                        var C3 = $"float4{constants[((Spline4ConstData)op.data).constant_index].Vec}";
-                        var C2 = $"float4{constants[((Spline4ConstData)op.data).constant_index + 1].Vec}";
-                        var C1 = $"float4{constants[((Spline4ConstData)op.data).constant_index + 2].Vec}";
-                        var C0 = $"float4{constants[((Spline4ConstData)op.data).constant_index + 3].Vec}";
-                        var threshold = $"float4{constants[((Spline4ConstData)op.data).constant_index + 4].Vec}";
+                        var s4c_index = ((TfxData1Byte)op.data).value;
+                        string X = StackTop();
+                        string C3 = $"float4{constants[s4c_index].Vec}";
+                        string C2 = $"float4{constants[s4c_index + 1].Vec}";
+                        string C1 = $"float4{constants[s4c_index + 2].Vec}";
+                        string C0 = $"float4{constants[s4c_index + 3].Vec}";
+                        string threshold = $"float4{constants[s4c_index + 4].Vec}";
 
-                        if (bInline)
-                            StackPush($"bytecode_op_spline4_const({X}, {C3}, {C2}, {C1}, {C0}, {threshold})");
-                        else
-                            StackPush($"{bytecode_op_spline4_const(X, C3, C2, C1, C0, threshold)}");
+                        StackPush($"{bytecode_op_spline4_const(X, C3, C2, C1, C0, threshold)}");
                         break;
                     case TfxBytecode.Spline8Const:
-                        var s8c_X = StackTop();
-                        var s8c_C3 = $"float4{constants[((Spline8ConstData)op.data).constant_index].Vec}";
-                        var s8c_C2 = $"float4{constants[((Spline8ConstData)op.data).constant_index + 1].Vec}";
-                        var s8c_C1 = $"float4{constants[((Spline8ConstData)op.data).constant_index + 2].Vec}";
-                        var s8c_C0 = $"float4{constants[((Spline8ConstData)op.data).constant_index + 3].Vec}";
-                        var s8c_D3 = $"float4{constants[((Spline8ConstData)op.data).constant_index + 4].Vec}";
-                        var s8c_D2 = $"float4{constants[((Spline8ConstData)op.data).constant_index + 5].Vec}";
-                        var s8c_D1 = $"float4{constants[((Spline8ConstData)op.data).constant_index + 6].Vec}";
-                        var s8c_D0 = $"float4{constants[((Spline8ConstData)op.data).constant_index + 7].Vec}";
-                        var s8c_CThresholds = $"float4{constants[((Spline8ConstData)op.data).constant_index + 8].Vec}";
-                        var s8c_DThresholds = $"float4{constants[((Spline8ConstData)op.data).constant_index + 9].Vec}";
+                        var s8c_index = ((TfxData1Byte)op.data).value;
+                        string s8c_X = StackTop();
+                        string s8c_C3 = $"float4{constants[s8c_index].Vec}";
+                        string s8c_C2 = $"float4{constants[s8c_index + 1].Vec}";
+                        string s8c_C1 = $"float4{constants[s8c_index + 2].Vec}";
+                        string s8c_C0 = $"float4{constants[s8c_index + 3].Vec}";
+                        string s8c_D3 = $"float4{constants[s8c_index + 4].Vec}";
+                        string s8c_D2 = $"float4{constants[s8c_index + 5].Vec}";
+                        string s8c_D1 = $"float4{constants[s8c_index + 6].Vec}";
+                        string s8c_D0 = $"float4{constants[s8c_index + 7].Vec}";
+                        string s8c_CThresholds = $"float4{constants[s8c_index + 8].Vec}";
+                        string s8c_DThresholds = $"float4{constants[s8c_index + 9].Vec}";
 
-                        if (bInline)
-                            StackPush($"bytecode_op_spline8_const({s8c_X}, {s8c_C3}, {s8c_C2}, {s8c_C1}, {s8c_C0}, {s8c_D3}, {s8c_D2}, {s8c_D1}, {s8c_D0}, {s8c_CThresholds}, {s8c_DThresholds})");
-                        else
-                            StackPush($"{bytecode_op_spline8_const(s8c_X, s8c_C3, s8c_C2, s8c_C1, s8c_C0, s8c_D3, s8c_D2, s8c_D1, s8c_D0, s8c_CThresholds, s8c_DThresholds)}");
+                        StackPush($"{bytecode_op_spline8_const(s8c_X, s8c_C3, s8c_C2, s8c_C1, s8c_C0, s8c_D3, s8c_D2, s8c_D1, s8c_D0, s8c_CThresholds, s8c_DThresholds)}");
                         break;
                     case TfxBytecode.Spline8ConstChain:
-                        var s8cc_X = StackTop();
-                        var s8cc_Recursion = $"float4{constants[((Spline8ConstChainData)op.data).constant_index].Vec}";
-                        var s8cc_C3 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 1].Vec}";
-                        var s8cc_C2 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 2].Vec}";
-                        var s8cc_C1 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 3].Vec}";
-                        var s8cc_C0 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 4].Vec}";
-                        var s8cc_D3 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 5].Vec}";
-                        var s8cc_D2 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 6].Vec}";
-                        var s8cc_D1 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 7].Vec}";
-                        var s8cc_D0 = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 8].Vec}";
-                        var s8cc_CThresholds = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 9].Vec}";
-                        var s8cc_DThresholds = $"float4{constants[((Spline8ConstChainData)op.data).constant_index + 10].Vec}";
+                        var s8cc_index = ((TfxData1Byte)op.data).value;
+                        string s8cc_X = StackTop();
+                        string s8cc_Recursion = $"float4{constants[s8cc_index].Vec}";
+                        string s8cc_C3 = $"float4{constants[s8cc_index + 1].Vec}";
+                        string s8cc_C2 = $"float4{constants[s8cc_index + 2].Vec}";
+                        string s8cc_C1 = $"float4{constants[s8cc_index + 3].Vec}";
+                        string s8cc_C0 = $"float4{constants[s8cc_index + 4].Vec}";
+                        string s8cc_D3 = $"float4{constants[s8cc_index + 5].Vec}";
+                        string s8cc_D2 = $"float4{constants[s8cc_index + 6].Vec}";
+                        string s8cc_D1 = $"float4{constants[s8cc_index + 7].Vec}";
+                        string s8cc_D0 = $"float4{constants[s8cc_index + 8].Vec}";
+                        string s8cc_CThresholds = $"float4{constants[s8cc_index + 9].Vec}";
+                        string s8cc_DThresholds = $"float4{constants[s8cc_index + 10].Vec}";
 
-                        if (bInline)
-                            StackPush($"bytecode_op_spline8_chain_const({s8cc_X}, {s8cc_Recursion}, {s8cc_C3}, {s8cc_C2}, {s8cc_C1}, {s8cc_C0}, {s8cc_D3}, {s8cc_D2}, {s8cc_D1}, {s8cc_D0}, {s8cc_CThresholds}, {s8cc_DThresholds})");
-                        else
-                            StackPush($"{bytecode_op_spline8_chain_const(s8cc_X, s8cc_Recursion, s8cc_C3, s8cc_C2, s8cc_C1, s8cc_C0, s8cc_D3, s8cc_D2, s8cc_D1, s8cc_D0, s8cc_CThresholds, s8cc_DThresholds)}"); break;
+                        StackPush($"{bytecode_op_spline8_chain_const(s8cc_X, s8cc_Recursion, s8cc_C3, s8cc_C2, s8cc_C1, s8cc_C0, s8cc_D3, s8cc_D2, s8cc_D1, s8cc_D0, s8cc_CThresholds, s8cc_DThresholds)}"); break;
+
                     case TfxBytecode.Gradient4Const:
-                        var g4c_X = StackTop();
-                        var BaseColor = $"float4{constants[((Gradient4ConstData)op.data).constant_index].Vec}";
-                        var Cred = $"float4{constants[((Gradient4ConstData)op.data).constant_index + 1].Vec}";
-                        var Cgreen = $"float4{constants[((Gradient4ConstData)op.data).constant_index + 2].Vec}";
-                        var Cblue = $"float4{constants[((Gradient4ConstData)op.data).constant_index + 3].Vec}";
-                        var Calpha = $"float4{constants[((Gradient4ConstData)op.data).constant_index + 4].Vec}";
-                        var Cthresholds = $"float4{constants[((Gradient4ConstData)op.data).constant_index + 5].Vec}";
+                        var g4c_index = ((TfxData1Byte)op.data).value;
+                        string g4c_X = StackTop();
+                        string BaseColor = $"float4{constants[g4c_index].Vec}";
+                        string Cred = $"float4{constants[g4c_index + 1].Vec}";
+                        string Cgreen = $"float4{constants[g4c_index + 2].Vec}";
+                        string Cblue = $"float4{constants[g4c_index + 3].Vec}";
+                        string Calpha = $"float4{constants[g4c_index + 4].Vec}";
+                        string Cthresholds = $"float4{constants[g4c_index + 5].Vec}";
 
-                        if (bInline)
-                            StackPush($"bytecode_op_gradient4_const({g4c_X}, {BaseColor}, {Cred}, {Cgreen}, {Cblue}, {Calpha}, {Cthresholds})");
-                        else
-                            StackPush($"{bytecode_op_gradient4_const(g4c_X, BaseColor, Cred, Cgreen, Cblue, Calpha, Cthresholds)}");
+                        StackPush($"{bytecode_op_gradient4_const(g4c_X, BaseColor, Cred, Cgreen, Cblue, Calpha, Cthresholds)}");
                         break;
                     case TfxBytecode.Gradient8Const: // A massive unknown function with a 12 inputs, maybe this is Gradient8Const? (idk if that exists)
-                        var g8c_X1 = StackTop();
-                        var g8c_BaseColor = $"float4{constants[((Gradient8ConstData)op.data).constant_index].Vec}";
-                        var g8c_Cred = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 1].Vec}";
-                        var g8c_Cgreen = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 2].Vec}";
-                        var g8c_Cblue = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 3].Vec}";
-                        var g8c_Calpha = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 4].Vec}";
-                        var g8c_Dred = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 5].Vec}";
-                        var g8c_Dgreen = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 6].Vec}";
-                        var g8c_Dblue = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 7].Vec}";
-                        var g8c_Dalpha = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 8].Vec}";
-                        var g8c_Cthresholds = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 9].Vec}";
-                        var g8c_Dthresholds = $"float4{constants[((Gradient8ConstData)op.data).constant_index + 10].Vec}";
+                        var g8c_index = ((TfxData1Byte)op.data).value;
+                        string g8c_X1 = StackTop();
+                        string g8c_BaseColor = $"float4{constants[g8c_index].Vec}";
+                        string g8c_Cred = $"float4{constants[g8c_index + 1].Vec}";
+                        string g8c_Cgreen = $"float4{constants[g8c_index + 2].Vec}";
+                        string g8c_Cblue = $"float4{constants[g8c_index + 3].Vec}";
+                        string g8c_Calpha = $"float4{constants[g8c_index + 4].Vec}";
+                        string g8c_Dred = $"float4{constants[g8c_index + 5].Vec}";
+                        string g8c_Dgreen = $"float4{constants[g8c_index + 6].Vec}";
+                        string g8c_Dblue = $"float4{constants[g8c_index + 7].Vec}";
+                        string g8c_Dalpha = $"float4{constants[g8c_index + 8].Vec}";
+                        string g8c_Cthresholds = $"float4{constants[g8c_index + 9].Vec}";
+                        string g8c_Dthresholds = $"float4{constants[g8c_index + 10].Vec}";
 
-                        if (bInline)
-                            StackPush($"bytecode_op_gradient8_const({g8c_X1}, {g8c_BaseColor}, {g8c_Cred}, {g8c_Cgreen}, {g8c_Cblue}, {g8c_Calpha}, {g8c_Dred}, {g8c_Dgreen}, {g8c_Dblue}, {g8c_Dalpha}, {g8c_Cthresholds}, {g8c_Dthresholds})");
-                        else
-                            StackPush($"{bytecode_op_gradient8_const(g8c_X1, g8c_BaseColor, g8c_Cred, g8c_Cgreen, g8c_Cblue, g8c_Calpha, g8c_Dred, g8c_Dgreen, g8c_Dblue, g8c_Dalpha, g8c_Cthresholds, g8c_Dthresholds)}");
+                        StackPush($"{bytecode_op_gradient8_const(g8c_X1, g8c_BaseColor, g8c_Cred, g8c_Cgreen, g8c_Cblue, g8c_Calpha, g8c_Dred, g8c_Dgreen, g8c_Dblue, g8c_Dalpha, g8c_Cthresholds, g8c_Dthresholds)}");
                         break;
 
                     case TfxBytecode.PushExternInputFloat:
-                        var v = Externs.GetExternFloat(((PushExternInputFloatData)op.data).extern_, ((PushExternInputFloatData)op.data).element * 4, bInline);
+                        string v = Externs.GetExternFloat((TfxExtern)((TfxData2Byte)op.data).value, ((TfxData2Byte)op.data).value2 * 4);
                         StackPush(v);
                         break;
                     case TfxBytecode.PushExternInputVec4:
-                        var PushExternInputVec4 = Externs.GetExternVec4(((PushExternInputVec4Data)op.data).extern_, ((PushExternInputVec4Data)op.data).element * 16, bInline);
+                        string PushExternInputVec4 = Externs.GetExternVec4((TfxExtern)((TfxData2Byte)op.data).value, ((TfxData2Byte)op.data).value2 * 16);
                         StackPush(PushExternInputVec4);
                         break;
                     case TfxBytecode.PushExternInputMat4:
@@ -353,101 +311,101 @@ public class TfxBytecodeInterpreter
 
                     // Texture stuff
                     case TfxBytecode.PushTexDimensions:
-                        var ptd = ((PushTexDimensionsData)op.data);
-                        Texture tex = FileResourcer.Get().GetFile<Texture>(material.PSSamplers[ptd.index].Hash);
-                        StackPush($"float4({tex.TagData.Width}, {tex.TagData.Height}, {tex.TagData.Depth}, {tex.TagData.ArraySize}){TfxBytecodeOp.DecodePermuteParam(ptd.fields)}");
+                        var ptd = ((TfxData2Byte)op.data);
+                        Texture tex = FileResourcer.Get().GetFile<Texture>(material.PSSamplers[ptd.value].Hash);
+                        StackPush($"float4({tex.TagData.Width}, {tex.TagData.Height}, {tex.TagData.Depth}, {tex.TagData.ArraySize}){TfxBytecodeOp.DecodePermuteParam(ptd.value2)}");
                         break;
                     case TfxBytecode.PushTexTileParams:
-                        var ptt = ((PushTexTileParamsData)op.data);
-                        tex = FileResourcer.Get().GetFile<Texture>(material.PSSamplers[ptt.index].Hash);
-                        StackPush($"float4{tex.TagData.TilingScaleOffset}{TfxBytecodeOp.DecodePermuteParam(ptt.fields)}");
+                        var ptt = ((TfxData2Byte)op.data);
+                        tex = FileResourcer.Get().GetFile<Texture>(material.PSSamplers[ptt.value].Hash);
+                        StackPush($"float4{tex.TagData.TilingScaleOffset}{TfxBytecodeOp.DecodePermuteParam(ptt.value2)}");
                         break;
                     case TfxBytecode.PushTexTileCount:
-                        var pttc = ((PushTexTileCountData)op.data);
-                        tex = FileResourcer.Get().GetFile<Texture>(material.PSSamplers[pttc.index].Hash);
-                        StackPush($"float4({tex.TagData.TileCount}, {tex.TagData.ArraySize}, 0, 0){TfxBytecodeOp.DecodePermuteParam(pttc.fields)}");
+                        var pttc = ((TfxData2Byte)op.data);
+                        tex = FileResourcer.Get().GetFile<Texture>(material.PSSamplers[pttc.value].Hash);
+                        StackPush($"float4({tex.TagData.TileCount}, {tex.TagData.ArraySize}, 0, 0){TfxBytecodeOp.DecodePermuteParam(pttc.value2)}");
                         break;
                     /////
 
 
                     case TfxBytecode.PushExternInputTextureView:
                     case TfxBytecode.PushExternInputUav:
-                    case TfxBytecode.SetShaderTexture:
-                    case TfxBytecode.SetShaderSampler:
+                    case TfxBytecode.PopTextureView:
+                    case TfxBytecode.PopSamplerState:
                     case TfxBytecode.PushSampler:
                         break;
 
                     case TfxBytecode.PushFromOutput:
-                        StackPush($"{hlsl[((PushFromOutputData)op.data).element]}");
+                        StackPush($"{hlsl[((TfxData1Byte)op.data).value]}");
                         break;
 
                     case TfxBytecode.PopOutputMat4:
-                        var PopOutputMat4 = StackPop(4);
-                        var Mat4_1 = PopOutputMat4[0];
-                        var Mat4_2 = PopOutputMat4[1];
-                        var Mat4_3 = PopOutputMat4[2];
-                        var Mat4_4 = PopOutputMat4[3];
+                        var pom4_index = ((TfxData1Byte)op.data).value;
+                        List<string> PopOutputMat4 = StackPop(4);
+                        string Mat4_1 = PopOutputMat4[0];
+                        string Mat4_2 = PopOutputMat4[1];
+                        string Mat4_3 = PopOutputMat4[2];
+                        string Mat4_4 = PopOutputMat4[3];
 
-                        hlsl.TryAdd(((PopOutputMat4Data)op.data).slot, Mat4_1);
-                        hlsl.TryAdd(((PopOutputMat4Data)op.data).slot + 1, Mat4_2);
-                        hlsl.TryAdd(((PopOutputMat4Data)op.data).slot + 2, Mat4_3);
-                        hlsl.TryAdd(((PopOutputMat4Data)op.data).slot + 3, Mat4_4);
+                        hlsl.TryAdd(pom4_index, Mat4_1);
+                        hlsl.TryAdd(pom4_index + 1, Mat4_2);
+                        hlsl.TryAdd(pom4_index + 2, Mat4_3);
+                        hlsl.TryAdd(pom4_index + 3, Mat4_4);
                         Stack.Clear();
                         break;
                     case TfxBytecode.PushTemp:
-                        var PushTemp = ((PushTempData)op.data).slot;
+                        byte PushTemp = ((TfxData1Byte)op.data).value;
                         StackPush(Temp[PushTemp]);
                         break;
                     case TfxBytecode.PopTemp:
-                        var PopTemp = ((PopTempData)op.data).slot;
-                        var PopTemp_v = StackTop();
+                        byte PopTemp = ((TfxData1Byte)op.data).value;
+                        string PopTemp_v = StackTop();
                         Temp.Insert(PopTemp, PopTemp_v);
                         break;
 
 
                     // Unknown or Useless
-                    case TfxBytecode.Unk42:
-                    case TfxBytecode.Unk4c:
+                    case TfxBytecode.Unk50:
+                    case TfxBytecode.Unk5A:
                         StackPush($"float4(1,1,1,1)");
                         break;
-                    case TfxBytecode.Unk50:
+                    case TfxBytecode.Unk5E:
                         StackPush($"float4(0,0,0,0)");
                         break;
                     case TfxBytecode.Unk2c:
-                    case TfxBytecode.Unk49:
-                    case TfxBytecode.Unk51:
-                        _ = StackPop(1);
+                    case TfxBytecode.Unk57:
+                    case TfxBytecode.Unk5F:
+                        _ = StackTop();
                         break;
                     case TfxBytecode.Unk2d:
                         _ = StackPop(4);
                         break;
-                    case TfxBytecode.Unk14:
+                    case TfxBytecode.Unk17:
                         _ = StackPop(2);
                         break;
 
                     case TfxBytecode.PushGlobalChannelVector:
-                        var global_channel = GlobalChannels.Get(((PushGlobalChannelVectorData)op.data).Index);
+                        //Vector4 global_channel = GlobalChannels.GetDefault(((PushGlobalChannelVectorData)op.data).Index);
                         //StackPush($"float4{global_channel}");
-                        StackPush($"GlobalChannel{((PushGlobalChannelVectorData)op.data).Index}");
+                        StackPush($"GlobalChannel{((TfxData1Byte)op.data).value}");
                         break;
                     case TfxBytecode.PushObjectChannelVector:
                         StackPush($"float4(1, 1, 1, 1)");
                         break;
 
                     case TfxBytecode.PopOutput:
-                        if (print)
-                            Console.WriteLine($"----Output Stack Count: {Stack.Count}\n");
-
                         if (Stack.Count == 0) // Shouldnt happen
-                            hlsl.TryAdd(((PopOutputData)op.data).slot, "float4(0, 0, 0, 0)");
+                            hlsl.TryAdd(((TfxData1Byte)op.data).value, "float4(0, 0, 0, 0)");
                         else
-                            hlsl.TryAdd(((PopOutputData)op.data).slot, StackTop());
+                            hlsl.TryAdd(((TfxData1Byte)op.data).value, StackTop());
 
                         Stack.Clear(); // Does this matter?
+                        if (print)
+                            PrintedOps.AppendLine($"----Output Stack Count: {(Stack.Count != 0 ? Stack.Count + " (Should be 0, something is wrong)" : Stack.Count)}\n");
                         break;
                     default:
                         if (print)
-                            Console.WriteLine($"Not Implemented: {op.op}");
+                            PrintedOps.AppendLine($"Not Implemented: {op.op}");
                         break;
 
                 }
@@ -458,16 +416,24 @@ public class TfxBytecodeInterpreter
             Log.Error(e.Message);
         }
 
+#if DEBUG
+        if (print)
+        {
+            Console.WriteLine($"--------Evaluating Bytecode:");
+            Console.WriteLine(PrintedOps.ToString());
+        }
+#endif
+
         return hlsl;
     }
 
     private string mul_vec4(List<string> TransformVec4) //probably wrong
     {
-        var x_axis = TransformVec4[0];
-        var y_axis = TransformVec4[1];
-        var z_axis = TransformVec4[2];
-        var w_axis = TransformVec4[3];
-        var value = TransformVec4[4];
+        string x_axis = TransformVec4[0];
+        string y_axis = TransformVec4[1];
+        string z_axis = TransformVec4[2];
+        string w_axis = TransformVec4[3];
+        string value = TransformVec4[4];
 
         string res = $"({x_axis}*{value}.xxxx)";  //x_axis.mul(rhs.xxxx());
         res = $"({res}+({y_axis}*{value}.yyyy))"; //res = res.add(self.y_axis.mul(rhs.yyyy()));
@@ -760,27 +726,5 @@ public class TfxBytecodeInterpreter
     private string _trig_helper_vector_pseudo_sin_rotations_clamped(string a)
     {
         return $"({a} * (abs({a}) * -16.0 + 8.0))";
-    }
-
-    /// <summary>
-    /// Used for S&Box Only.
-    /// Determines if this bytecode should be put into the materials shader as normal HLSL,
-    /// or if it can be added to the vmat and used by the dynamic expression compilier.
-    /// S&Box can crash if the bytecode is too long and/or complex in a materials dynamic expressions, worked before so its bugged now I guess.
-    /// Gradient and Spline being the main offenders.
-    /// </summary>
-    /// <returns></returns>
-    public bool CanInlineBytecode()
-    {
-        if (Opcodes.Count > 100 ||
-            (Opcodes.Exists(x => x.op == TfxBytecode.Spline4Const) ||
-            Opcodes.Exists(x => x.op == TfxBytecode.Spline8Const) ||
-            Opcodes.Exists(x => x.op == TfxBytecode.Spline8ConstChain) ||
-            Opcodes.Exists(x => x.op == TfxBytecode.Gradient4Const) ||
-            Opcodes.Exists(x => x.op == TfxBytecode.Gradient8Const)))
-        {
-            return true;
-        }
-        return false;
     }
 }

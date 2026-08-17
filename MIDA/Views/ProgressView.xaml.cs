@@ -34,6 +34,11 @@ public partial class ProgressView : UserControl
         ProgressText.Text = GetCurrentStageName();
     }
 
+    public void SetProgressStage(string stage)
+    {
+        SetProgressStages(new List<string> { stage });
+    }
+
     public void SetProgressStages(List<string> progressStages, bool bLogProgress = true, bool bUseFullBar = false)
     {
         this.bLogProgress = bLogProgress;
@@ -42,7 +47,7 @@ public partial class ProgressView : UserControl
         {
             TotalStageCount = progressStages.Count;
             _progressStages = new Queue<string>();
-            foreach (var progressStage in progressStages)
+            foreach (string progressStage in progressStages)
             {
                 _progressStages.Enqueue(progressStage);
             }
@@ -76,7 +81,7 @@ public partial class ProgressView : UserControl
     {
         if (_progressStages.Count > 0)
         {
-            var stage = _progressStages.Peek();
+            string stage = _progressStages.Peek();
             if (bLogProgress)
                 Log.Verbose($"Starting loading stage: {stage}");
             return stage;

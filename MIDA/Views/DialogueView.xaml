@@ -14,7 +14,7 @@
                 Height="90"
                 Margin="5"
                 Click="PlayWem_OnClick"
-                Style="{StaticResource D2StyleButton}">
+                Style="{StaticResource MarathonStyleButton}">
                 <Grid Background="Transparent">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="80*" />

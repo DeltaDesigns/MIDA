@@ -1,0 +1,92 @@
+[
+    {
+        "version": "0.6.0",
+        "date": "06-10-2026",
+        "changes": [
+            {
+                "title": "Fixes",
+                "notes": [
+                    "Fixes for Season 2."
+                ]
+            }
+        ]
+    },
+    {
+        "version": "0.5.8",
+        "date": "03-31-2026",
+        "changes": [
+            {
+                "title": "Fixes",
+                "notes": [
+                    "Gear Dye Exporting: Fixed incorrect slots 2 and 3.",
+                    "Removed Static Map viewing. Marathon maps are too large/resource heavy to be viewed here.",
+                    "Fixed Narrator string in DialogueView"
+                ]
+            },
+            {
+                "title": "Additions",
+                "notes": [
+                    "Added Sound Bank viewing. Some entries are named (if the wordlist is present) though there is a chance that a name can be incorrect/inaccurate. Entries are sorted by named first then unnamed."
+                ]
+            }
+        ]
+    },
+    {
+        "version": "0.5.5",
+        "date": "03-20-2026",
+        "changes": [
+            {
+                "title": "Fixes",
+                "notes": [
+                    "Hopefully fixed a random crash when exporting cubemap textures."
+                ]
+            },
+            {
+                "title": "Exporting",
+                "notes": [
+                    "Gear View: When adding a weapon to the export list, supported attachments can now be selected to export instead of it's default attachments.",
+                    "Gear View: Stickers can now be exported, they are (usually) just a single texture or 2.",
+                    "Gear View: When exporting a weapon, a DyeColor.txt file (WIP) is created that includes the weapons dye colors to use on attachments."
+                ]
+            }
+        ]
+    },
+    {
+        "version": "0.5.0",
+        "date": "03-11-2026",
+        "changes": [
+            {
+                "title": "Fixes",
+                "notes": [
+                    "Various fixes from the Server Slam to Release."
+                ]
+            },
+            {
+                "title": "Additions",
+                "notes": [
+                    "Weapon Audio can now be viewed and exported.",
+                    "[Experimental] DX12 shaders can now be decompiled into HLSL, though its not very user friendly."
+                ]
+            },
+            {
+                "title": "Exporting",
+                "notes": [
+                    "Gear exports now include their \"UI\" model and \"World\" model.\nThese include things such as Patch Kits where the model used when you heal is an injector vs a different model in the inventory.",
+                    "Weapons will now import into Blender with their default attachments in their correct positions."
+                ]
+            }
+        ]
+    },
+    {
+        "version": "0.3.0",
+        "date": "02-24-2026",
+        "changes": [
+            {
+                "title": "Hello :)",
+                "notes": [
+                    "Welcome to the MIDA Beta, please report any issues you find in the Marathon Model Ripping Discord server!"
+                ]
+            }
+        ]
+    }
+]

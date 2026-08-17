@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Arithmic;
 using Tiger.Schema;
+using Tiger.Schema.Activity.MARATHON;
 using Tiger.Schema.Entity;
 using Tiger.Schema.Static;
 
@@ -156,4 +157,24 @@ public class TestsSubsystem : Subsystem<TestsSubsystem>
         Debug.Assert(allMeshLodData.Count > 0, "No static meshes found");
     }
 
+
+    [SchemaTest("Analyze All S8080B381")]
+    public void AnalyzeAllS8080B381()
+    {
+        Log.Info("Getting all S8080B381 Tags...");
+        var hashes = PackageResourcer.Get().GetAllHashes<S8080B381>();
+        Log.Info($"Got {hashes.Count} Hashes.");
+
+        Parallel.ForEach(hashes, hash =>
+        {
+            Tag<S8080B381> tag = FileResourcer.Get().GetSchemaTag<S8080B381>(hash);
+            using TigerReader reader = tag.GetReader();
+            reader.Seek(0x38, SeekOrigin.Begin);
+            int isZero = reader.ReadInt32();
+            if (isZero == 0)
+                return;
+
+            Log.Debug($"Tag: {hash}, {isZero}, Unk10: {tag.TagData.Unk10.GetValueRaw(tag.GetReader()).ToString("X2")}");
+        });
+    }
 }

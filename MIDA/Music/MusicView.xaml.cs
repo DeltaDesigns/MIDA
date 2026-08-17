@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
-using Arithmic;
 using Tiger;
-using Tiger.Schema.Activity.MARATHON_ALPHA;
+using Tiger.Schema.Activity.MARATHON;
 using Tiger.Schema.Audio;
 using Tiger.Schema.Entity;
 
@@ -20,22 +19,22 @@ public partial class MusicView : UserControl
     {
         if (extra is Entity entity)
         {
-            List<S40668080> sounds = new();
-            foreach (var resourceHash in entity.TagData.EntityResources.Select(entity.GetReader(), r => r.Resource))
+            List<SSequenceAudioEvent> sounds = new();
+            foreach (FileHash? resourceHash in entity.Components)
             {
-                EntityResource e = FileResourcer.Get().GetFile<EntityResource>(resourceHash);
-                if (e.TagData.Unk18.GetValue(e.GetReader()) is S519F8080 a)
+                EntityComponent e = FileResourcer.Get().GetFile<EntityComponent>(resourceHash);
+                if (e.TagData.Unk18.GetValue(e.GetReader()) is S80809F51 a)
                 {
-                    foreach (var d2ClasS6EB68080 in a.Array1)
+                    foreach (var d2ClassF1918080 in a.Array1)
                     {
-                        if (d2ClasS6EB68080.Unk10.GetValue(e.GetReader()) is S40668080 b)
+                        if (d2ClassF1918080.Unk10.GetValue(e.GetReader()) is SSequenceAudioEvent b)
                         {
                             sounds.Add(b);
                         }
                     }
-                    foreach (var d2ClasS6EB68080 in a.Array2)
+                    foreach (var d2ClassF1918080 in a.Array2)
                     {
-                        if (d2ClasS6EB68080.Unk10.GetValue(e.GetReader()) is S40668080 b)
+                        if (d2ClassF1918080.Unk10.GetValue(e.GetReader()) is SSequenceAudioEvent b)
                         {
                             sounds.Add(b);
                         }
@@ -64,39 +63,39 @@ public partial class MusicView : UserControl
         //    throw new NotImplementedException();
         //}
 
-        var resource = music.TagData.Unk28[0].Unk00.GetValue(music.GetReader());
-        if (resource is SF5458080 f5458080)
-        {
-            WemsControl.Load(f5458080);
-            EventsControl.Load(f5458080);
-            FileHash sbhash = null;
-
-            sbhash = f5458080.MusicLoopSound.TagData.Soundbank.TagData.SoundBank.Hash;
-            SoundbankHash.Text = $"Soundbank: {sbhash} / {sbhash.PackageId:X4}-{sbhash.FileIndex:X4}";
-        }
-        else if (resource is SF7458080 res)
-        {
-            WemsControl.Load(res);
-            EventsControl.Load(res);
-            if (res.AmbientMusicSet != null)
-            {
-                var sbhash = res.AmbientMusicSet.TagData.Unk08[0].MusicLoopSound.TagData.Soundbank.TagData.SoundBank.Hash;
-                SoundbankHash.Text = $"Soundbank: {sbhash} / {sbhash.PackageId:X4}-{sbhash.FileIndex:X4}";
-            }
-        }
-        else if (resource is SUnkMusicE6BF8080 rese6bf)
-        {
-            EventsControl.Load(rese6bf, music.TagData.MusicTemplateName?.Value);
-        }
-        else
-        {
-            if (resource is not SF7458080)
-            {
-                //throw new NotImplementedException();
-                Log.Error($"Music Resource F7458080 Not Implemented");
-            }
-        }
+        // TODO
+        //dynamic? resource = music.TagData.Unk28[0].Unk00.GetValue(music.GetReader());
+        //if (resource is SF5458080 f5458080)
+        //{
+        //    WemsControl.Load(f5458080);
+        //    EventsControl.Load(f5458080);
+        //    FileHash sbhash = f5458080.MusicLoopSound.TagData.Soundbank.TagData.SoundBank.Hash;
+        //    SoundbankHash.Text = $"Soundbank: {sbhash} / {sbhash.PackageId:X4}-{sbhash.FileIndex:X4}";
+        //}
+        //else if (resource is SF7458080 res)
+        //{
+        //    WemsControl.Load(res);
+        //    EventsControl.Load(res);
+        //    if (res.AmbientMusicSet != null)
+        //    {
+        //        FileHash sbhash = res.AmbientMusicSet.TagData.Unk08[0].MusicLoopSound.TagData.Soundbank.TagData.SoundBank.Hash;
+        //        SoundbankHash.Text = $"Soundbank: {sbhash} / {sbhash.PackageId:X4}-{sbhash.FileIndex:X4}";
+        //    }
+        //}
+        //else if (resource is SUnkMusicE6BF8080 rese6bf)
+        //{
+        //    EventsControl.Load(rese6bf, music.TagData.MusicTemplateName?.Value);
+        //}
+        //else
+        //{
+        //    if (resource is not SF7458080)
+        //    {
+        //        //throw new NotImplementedException();
+        //        Log.Error($"Music Resource F7458080 Not Implemented");
+        //    }
+        //}
     }
+
 
     // This is bit of a hack since music stuff isnt actually a part of TagListView so gotta jump through some hoops to
     // export fully. (At least I don't think there's a way of doing it right in TagListView?)

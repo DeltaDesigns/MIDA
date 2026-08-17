@@ -1,6 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Buffers;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -82,10 +84,10 @@ public static class Helpers
         Debug.Assert(strideBound + 4 >= offset);
     }
 
-    public static uint Fnv(string fnvString, bool le = false)
+    public static uint Fnv1a32(string fnvString, bool le = false)
     {
         uint value = 0x811c9dc5;
-        for (var i = 0; i < fnvString.Length; i++)
+        for (int i = 0; i < fnvString.Length; i++)
         {
             value *= 0x01000193;
             value ^= fnvString[i];
@@ -100,10 +102,33 @@ public static class Helpers
             return value;
     }
 
+    public static void EnsureCapacity(ref byte[] buf, int required, ArrayPool<byte> pool)
+    {
+        if (buf.Length >= required) return;
+        int newSize = buf.Length * 2;
+        while (newSize < required) newSize *= 2;
+        byte[] newBuf = pool.Rent(newSize);
+        Buffer.BlockCopy(buf, 0, newBuf, 0, buf.Length);
+        pool.Return(buf);
+        buf = newBuf;
+    }
+
     public static string SanitizeString(string input, string replacement = "_")
     {
-        var pattern = @"[^a-zA-Z0-9 ]";
-        return Regex.Replace(input, pattern, replacement).Trim();
+        if (string.IsNullOrEmpty(input))
+            return string.Empty;
+
+        string normalized = input.Normalize(NormalizationForm.FormD);
+
+        var sb = new StringBuilder(normalized.Length);
+        foreach (char c in normalized)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                sb.Append(c);
+        }
+
+        string cleaned = sb.ToString().Normalize(NormalizationForm.FormC);
+        return Regex.Replace(cleaned, @"[^a-zA-Z0-9 ]", replacement).Trim();
     }
 
     public static byte[] HexStringToByteArray(string hex)
@@ -161,21 +186,21 @@ public static class Helpers
 
     public static bool ParseHash(in string searchStr, out uint parsedHash)
     {
-        bool isValidHash = Helpers.IsValidHexHash(searchStr);
+        bool isValidHash = IsValidHexHash(searchStr);
+
         if (isValidHash &&
             (searchStr.StartsWith("80") || searchStr.StartsWith("81")) &&
             (!searchStr.EndsWith("80") && !searchStr.EndsWith("81")))
         {
-            byte[] bytes = Helpers.HexStringToByteArray(searchStr);
-            Array.Reverse(bytes);
-            parsedHash = new TigerHash(BitConverter.ToUInt32(bytes)).Hash32;
-            return true;
+            return uint.TryParse(searchStr, System.Globalization.NumberStyles.HexNumber, null, out parsedHash);
         }
         else if (isValidHash && (searchStr.EndsWith("80") || searchStr.EndsWith("81")))
         {
-            parsedHash = new TigerHash(searchStr).Hash32;
+            byte[] bytes = HexStringToByteArray(searchStr);
+            parsedHash = BitConverter.ToUInt32(bytes);
             return true;
         }
+
         parsedHash = 0;
         return false;
     }
@@ -184,6 +209,47 @@ public static class Helpers
     public static bool IsHighestLevel(this ELodCategory eLod)
     {
         return eLod == ELodCategory.Unk0 || ((byte)eLod & 1) == 1;
+    }
+
+    public static uint GetClassHashForStrategy(Type structType, TigerStrategy strategy)
+    {
+        var attrs = structType.GetCustomAttributes(inherit: false)
+            .OfType<SchemaStructAttribute>()
+            .ToList();
+
+        // Try exact match first
+        var match = attrs.FirstOrDefault(a => a.Strategy == strategy);
+        if (match != null)
+            return match.ClassID;
+
+        // If not found, try the highest lower strategy
+        // ex: if SHADOWKEEP_2999 isnt defined, use SHADOWKEEP_2601 (or RISE_OF_IRON if 2601 isnt defined either)
+        var lower = attrs
+            .Where(a => a.Strategy < strategy)
+            .OrderByDescending(a => a.Strategy)
+            .FirstOrDefault();
+
+        if (lower != null)
+            return lower.ClassID;
+
+        // Worst case, use the next higher strategy (which will probably be the wrong class hash)
+        var nextHighest = attrs
+            .Where(a => a.Strategy > strategy)
+            .OrderBy(a => a.Strategy)
+            .FirstOrDefault();
+
+        if (nextHighest != null)
+            return nextHighest.ClassID;
+
+        return TigerHash.InvalidHash32;
+    }
+
+    public static byte[] ConcatBytes(byte[] a, byte[] b)
+    {
+        byte[] result = new byte[a.Length + b.Length];
+        Buffer.BlockCopy(a, 0, result, 0, a.Length);
+        Buffer.BlockCopy(b, 0, result, a.Length, b.Length);
+        return result;
     }
 }
 
@@ -388,8 +454,8 @@ public static class EnumExtensions
 
     public static string GetEnumDescription(this Enum enumValue)
     {
-        if (Convert.ToInt32(enumValue) == -1)
-            return string.Empty;
+        //if (Convert.ToInt32(enumValue) == -1)
+        //    return string.Empty;
 
         var fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
         if (fieldInfo == null)
@@ -397,5 +463,44 @@ public static class EnumExtensions
 
         var descriptionAttributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
         return descriptionAttributes.Length > 0 ? descriptionAttributes[0].Description : enumValue.ToString();
+    }
+
+    public static MarathonItemType? GetTraitType(this MarathonTraitID enumValue)
+    {
+        var attribute = enumValue.GetAttribute<MarathonItemAttribute>();
+        return attribute?.ItemType ?? MarathonItemType.Default;
+    }
+
+    public static string GetTraitName(this MarathonTraitID enumValue)
+    {
+        var attribute = enumValue.GetAttribute<MarathonItemAttribute>();
+        // Barely any traits have actual strings and some of them are just wrong for some reason?
+        // Ex: Prestige items have their trait name as Contraband??
+        //if (attribute is null)
+        //{
+        //    var investmentTrait = Investment.Get().GetTrait(enumValue);
+        //    if (investmentTrait.HasValue && investmentTrait.Value.TraitName.Index != -1)
+        //    {
+        //        return investmentTrait?.TraitName.Value.ToString();
+        //    }
+        //}
+        return attribute?.Name ?? enumValue.ToString();
+    }
+
+    public static string GetTraitGlyph(this MarathonTraitID enumValue)
+    {
+        var attribute = enumValue.GetAttribute<MarathonItemAttribute>();
+        return attribute?.Glyph ?? "";
+    }
+
+    private static TAttribute GetAttribute<TAttribute>(this Enum enumValue) where TAttribute : Attribute
+    {
+        var memberInfo = enumValue.GetType().GetMember(enumValue.ToString());
+        if (memberInfo.Length > 0)
+        {
+            return memberInfo[0].GetCustomAttribute<TAttribute>();
+        }
+
+        return null;
     }
 }

@@ -1,3 +1,4 @@
+using Arithmic;
 using Tiger.Exporters;
 using Tiger.Schema.Entity;
 
@@ -13,11 +14,12 @@ public class SkyObjects : Tag<SMapSkyObjects>
 
     public void LoadIntoExporter(ExporterScene scene)
     {
-        var _config = ConfigSubsystem.Get();
-
         if (_tag.Entries is null)
             return;
 
+        Log.Debug($"Loading SkyObjects {Hash} into Exporter.");
+
+        var _config = ConfigSubsystem.Get();
         foreach ((int i, var element) in _tag.Entries.Select((value, index) => (index, value)))
         {
             if (element.Model.TagData.Model is null || element.Unk70 == 5)
@@ -52,17 +54,17 @@ public class SkyObjects : Tag<SMapSkyObjects>
 /// </summary>
 /// Background entities/skybox resource
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "78838080", 0x18)]
+[SchemaStruct(TigerStrategy.MARATHON, "78838080", 0x18)]
 public struct SMapSkyObjectsResource
 {
-    [SchemaField(0x10, TigerStrategy.MARATHON_ALPHA), NoLoad]
+    [SchemaField(0x10, TigerStrategy.MARATHON), NoLoad]
     public SkyObjects SkyObjects;
 }
 
 /// <summary>
 /// Background entities/skybox
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080837C", 0x60)]
+[SchemaStruct(TigerStrategy.MARATHON, "8080837C", 0x60)]
 public struct SMapSkyObjects
 {
     public long FileSize;
@@ -74,7 +76,7 @@ public struct SMapSkyObjects
     public Vector4 Unk50;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "7E838080", 0x90)]
+[SchemaStruct(TigerStrategy.MARATHON, "7E838080", 0x90)]
 public struct S7E838080
 {
     public Matrix4x4 Transform;
@@ -82,14 +84,14 @@ public struct S7E838080
     public Tag<S80808383> Model;
     public float Unk68; // Ordering?
 
-    [SchemaField(0x70, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x70, TigerStrategy.MARATHON)]
     public int Unk70; // if 5, skip the model??
 
-    [SchemaField(0x7C, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x7C, TigerStrategy.MARATHON)]
     public Tag<S8080ACD0> Complex;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080ACD0", 0x1C)]
+[SchemaStruct(TigerStrategy.MARATHON, "8080ACD0", 0x1C)]
 public struct S8080ACD0
 {
     public long FileSize;
@@ -98,7 +100,7 @@ public struct S8080ACD0
     public ResourcePointer Pointer; // 3FB18080
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "3FB18080", 0x70)]
+[SchemaStruct(TigerStrategy.MARATHON, "3FB18080", 0x70)]
 public struct S3FB18080
 {
     [SchemaField(0x10)]
@@ -106,7 +108,7 @@ public struct S3FB18080
     public DynamicArray<SInt16> Unk10;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808383", 0x10)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808383", 0x10)]
 public struct S80808383
 {
     public long FileSize;

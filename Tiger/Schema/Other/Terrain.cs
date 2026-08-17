@@ -14,6 +14,7 @@ public class Terrain : Tag<STerrain>
 
     }
 
+    // To test use edz.strike_hmyn and alleys_a adf6ae80
     public void LoadIntoExporter(ExporterScene scene, string saveDirectory, ulong? identifier = null)
     {
         var _config = ConfigSubsystem.Get();
@@ -21,14 +22,12 @@ public class Terrain : Tag<STerrain>
             saveDirectory = Path.Join(_config.GetExportSavePath(), $"Maps/Assets/");
 
         // Uses triangle strip + only using first set of vertices and indices
-        Dictionary<StaticPart, Material> parts = new Dictionary<StaticPart, Material>();
-        List<Texture> dyeMaps = new List<Texture>();
-
-        int terrainTextureIndex = 14;
+        Dictionary<StaticPart, Material> parts = new();
+        List<Texture> dyeMaps = new();
         Texture lastValidEntry = null;
         for (int i = 0; i < _tag.MeshGroups.Count; i++)
         {
-            var meshGroup = _tag.MeshGroups[i];
+            SMeshGroup meshGroup = _tag.MeshGroups[i];
             // Check if the current Dyemap is null
 
             if (meshGroup.Dyemap == null)
@@ -41,7 +40,7 @@ public class Terrain : Tag<STerrain>
                 }
                 else // Use the first valid dyemap if it gets to this point
                 {
-                    var firstValidDyemap = _tag.MeshGroups.FirstOrDefault(x => x.Dyemap != null).Dyemap;
+                    Texture firstValidDyemap = _tag.MeshGroups.FirstOrDefault(x => x.Dyemap != null).Dyemap;
                     if (firstValidDyemap != null)
                     {
                         scene.ExternalTextures.Add(firstValidDyemap);
@@ -57,14 +56,14 @@ public class Terrain : Tag<STerrain>
                 dyeMaps.Add(meshGroup.Dyemap);
             }
 
-            foreach (var partEntry in _tag.StaticParts.Where(x => x.GroupIndex == i))
+            foreach (STerrainPart partEntry in _tag.StaticParts.Where(x => x.GroupIndex == i))
             {
                 // MainGeom0 LOD0, GripStock0 LOD1, Stickers0 LOD2?
                 if (partEntry.DetailLevel == ELodCategory.Unk0)
                 {
                     if (partEntry.Material != null && partEntry.Material.Vertex.Shader != null)
                     {
-                        var part = MakePart(partEntry);
+                        StaticPart part = MakePart(partEntry);
 
                         scene.Materials.Add(new ExportMaterial(partEntry.Material, true));
                         part.Material = partEntry.Material;
@@ -73,19 +72,12 @@ public class Terrain : Tag<STerrain>
                         TransformTexcoords(part);
                         TransformVertexColors(part);
 
-                        if (_config.GetS2ShaderExportEnabled())
-                            Source2Handler.SaveVMAT($"{saveDirectory}", $"{part.Material.Hash}", part.Material, dyeMaps);
-
                         parts.TryAdd(part, partEntry.Material);
                     }
                 }
             }
 
             scene.AddTerrain($"{Hash}", parts.Keys.ToList(), identifier, i);
-
-            if (_config.GetS2VMDLExportEnabled())
-                Source2Handler.SaveTerrainVMDL($"{Hash}_{i}", saveDirectory, parts.Keys.ToList());
-
             parts.Clear();
         }
 
@@ -104,7 +96,7 @@ public class Terrain : Tag<STerrain>
         part.VertexLayoutIndex = 22;
 
         // Get unique vertex indices we need to get data for
-        HashSet<uint> uniqueVertexIndices = new HashSet<uint>();
+        HashSet<uint> uniqueVertexIndices = new();
         foreach (UIntVector3 index in part.Indices)
         {
             uniqueVertexIndices.Add(index.X);
@@ -143,14 +135,14 @@ public class Terrain : Tag<STerrain>
             r0.W = 0.000122070313f * r0.Z;
 
             //r1.xyz = float3(0,1,0) * v1.yzx;
-            r1.X = 0 * v1.Y;
-            r1.Y = 1 * v1.Z;
-            r1.Z = 0 * v1.X;
+            r1.X = 0f * v1.Y;
+            r1.Y = 1f * v1.Z;
+            r1.Z = 0f * v1.X;
 
             //r1.xyz = v1.zxy * float3(0,0,1) + -r1.xyz;
-            r1.X = v1.Z * 0 + -r1.X;
-            r1.Y = v1.X * 0 + -r1.Y;
-            r1.Z = v1.Y * 1 + -r1.Z;
+            r1.X = v1.Z * 0f + -r1.X;
+            r1.Y = v1.X * 0f + -r1.Y;
+            r1.Z = v1.Y * 1f + -r1.Z;
 
             //r0.z = dot(r1.yz, r1.yz);
             r0.Z = System.Numerics.Vector2.Dot(new(r1.Y, r1.Z), new(r1.Y, r1.Z));
@@ -178,7 +170,12 @@ public class Terrain : Tag<STerrain>
             r0.Z = System.Numerics.Vector3.Dot(new(r2.X, r2.Y, r2.Z), new(r2.X, r2.Y, r2.Z));
             r0.Z = MathF.ReciprocalSqrtEstimate(r0.Z);
 
-            part.VertexPositions[i] = new Vector4(r0.X, r0.Y, r0.Z * r0.W, r0.W);
+            r1 = new System.Numerics.Vector4(0, 1, 0, 0) * r0.Y;
+            r1 = new System.Numerics.Vector4(1, 0, 0, 0) * r0.X + r1;
+            r0 = new System.Numerics.Vector4(0, 0, 1, 0) * r0.W + r1;
+            r0 = new System.Numerics.Vector4(0, 0, 0, 1) + r0;
+
+            part.VertexPositions[i] = new Vector4(r0.X, r0.Y, r0.Z, r0.W);
         }
     }
 
@@ -195,6 +192,7 @@ public class Terrain : Tag<STerrain>
     public void TransformVertexColors(StaticPart part)
     {
         //Helper for dyemap assignment
+        //ROI and Pre-BL can have a max of 16 per terrain part
         float alpha = part.GroupIndex / 15.0f;
         for (int i = 0; i < part.VertexPositions.Count; i++)
         {
@@ -206,7 +204,7 @@ public class Terrain : Tag<STerrain>
 /// <summary>
 /// Terrain data resource.
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808563", 0x20)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808563", 0x20)]
 public struct SMapTerrainResource
 {
     [SchemaField(0x10)]
@@ -219,7 +217,7 @@ public struct SMapTerrainResource
 /// <summary>
 /// Terrain _tag.
 /// </summary>
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "80808567", 0xB0)]
+[SchemaStruct(TigerStrategy.MARATHON, "80808567", 0xB0)]
 public struct STerrain
 {
     public long FileSize;
@@ -228,7 +226,7 @@ public struct STerrain
     public Vector4 Unk20;
     public Vector4 Unk30;
 
-    [SchemaField(0x50, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x50, TigerStrategy.MARATHON)]
     public DynamicArray<SMeshGroup> MeshGroups;
 
     public VertexBuffer Vertices1;
@@ -237,14 +235,14 @@ public struct STerrain
     public Material Unk6C;
     public Material Unk70;
 
-    [SchemaField(0x78, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x78, TigerStrategy.MARATHON)]
     public DynamicArray<STerrainPart> StaticParts;
     public VertexBuffer Vertices3;
     public VertexBuffer Vertices4;
     public IndexBuffer Indices2;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080856C", 0x60)]
+[SchemaStruct(TigerStrategy.MARATHON, "8080856C", 0x60)]
 public struct SMeshGroup
 {
     //Location?
@@ -260,11 +258,11 @@ public struct SMeshGroup
     public uint Unk48;
     public uint Unk4C;
 
-    [SchemaField(0x50, TigerStrategy.MARATHON_ALPHA)]
+    [SchemaField(0x50, TigerStrategy.MARATHON)]
     public Texture Dyemap;
 }
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "8080856A", 0x0C)]
+[SchemaStruct(TigerStrategy.MARATHON, "8080856A", 0x0C)]
 public struct STerrainPart
 {
     public Material Material;

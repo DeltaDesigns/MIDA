@@ -123,7 +123,7 @@ public struct DyeInfo
 }
 
 
-[SchemaStruct(TigerStrategy.MARATHON_ALPHA, "BA6D8080", 0x378)]
+[SchemaStruct(TigerStrategy.MARATHON, "BA6D8080", 0x378)]
 public struct SScope
 {
     public long FileSize;
@@ -134,7 +134,7 @@ public struct SScope
     public DynamicArray<STextureTag> Textures;
     public TigerHash Unk58;
     public TigerHash Unk5C;
-    public DynamicArray<SUint8> Bytecode;
+    public DynamicArray<SUInt8> Bytecode;
     public DynamicArray<Vec4> BytecodeConstants;
 
     [SchemaField(0x90)]

@@ -1,43 +1,40 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Tiger;
 using Tiger.Schema.Investment;
-using static MIDA.APIItemView;
 
 namespace MIDA;
 
 public partial class MainMenuView : UserControl
 {
     private static MainWindow _mainWindow = null;
-    private APITooltip ToolTip;
 
-    public MainMenuView() // TODO buttons
+    public MainMenuView()
     {
         InitializeComponent();
 
         ApiButton.IsEnabled = true;
         BagsButton.IsEnabled = false;
-        WeaponAudioButton.IsEnabled = false;
+        WeaponAudioButton.IsEnabled = true;
         StaticsButton.IsEnabled = true;
-        CollectionsButton.IsEnabled = false;
 
         Strategy.OnStrategyChangedEvent += delegate (StrategyEventArgs args)
         {
             Dispatcher.Invoke(() =>
             {
                 ApiButton.IsEnabled = true;
-                BagsButton.IsEnabled = false;
-                WeaponAudioButton.IsEnabled = false;
+                BagsButton.IsEnabled = false; // TODO?
+                WeaponAudioButton.IsEnabled = true;
                 StaticsButton.IsEnabled = true;
-                CollectionsButton.IsEnabled = false;
             });
         };
     }
@@ -48,50 +45,21 @@ public partial class MainMenuView : UserControl
         GameVersion.Text = $"Game Version: {_mainWindow.GameInfo?.FileVersion}";
         //MouseMove += UserControl_MouseMove; // I like the effect but Marathon doesnt use this
 
-        ToolTip = new();
-        Panel.SetZIndex(ToolTip, 50);
-        MainContainer.Children.Add(ToolTip);
         SetupTimer();
-    }
 
-    private void CategoryButton_MouseEnter(object sender, MouseEventArgs e)
-    {
-        ToolTip.ActiveItem = (sender as Button);
-        string[] text = (sender as Button).Tag.ToString().Split(":");
-
-        PlugItem plugItem = new()
+        if (Random.Shared.Next(0, 420) == 67) // haha im so funny. kill me.
         {
-            Name = $"{text[0]}",
-            Description = $"{text[1]}",
-            PlugRarityColor = MarathonTierType.Superior.GetColor(),
-        };
-
-        ToolTip.MakeTooltip(plugItem);
-    }
-
-    public void CategoryButton_MouseLeave(object sender, MouseEventArgs e)
-    {
-        ToolTip.ClearTooltip();
-        ToolTip.ActiveItem = null;
+            funnyeasteregg();
+        }
     }
 
     private async void ApiViewButton_OnClick(object sender, RoutedEventArgs e)
     {
         await LoadInvestment();
 
-        APIView apiView = new APIView();
+        GearView apiView = new GearView();
         apiView.LoadContent();
-        _mainWindow.MakeNewTab("api", apiView);
-        _mainWindow.SetNewestTabSelected();
-    }
-
-    private async void CollectionsViewButton_OnClick(object sender, RoutedEventArgs e)
-    {
-        await LoadInvestment();
-
-        CollectionsView apiView2 = new CollectionsView();
-        apiView2.LoadContent();
-        _mainWindow.MakeNewTab("Collections", apiView2);
+        _mainWindow.MakeNewTab("GEAR", apiView);
         _mainWindow.SetNewestTabSelected();
     }
 
@@ -103,11 +71,11 @@ public partial class MainMenuView : UserControl
         _mainWindow.SetNewestTabSelected();
     }
 
-    private void AllEntitiesViewButton_OnClick(object sender, RoutedEventArgs e)
+    private void AllEntitiesView2Button_OnClick(object sender, RoutedEventArgs e)
     {
-        TagListViewerView tagListView = new TagListViewerView();
-        tagListView.LoadContent(ETagListType.EntityList);
-        _mainWindow.MakeNewTab("dynamics", tagListView);
+        EntityListView entityListView = new();
+        entityListView.LoadContent();
+        _mainWindow.MakeNewTab("Entities", entityListView);
         _mainWindow.SetNewestTabSelected();
     }
 
@@ -115,15 +83,15 @@ public partial class MainMenuView : UserControl
     {
         TagListViewerView tagListView = new TagListViewerView();
         tagListView.LoadContent(ETagListType.ActivityList);
-        _mainWindow.MakeNewTab("activities", tagListView);
+        _mainWindow.MakeNewTab("Activities", tagListView);
         _mainWindow.SetNewestTabSelected();
     }
 
     private void AllStaticsViewButton_OnClick(object sender, RoutedEventArgs e)
     {
-        TagListViewerView tagListView = new TagListViewerView();
-        tagListView.LoadContent(ETagListType.StaticsList);
-        _mainWindow.MakeNewTab("statics", tagListView);
+        StaticListView statics = new StaticListView();
+        statics.LoadContent();
+        _mainWindow.MakeNewTab("Statics", statics);
         _mainWindow.SetNewestTabSelected();
     }
 
@@ -131,49 +99,33 @@ public partial class MainMenuView : UserControl
     {
         await LoadInvestment();
 
-        TagListViewerView tagListView = new TagListViewerView();
-        tagListView.LoadContent(ETagListType.WeaponAudioGroupList);
-        _mainWindow.MakeNewTab("weapon audio", tagListView);
+        WeaponAudioListView weaponAudio = new();
+        weaponAudio.LoadContent();
+        _mainWindow.MakeNewTab("Weapon Audio", weaponAudio);
         _mainWindow.SetNewestTabSelected();
     }
 
     private void AllAudioViewButton_OnClick(object sender, RoutedEventArgs e)
     {
-        TagListViewerView tagListView = new TagListViewerView();
-        tagListView.LoadContent(ETagListType.SoundsPackagesList);
-        _mainWindow.MakeNewTab("sounds", tagListView);
+        AudioListView audioListView = new();
+        audioListView.LoadContent();
+        _mainWindow.MakeNewTab("Sounds", audioListView);
         _mainWindow.SetNewestTabSelected();
     }
 
     private void AllBKHDViewButton_OnClick(object sender, RoutedEventArgs e)
     {
-        TagListViewerView tagListView = new TagListViewerView();
-        tagListView.LoadContent(ETagListType.BKHDGroupList);
-        _mainWindow.MakeNewTab("sound banks", tagListView);
+        AudioListView audioListView = new(AudioListView.AudioListViewType.SoundBanks);
+        audioListView.LoadContent();
+        _mainWindow.MakeNewTab("Sound Banks", audioListView);
         _mainWindow.SetNewestTabSelected();
     }
-
-    private void AllStringsViewButton_OnClick(object sender, RoutedEventArgs e)
-    {
-        TagListViewerView tagListView = new TagListViewerView();
-        tagListView.LoadContent(ETagListType.StringContainersList);
-        _mainWindow.MakeNewTab("strings", tagListView);
-        _mainWindow.SetNewestTabSelected();
-    }
-
-    //private void AllTexturesViewButton_OnClick(object sender, RoutedEventArgs e)
-    //{
-    //    TagListViewerView tagListView = new TagListViewerView();
-    //    tagListView.LoadContent(ETagListType.TextureList);
-    //    _mainWindow.MakeNewTab("textures", tagListView);
-    //    _mainWindow.SetNewestTabSelected();
-    //}
 
     private void AllTexturesView2Button_OnClick(object sender, RoutedEventArgs e)
     {
         TextureListView textureListView = new TextureListView();
         textureListView.LoadContent();
-        _mainWindow.MakeNewTab("textures", textureListView);
+        _mainWindow.MakeNewTab("Textures", textureListView);
         _mainWindow.SetNewestTabSelected();
     }
 
@@ -181,7 +133,7 @@ public partial class MainMenuView : UserControl
     {
         TagListViewerView tagListView = new TagListViewerView();
         tagListView.LoadContent(ETagListType.MaterialList);
-        _mainWindow.MakeNewTab("materials", tagListView);
+        _mainWindow.MakeNewTab("Materials", tagListView);
         _mainWindow.SetNewestTabSelected();
     }
 
@@ -210,44 +162,65 @@ public partial class MainMenuView : UserControl
         PopupBanner about = new()
         {
             DarkenBackground = true,
-            Icon = $"{Char.ConvertFromUtf32(0xEE3F)[0]}",
-            //about.IconImage = MainWindow.GetBitmapSource(System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location));
+            Icon = "",
             Title = $"MIDA {App.CurrentVersion.Id}",
-            Subtitle = "MIDA is a fork of Charm designed soley for Marathon",
+            Subtitle = "Marathon Information and Data Assistant",
             Description =
-            "MIDA was developed for 3D artists, to preserve content as much as possible, and for learning how the Tiger engine works in general!\n\n" +
-            "Additional help/development from:\n" +
-            "• nblock\n" +
-            "• Cohae\n",
+            "MIDA is a fork of Charm designed for Marathon.\n" +
+            "MIDA was developed for 3D artists, nerds, to preserve content as much as possible, and for learning how the Tiger engine works in general!\n\n" +
+            "By using MIDA, you agree to not use it to spread leaks/spoilers or anything that may break Bungie's TOS.",
             Style = PopupBanner.PopupStyle.Information
         };
         about.Show();
     }
 
-    private static Random random = new Random();
-    private static Timer timer;
-    private void SetupTimer()
+    private void ChangelogButton_OnClick(object sender, RoutedEventArgs e)
     {
-        if (timer is not null)
+        if (!File.Exists($"./Changelog.json"))
         {
-            timer?.Stop();
-            timer?.Dispose();
-            timer = null;
+            NotificationBanner noChangelog = new()
+            {
+                Icon = "⚠️",
+                Title = "CHANGELOG NOT FOUND",
+                Description = "Changelog.json not found in the MIDA root folder.",
+                Style = NotificationBanner.PopupStyle.Warning
+            };
+            noChangelog.Show();
+            return;
         }
 
-        timer = new Timer(1500); // 5 seconds
-        timer.Elapsed += OnTimerElapsed;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        Changelog changelog = new();
+        MainWindow.Current.ViewboxGrid.Children.Add(changelog);
+        changelog.Load();
     }
 
-    private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+    private DispatcherTimer uiTimer;
+    private void SetupTimer()
     {
-        int randomLength = random.Next(8, 17);
-        Dispatcher.Invoke(() =>
+        uiTimer?.Stop();
+        uiTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1500) };
+        uiTimer.Tick += (s, e) =>
         {
-            Symbols.Text = GenerateRandomHexString(randomLength);
-        });
+            int len = Random.Shared.Next(8, 16);
+            Symbols.Text = GenerateRandomString(len);
+        };
+        uiTimer.Start();
+    }
+
+    private static string GenerateRandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder(length * 2);
+
+        for (int i = 0; i < length; i++)
+        {
+            char c = chars[Random.Shared.Next(chars.Length)];
+            sb.Append(c);
+            if (i < length - 1)
+                sb.Append(' ');
+        }
+
+        return sb.ToString();
     }
 
     private static string GenerateRandomHexString(int length)
@@ -256,12 +229,35 @@ public partial class MainMenuView : UserControl
 
         for (int i = 0; i < length; i++)
         {
-            int value = random.Next(0, 16);
+            int value = Random.Shared.Next(0, 16);
             sb.Append(value.ToString("X"));
             if (i < length - 1)
                 sb.Append(' ');
         }
 
         return sb.ToString();
+    }
+
+    private void funnyeasteregg()
+    {
+        var bitmapImage = new BitmapImage();
+        bitmapImage.BeginInit();
+        bitmapImage.UriSource = new Uri("https://images.contentstack.io/v3/assets/blt15f7b5c0d43ed112/blt0656353348a074b8/69806a3998d6ebf4e5ca3676/marathon.bungie.character.png"); ;
+        bitmapImage.EndInit();
+
+        PopupBanner about = new()
+        {
+            DarkenBackground = true,
+            //Icon = "",
+            IconImage = bitmapImage,
+            Title = $"ATTENTION RUNNAH",
+            Subtitle = "MIDA NEEDS YOU.",
+            Description =
+            "WRITE \"uesc sux\" ON 5 WALLS\n\n" +
+            "WITH A PERMANENT MARKA\n\n" +
+            "(in a single run)",
+            Style = PopupBanner.PopupStyle.Warning
+        };
+        about.Show();
     }
 }

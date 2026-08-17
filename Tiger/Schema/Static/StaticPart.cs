@@ -71,8 +71,9 @@ public class StaticPart : MeshPart
 
     private void TransformData(SStaticMesh container)
     {
-
-        var t = (container.StaticData as MARATHON_ALPHA.StaticMeshData).TagData;
+        var t = (container.StaticData as MARATHON.StaticMeshData).TagData;
+        VertexScale = new(t.ModelTransform.W);
+        VertexOffset = t.ModelTransform.ToVec3();
         TransformPositions(t.ModelTransform);
         TransformUVs(new Vector2(t.TexcoordScale, t.TexcoordScale), t.TexcoordTranslation);
 
