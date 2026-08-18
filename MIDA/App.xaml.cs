@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Xml;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -16,12 +15,7 @@ namespace MIDA;
 /// </summary>
 public partial class App : Application
 {
-    public static ApplicationVersion CurrentVersion = new("0.6.2");
-
-    static App()
-    {
-        AppDomain.CurrentDomain.AssemblyResolve += OnResolve;
-    }
+    public static ApplicationVersion CurrentVersion = new("0.6.3");
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -71,29 +65,6 @@ public partial class App : Application
             }
         }
         return false;
-    }
-
-    private static Assembly OnResolve(object sender, ResolveEventArgs args)
-    {
-        var name = new AssemblyName(args.Name).Name + ".dll";
-
-        var resourceName = Array.Find(
-            Assembly.GetExecutingAssembly().GetManifestResourceNames(),
-            r => r.EndsWith(name));
-
-        if (resourceName == null)
-            return null;
-
-        using var stream = Assembly.GetExecutingAssembly()
-            .GetManifestResourceStream(resourceName);
-
-        if (stream == null)
-            return null;
-
-        using var ms = new MemoryStream();
-        stream.CopyTo(ms);
-
-        return Assembly.Load(ms.ToArray());
     }
 }
 
