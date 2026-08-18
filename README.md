@@ -1,4 +1,9 @@
-# <img width="32" height="32" src="https://github.com/user-attachments/assets/694c5305-5e82-42d1-b341-862d5908bf1b" /> MIDA - the Marathon tool that does ~~(almost) everything~~ things.
+# <img width="32" height="32" src="https://github.com/user-attachments/assets/694c5305-5e82-42d1-b341-862d5908bf1b" /> MIDA - the Marathon tool that does things.
+
+> [!CAUTION]
+> I no longer have plans for this program besides fixing possible breaking changes caused by game updates, though they wont be immediate.
+> While I do enjoy learning about the Tiger engine, Marathon no longer has any interest to me.
+> Anyone is free to update and make pull requests AS LONG as no AI is used in development. I will not accept any slop.
 
 ## What is this?
 
@@ -7,7 +12,7 @@
 
 > [!WARNING]
 > * MIDA is still WIP, expect issues/bugs/crashes.
-> * For developers: *A lot* of the schema structs are leftover from Charm for Destiny. Some parts of the code are probably also obsolete as certain things are no longer required for Marathon. I will clean these things up at some point.
+> * For developers: *A lot* of the schema structs are leftover from Charm for Destiny. Some parts of the code are probably also obsolete as certain things are no longer required for Marathon.
 
 > [!CAUTION]
 > # Disclaimer
@@ -47,4 +52,4 @@ It would help greatly if you provide the latest crash log (`/Logs` folder) and s
 
 ## License
 The MIDA source code is licensed under GPLv3. All other used code and DLLs are subject to their own licenses.
-Just don't misuse the code. Respect developers.
+Just don't misuse the code. Respect developers. Please DO NOT use AI/LLMs for pull requests/issues/development on this repository and subsequent fork. It hurts to see anyones hard work be reduced down to slop.
